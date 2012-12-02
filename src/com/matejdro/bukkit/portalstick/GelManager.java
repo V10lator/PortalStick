@@ -150,7 +150,7 @@ public class GelManager {
 		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new V10Location(loc));
 		
 		ignore.add(entity);
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 10L);
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 5L);
 	}
 	
 	private boolean redGel(Entity entity, Block under, Region region)
