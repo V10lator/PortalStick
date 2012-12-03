@@ -714,7 +714,7 @@ public class PortalStickBlockListener implements Listener
 		 
 		 Block block = event.getRetractLocation().getBlock();
 		 if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
-			  return;
+		  return;
 		 
 		 fakeBBE = true;
 		 BlockBreakEvent bbe = new BlockBreakEvent(block, null);
@@ -740,8 +740,8 @@ public class PortalStickBlockListener implements Listener
 		 
 		 if(!region.getBoolean(RegionSetting.ENABLE_PISTON_BLOCK_TELEPORT))
 			 return;
-
-		 V10Location loc = new V10Location(event.getRetractLocation());
+		 
+		 V10Location loc = new V10Location(block);
 		 Portal portal = plugin.portalManager.insideBlocks.get(loc);
 		 
 		 if (portal != null)
