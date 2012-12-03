@@ -551,6 +551,14 @@ public class PortalManager {
 		}
 		
 		portalc.vertical = portalFace == BlockFace.UP || portalFace == BlockFace.DOWN;
+		
+		if(!portalc.vertical) //TODO: Lazy workaround...
+		{
+		  V10Location tmp = portalc.inside[0];
+		  portalc.inside[0] = portalc.inside[1];
+		  portalc.inside[1] = tmp;
+		}
+		
 		portalc.block = portalc.inside[0];
 		
 		if (oldPortal != null)
