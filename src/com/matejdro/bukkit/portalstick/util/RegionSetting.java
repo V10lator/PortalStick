@@ -4,7 +4,8 @@ import java.util.Arrays;
 
 public enum RegionSetting {
 	
-	ENABLE_PORTALS("enable-portals", true, true),
+	ENABLE_BLUE_PORTALS("enable-blue-portals", true, true),
+	ENABLE_ORANGE_PORTALS("enable-orange-portals", true, true),
 	TELEPORT_VEHICLES("teleport-vehicles", true, true),
 	TELEPORT_LIQUIDS("teleport-liquids", true, true),
 	INFINITE_DISPENSERS("infinite-dispensers", true, true),
@@ -39,10 +40,6 @@ public enum RegionSetting {
 	BLUE_GEL_BLOCK("blue-gel-block", "35:3", true),
 	RED_GEL_BLOCK("red-gel-block", "35:1", true),
 	GEL_TUBE("gel-tube", true, true),
-//	BLUE_GEL_VERTICAL_VELOCITY_MULTIPLIER("blue-gel-horizontal-velocity-multiplier", 1.5),
-//	BLUE_GEL_HORIZONTAL_VELOCITY_MULTIPLIER("blue-gel-horizontal-velocity-multiplier", 1.5),
-//	BLUE_GEL_VERTICAL_BOUNCE_VELOCITY("blue-gel-vertical-bounce-velocity", 1.0),
-//	BLUE_GEL_HORIZONTAL_BOUNCE_VELOCITY("blue-gel-horizontal-bounce-velocity", 1.0),
 	BLUE_GEL_MIN_VELOCITY("blue-gel-min-velocity", 1.0, true),
 	RED_GEL_VELOCITY_MULTIPLIER("red-gel-velocity-multiplier", 1.15, true),
 	RED_GEL_MAX_VELOCITY("red-gel-max-velocity", 0.7, true),

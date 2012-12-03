@@ -305,13 +305,9 @@ public class PortalManager {
 		Region region = plugin.regionManager.getRegion(block);
 		if (region.getBoolean(RegionSetting.CHECK_WORLDGUARD) && plugin.worldGuard != null && !plugin.worldGuard.canBuild(player, loc))
 			return false;
-		if (!region.getBoolean(RegionSetting.ENABLE_PORTALS) || !plugin.hasPermission(player, plugin.PERM_PLACE_PORTAL))
-			return false;
 		
 		boolean vertical = false;
-		
 		PortalCoord portalc;
-		
 		User owner = plugin.userManager.getUser(player);
 		
 		if (face == BlockFace.DOWN || face == BlockFace.UP)

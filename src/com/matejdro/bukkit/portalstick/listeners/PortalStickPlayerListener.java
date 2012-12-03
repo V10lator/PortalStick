@@ -66,11 +66,20 @@ public class PortalStickPlayerListener implements Listener {
 			
 			if (region.getBoolean(RegionSetting.CHECK_WORLDGUARD) && plugin.worldGuard != null && !plugin.worldGuard.canBuild(player, player.getLocation().getBlock()))
 				return;
-			if (!region.getBoolean(RegionSetting.ENABLE_PORTALS) || !plugin.hasPermission(player, plugin.PERM_PLACE_PORTAL))
+			if (!plugin.hasPermission(player, plugin.PERM_PLACE_PORTAL))
 				return;
-		
+			
+			boolean orange;
+			if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
+			  orange = true;
+			else
+			  orange = false;
+			
+			if((orange && !region.getBoolean(RegionSetting.ENABLE_BLUE_PORTALS)) || !orange && !region.getBoolean(RegionSetting.ENABLE_ORANGE_PORTALS))
+			  return;
+			
 			List<Block> targetBlocks = event.getPlayer().getLineOfSight(tb, 120);
-			if (targetBlocks.size() < 1 || !region.getBoolean(RegionSetting.ENABLE_PORTALS))
+			if (targetBlocks.size() < 1)
 				return;
 			
 			V10Location loc;
@@ -112,9 +121,6 @@ public class PortalStickPlayerListener implements Listener {
 				}
 			}
 			
-			boolean orange = false;
-			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-				orange = true;
 			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR || tb.contains((byte) event.getClickedBlock().getTypeId()))
 			{
 				Block b = targetBlocks.get(targetBlocks.size() - 1);
