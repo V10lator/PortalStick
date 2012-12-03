@@ -102,14 +102,13 @@ public class GelManager {
 	private void blueGel(final Entity entity, Region region, byte dir, Vector vector, double min)
 	{
 //		Vector vector = player.getVelocity(); //We need a self-calculated vector from the player move event as this has 0.0 everywhere.
-//		vector.multiply(region.getDouble(RegionSetting.BLUE_GEL_VELOCITY_MULTIPLIER));
 		Location loc = entity.getLocation();
 		double y = vector.getY();
 		if(dir == 0)
 		{
 		  y = -y;
 		  if(entity instanceof Player && onRedGel.containsKey(((Player)entity).getName()) && y < min)
-			y = -min;
+			y = min;
 		  else if(y < 0.1D)
 			return;
 		  if(y < min)
