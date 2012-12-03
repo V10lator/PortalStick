@@ -99,8 +99,6 @@ public class Portal {
 		  plugin.portalManager.awayBlocksY.remove(awayBlocksY[1]);
 		}
 		
-		Portal oldDestination = getDestination();
-		
 		if (orange)
 			owner.orangePortal = null;
 		else
@@ -111,9 +109,14 @@ public class Portal {
 		plugin.portalManager.portals.remove(this);
 		plugin.regionManager.getRegion(centerBlock).portals.remove(this);	
 		
-    	plugin.regionManager.getRegion(centerBlock).portalDeleted(this, oldDestination);
-		if (oldDestination != null && oldDestination.getDestination() == null) oldDestination.close();
-
+		plugin.regionManager.getRegion(centerBlock).portalDeleted(this);
+		
+/*		Portal oldDestination = getDestination();
+		if(oldDestination != null)
+		{
+//		  if (oldDestination.getDestination() == null) oldDestination.close(); TODO: Shouldn't be needed...
+		}
+*/
    	}
 	
 	public void open()
@@ -280,14 +283,11 @@ public class Portal {
     	}
     	
     	if (getDestination() == null)
-    	{
     		close();
-    	}
-    		
     	else
     	{
     		open();
-    		getDestination().open();
+    		getDestination().open(); //TODO: I think we double-open portals now. Need research where the other open is...
     	}
     	
     	

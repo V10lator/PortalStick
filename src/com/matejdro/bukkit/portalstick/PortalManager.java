@@ -558,14 +558,22 @@ public class PortalManager {
 		
 		if (portalc.border.size() == 0 || portalc.inside[0] == null)
 		  return;
+		
+		ArrayList<Portal> oldPortals = new ArrayList<Portal>();
 		for (V10Location tb : portalc.border)
 		{
-			oldPortal = borderBlocks.get(tb);
-			if (oldPortal != null)
-				oldPortal.delete();
+			if(borderBlocks.containsKey(tb))
+			  oldPortal = borderBlocks.get(tb);
+			else if(insideBlocks.containsKey(tb))
+			  oldPortal = insideBlocks.get(tb);
+			else
+			  oldPortal = null;
 			
-			if ((!region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL) && !region.getList(RegionSetting.PORTAL_BLOCKS).contains(tb.getHandle().getBlock().getTypeId())) || borderBlocks.containsKey(tb) || insideBlocks.containsKey(tb)) return;
-
+			if(oldPortal != null && !oldPortals.contains(oldPortal))
+			  oldPortals.add(oldPortal);
+			
+			if(oldPortal == null && !region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL) && !region.getList(RegionSetting.PORTAL_BLOCKS).contains(tb.getHandle().getBlock().getTypeId()))
+			  return;
 		}
 		for (V10Location tb : portalc.inside)
 		{
@@ -575,9 +583,23 @@ public class PortalManager {
 				if (oldPortal != null)
 					oldPortal.delete();
 				
-				if ((!region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL) && !region.getList(RegionSetting.PORTAL_BLOCKS).contains(tb.getHandle().getBlock().getTypeId())) || borderBlocks.containsKey(tb) || insideBlocks.containsKey(tb)) return;
+				if(borderBlocks.containsKey(tb))
+				  oldPortal = borderBlocks.get(tb);
+				else if(insideBlocks.containsKey(tb))
+				  oldPortal = insideBlocks.get(tb);
+				else
+				  oldPortal = null;
+				
+				if(oldPortal != null && !oldPortals.contains(oldPortal))
+				  oldPortals.add(oldPortal);
+				
+				if(oldPortal == null && !region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL) && !region.getList(RegionSetting.PORTAL_BLOCKS).contains(tb.getHandle().getBlock().getTypeId()))
+				  return;
 			}
 		}
+		
+		for(Portal old: oldPortals)
+		  old.delete();
 		
 		if (portalc.vertical)
 		  portalc.destLoc[0] = new V10Location(portalc.inside[0].getHandle().getBlock().getRelative(portalFace.getOppositeFace()));

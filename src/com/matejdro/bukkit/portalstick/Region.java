@@ -50,14 +50,14 @@ public class Region extends User
 	}
 	
 	public void setLocation(V10Location one, V10Location two) {
-		settings.remove(RegionSetting.LOCATION);
+//		settings.remove(RegionSetting.LOCATION); //TODO: We overwrite, so this shouldn't be needed.
 		Location a = one.getHandle();
 		settings.put(RegionSetting.LOCATION, a.getWorld().getName() + ":" + a.toVector().toString() + ":" + two.getHandle().toVector().toString());
 		updateLocation();
 	}
 	
 	//Called when any portal in this region is deleted
-	public void portalDeleted(Portal portal, Portal previousDestination)
+	public void portalDeleted(Portal portal)
 	{
 		//We lost orange destination. Lets find new one.
 		if (portal == orangeDestination)
@@ -65,9 +65,9 @@ public class Region extends User
 			orangeDestination = null;
 			if (orangePortal != null)
 			{
-				for (Portal p  : portals)
+				for (Portal p: portals)
 				{
-					if (p.orange == false) 
+					if (!p.orange) 
 					{
 						orangeDestination = p;
 						break;
@@ -82,15 +82,15 @@ public class Region extends User
 			blueDestination = null;
 			if (bluePortal != null)
 			{
-				for (Portal p  : portals)
+				for (Portal p: portals)
 				{
-					if (p.orange == true) 
+					if (p.orange) 
 					{
-						orangeDestination = p;
+						blueDestination = p;
 						break;
 					}
 				}
-				if (blueDestination == null) bluePortal.close(); //Close orange portal if there is no valid destinations.
+				if (blueDestination == null) bluePortal.close(); //Close blue portal if there is no valid destinations.
 			}
 		}
 		
@@ -126,13 +126,9 @@ public class Region extends User
 				
 				//This portal can be destination to our new portal
 				if (p.orange)
-				{
 					if (blueDestination == null) blueDestination = p;
-				}
 				else
-				{
 					if (orangeDestination == null) orangeDestination = p;
-				}
 
 			}
 			
@@ -141,15 +137,21 @@ public class Region extends User
 		}
 		else
 		{
-			if (portal.orange == false && orangePortal != null && orangeDestination == null)
+			if(portal.orange)
 			{
-				orangeDestination = portal;
-				orangePortal.open();
+				if(bluePortal != null && blueDestination == null)
+				{
+					blueDestination = portal;
+					bluePortal.open();
+				}
 			}
-			else if (portal.orange == true && bluePortal != null && blueDestination == null)
+			else
 			{
-				blueDestination = portal;
-				bluePortal.open();
+				if(orangePortal != null && orangeDestination == null)
+				{
+					orangeDestination = portal;
+					orangePortal.open();
+				}
 			}
 		}
 	}
