@@ -248,9 +248,11 @@ public class GrillManager {
 			}
 		  }
 		  if(changed)
+		  {
 			pi.setArmorContents(inv2);
+			changed = false;
+		  }
 		}
-		changed = false;
 		inv2 = inv.getContents();
 		for(int i = 0; i < inv2.length; i++)
 		{
@@ -289,6 +291,61 @@ public class GrillManager {
 			}
 		  }
 		  if(!hasGun)
+			entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(plugin.config.PortalTool, 1, plugin.config.portalToolData));
+		}
+	  }
+	  if(region.getBoolean(RegionSetting.GRILL_GIVE_BOOTS_IF_NEEDED))
+	  {
+		boolean hasBoots = false;
+		int boots = region.getInt(RegionSetting.FALL_DAMAGE_BOOTS);
+		if(inv instanceof PlayerInventory)
+		{
+		  PlayerInventory pi = (PlayerInventory)inv;
+		  ItemStack[] armor = pi.getArmorContents();
+		  for(int i = 0; i < armor.length; i++)
+		  {
+			if(armor[i] != null && armor[i].getTypeId() == boots)
+			{
+			  hasBoots = true;
+			  break;
+			}
+		  }
+		}
+		if(!hasBoots)
+		{
+		  for(int i = 0; i < inv2.length; i++)
+		  {
+			if(inv2[i] != null && inv2[i].getTypeId() == boots)
+			{
+			  hasBoots = true;
+			  break;
+			}
+		  }
+		  if(!hasBoots)
+		  {
+			if(inv instanceof PlayerInventory)
+			{
+			  PlayerInventory pi = (PlayerInventory)inv;
+			  if(pi.getBoots() == null)
+			  {
+				pi.setBoots(new ItemStack(boots));
+				hasBoots = true;
+			  }
+			}
+			if(!hasBoots)
+			{
+			  for(int i = 0; i < inv2.length; i++)
+			  {
+				if(inv2[i] == null)
+				{
+				  inv2[i] = new ItemStack(boots);
+				  changed = hasBoots = true;
+				  break;
+				}
+			  }
+			}
+		  }
+		  if(!hasBoots)
 			entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(plugin.config.PortalTool, 1, plugin.config.portalToolData));
 		}
 	  }
