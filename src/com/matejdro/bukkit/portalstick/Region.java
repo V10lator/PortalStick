@@ -59,38 +59,43 @@ public class Region extends User
 	//Called when any portal in this region is deleted
 	public void portalDeleted(Portal portal)
 	{
+		portals.remove(portal);
+		
 		//We lost orange destination. Lets find new one.
 		if (portal == orangeDestination)
 		{
 			orangeDestination = null;
-			if (orangePortal != null)
-			{
-				for (Portal p: portals)
-				{
-					if (!p.orange) 
-					{
-						orangeDestination = p;
-						break;
-					}
-				}
-				if (orangeDestination == null) orangePortal.close(); //Close orange portal if there is no valid destinations.
-			}
-		}
-		//We lost blue destination. Lets find new one
-		else if (portal == blueDestination)
-		{
-			blueDestination = null;
 			if (bluePortal != null)
 			{
 				for (Portal p: portals)
 				{
 					if (p.orange) 
 					{
+						orangeDestination = p;
+						break;
+					}
+				}
+				
+				if (orangeDestination == null) //Close blue portals if there is no valid destinations.
+					bluePortal.close();
+			}
+		}
+		//We lost blue destination. Lets find new one
+		else if (portal == blueDestination)
+		{
+			blueDestination = null;
+			if (orangePortal != null)
+			{
+				for (Portal p: portals)
+				{
+					if (!p.orange) 
+					{
 						blueDestination = p;
 						break;
 					}
 				}
-				if (blueDestination == null) bluePortal.close(); //Close blue portal if there is no valid destinations.
+				if (blueDestination == null)
+					orangePortal.close();
 			}
 		}
 		
@@ -112,9 +117,17 @@ public class Region extends User
 		if (portal.isRegionPortal())
 		{
 			if (portal.orange)
+			{
 				orangeDestination = portal.getDestination();
+				if(orangeDestination != null)
+					return;
+			}
 			else
+			{
 				blueDestination = portal.getDestination();
+				if(blueDestination != null)
+					return;
+			}
 			
 			
 			for (Portal p : portals)
@@ -129,7 +142,7 @@ public class Region extends User
 					if (blueDestination == null) blueDestination = p;
 				else
 					if (orangeDestination == null) orangeDestination = p;
-
+				break;
 			}
 			
 			if (!portal.open && portal.getDestination() != null)

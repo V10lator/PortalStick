@@ -450,11 +450,7 @@ public class PortalManager {
 				 
 				 int counter = 1;
 				 while (firstIronBar.getRelative(face.getOppositeFace(), counter).getType() == Material.IRON_FENCE)
-				 {
-					 ironBars.add(firstIronBar.getRelative(face.getOppositeFace(), counter));
-					 counter++;
-				 }
-
+					 ironBars.add(firstIronBar.getRelative(face.getOppositeFace(), counter++));
 				 
 				 break;
 			 }
@@ -583,10 +579,6 @@ public class PortalManager {
 		{
 			if (tb != null)
 			{
-				oldPortal = borderBlocks.get(tb);
-				if (oldPortal != null)
-					oldPortal.delete();
-				
 				if(borderBlocks.containsKey(tb))
 				  oldPortal = borderBlocks.get(tb);
 				else if(insideBlocks.containsKey(tb))

@@ -104,19 +104,15 @@ public class Portal {
 		else
 			owner.bluePortal = null;
 			
-		open = false;
-				
 		plugin.portalManager.portals.remove(this);
 		plugin.regionManager.getRegion(centerBlock).portals.remove(this);	
 		
 		plugin.regionManager.getRegion(centerBlock).portalDeleted(this);
 		
-/*		Portal oldDestination = getDestination();
+		Portal oldDestination = getDestination();
 		if(oldDestination != null)
-		{
-//		  if (oldDestination.getDestination() == null) oldDestination.close(); TODO: Shouldn't be needed...
-		}
-*/
+		  if (oldDestination.getDestination() == null) oldDestination.close();
+
    	}
 	
 	public void open()

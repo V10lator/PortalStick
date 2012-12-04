@@ -18,7 +18,7 @@ public class RegionToolCommand extends BaseCommand {
 			plugin.util.sendMessage(sender, plugin.i18n.getString("RegionToolDisabled", playerName));
 		}
 		else {
-			plugin.util.sendMessage(sender, plugin.i18n.getString("RegionToolEnabled", playerName, args[0]));
+			plugin.util.sendMessage(sender, plugin.i18n.getString("RegionToolEnabled", playerName));
 			if (!player.getInventory().contains(plugin.config.RegionTool))
 					player.getInventory().addItem(new ItemStack(plugin.config.RegionTool, 1));
 		}
