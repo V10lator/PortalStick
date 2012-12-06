@@ -139,7 +139,7 @@ public class PortalStickPlayerListener implements Listener {
 			switch (event.getAction()) {
 				case RIGHT_CLICK_BLOCK:
 					user.pointTwo = new V10Location(event.getClickedBlock());
-					plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointTwoSet", player.getName()));
+					plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointOneSet", player.getName()));
 					break;
 				case LEFT_CLICK_BLOCK:
 					user.pointOne = new V10Location(event.getClickedBlock());
