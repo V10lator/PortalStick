@@ -2,7 +2,7 @@ package com.matejdro.bukkit.portalstick;
 
 import java.util.HashMap;
 
-import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import de.V10lator.PortalStick.V10Location;
 
@@ -16,12 +16,16 @@ public class RegionManager {
 	
 	public final HashMap<String, Region> regions = new HashMap<String, Region>();
 	
-	public Region loadRegion(String name) {
-		Region region = getRegion(name);
-		if (region == null)
-			region = new Region(name);
-		plugin.config.loadRegionSettings(region);
-		regions.put(name, region);
+	public Region loadRegion(String name, Player player, Region region) {
+		name = name.toLowerCase();
+		if(region == null)
+		  region = getRegion(name);
+		if(region == null)
+		  region = new Region(name);
+		if(plugin.config.loadRegionSettings(region))
+		  regions.put(name, region);
+		else
+		  region = null;
 		return region;
 	}
 	
@@ -31,16 +35,21 @@ public class RegionManager {
 		plugin.config.deleteRegion(name);
 	}
 	
-	public void createRegion(String name, V10Location one, V10Location two) {
-		Region region = loadRegion(name);
-		region.setLocation(one, two);
-		plugin.config.saveAll();
+	public boolean createRegion(Player player, String name, V10Location one, V10Location two) {
+		name = name.toLowerCase();
+		Region region = new Region(name);
+		boolean ret = region.setLocation(plugin, player, one, two);
+		if(ret)
+		{
+		  loadRegion(name, player, region);
+		  plugin.config.saveAll();
+		}
+		return ret;
 	}
 	
 	public Region getRegion(V10Location location) {
-		Location rl = location.getHandle();
 		for (Region region : regions.values())
-			if (region.contains(rl.toVector()) && rl.getWorld().getName().equalsIgnoreCase(region.world) && !region.name.equalsIgnoreCase("global"))
+			if (region.contains(location) && !region.name.equals("global"))
 				return region;
 		return getRegion("global");
 	}

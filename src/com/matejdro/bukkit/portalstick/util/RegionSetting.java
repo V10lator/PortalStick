@@ -14,7 +14,7 @@ public enum RegionSetting {
 	DELETE_ON_EXITENTRANCE("delete-portals-on-exitentrance", true, true),
 	GRILLS_REMOVE_ITEMS("grills-clear-inventory", true, true),
 	GRILL_GIVE_GUN_IF_NEEDED("grill-give-gun-if-needed", true, true),
-	GRILL_GIVE_BOOTS_IF_NEEDED("grill-give-gun-if-needed", true, true),
+	GRILL_GIVE_BOOTS_IF_NEEDED("grill-give-boots-if-needed", true, true),
 	GRILL_REMOVE_EXTRA_GUNS("grill-remove-extra-guns", true, true),
 	GRILL_REMOVE_EXCEPTIONS("grill-remove-exceptions", Arrays.asList(new Integer[]{280,313}), false),
 	GRILL_ONE_EXCEPTION("grill-one-exception", true, true),

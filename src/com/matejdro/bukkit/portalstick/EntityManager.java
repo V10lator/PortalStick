@@ -305,7 +305,7 @@ public class EntityManager implements Runnable {
 			Grill grill = plugin.grillManager.insideBlocks.get(vlocTo);
 			if (grill != null && !grill.disabled)
 			{
-				plugin.grillManager.emancipate(entity);
+				plugin.grillManager.emancipate(regionTo, entity);
 				return null;
 			}
 		}

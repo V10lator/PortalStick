@@ -14,6 +14,7 @@ RegionPointOneSet: '&aRegion point one set`nType /portal setregion to save the r
 RegionPointTwoSet: '&aRegion point two set`nType /portal setregion to save the region'
 RegionToolNoPointsSelected: '&cPlease select two points'
 CanNotDeleteGlobalRegion: '&cYou cannot delete the global config!'
+RegionsOverlap: '&cError: Region &a%1% &coverlaps with region &a%2%'
 InvalidRegionFlag: '&cInvalid flag %1%, please choose from one of the following:'
 InvalidRegionFlagValue: '&cInvalid value supplied for flag &7%1%'
 LanguageChanged: '&cLanguage changed to %1%!'

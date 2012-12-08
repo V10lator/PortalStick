@@ -1,11 +1,12 @@
 package com.matejdro.bukkit.portalstick;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.bukkit.Location;
-import org.bukkit.util.Vector;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
 
@@ -16,9 +17,7 @@ public class Region extends User
 	
 	public HashMap<RegionSetting, Object> settings = new HashMap<RegionSetting, Object>();
 	
-	public final Vector min = new Vector();
-	public final Vector max = new Vector();
-	public String world;
+	public V10Location min, max;
 		
 	public HashSet<Portal> portals = new HashSet<Portal>();
 	public final String name;
@@ -32,28 +31,75 @@ public class Region extends User
 		this.name = name;
 	}
 	
-	public void updateLocation() {
+	public boolean updateLocation(PortalStick plugin, Player player) {
 		String[] loc = getString(RegionSetting.LOCATION).split(":");
-		String[] loc1 = loc[1].split(",");
-		Vector one = new Vector(Double.parseDouble(loc1[0]), Double.parseDouble(loc1[1]), Double.parseDouble(loc1[2]));
-		String[] loc2 = loc[2].split(",");
-		Vector two = new Vector(Double.parseDouble(loc2[0]), Double.parseDouble(loc2[1]), Double.parseDouble(loc2[2]));
-
-		min.setX(one.getX() < two.getX()?one.getX():two.getX());
-		max.setX(one.getX() > two.getX()?one.getX():two.getX());
-		min.setY(one.getY() < two.getY()?one.getY():two.getY());
-		max.setY(one.getY() > two.getY()?one.getY():two.getY());
-		min.setZ(one.getZ() < two.getZ()?one.getZ():two.getZ());
-		max.setZ(one.getZ() > two.getZ()?one.getZ():two.getZ());
-
-		world = loc[0];
+		V10Location min, max;
+		if(name.equals("global"))
+		  min = max = new V10Location(null, 0, 0, 0);
+		else
+		{
+		  String[] loc1 = loc[1].split(",");
+		  
+		  int aX = Integer.parseInt(loc1[0]);
+		  int aY = Integer.parseInt(loc1[1]);
+		  int aZ = Integer.parseInt(loc1[2]);
+		  
+		  loc1 = loc[2].split(",");
+		  int bX = Integer.parseInt(loc1[0]);
+		  int bY = Integer.parseInt(loc1[1]);
+		  int bZ = Integer.parseInt(loc1[2]);
+		  
+		  if(aX > bX)
+		  {
+			int tmp = aX;
+			aX = bX;
+			bX = tmp;
+		  }
+		  if(aY > bY)
+		  {
+			int tmp = aY;
+			aY = bY;
+			bY = tmp;
+		  }
+		  if(aZ > bZ)
+		  {
+			int tmp = aZ;
+			aZ = bZ;
+			bZ = tmp;
+		  }
+		  
+		  ArrayList<V10Location> locs = new ArrayList<V10Location>(); 
+		  for(int x = aX; x <= bX; x++)
+			for(int y = aY; y <= bY; y++)
+			  for(int z = aZ; z <= bZ; z++)
+				locs.add(new V10Location(loc[0], x, y, z));
+		  
+		  min = new V10Location(loc[0], aX, aY, aZ);
+		  max = new V10Location(loc[0], bX, bY, bZ);
+		  
+		  for(Region region: plugin.regionManager.regions.values())
+			if(region != this && !region.name.equals("global"))
+			  for(V10Location vLoc: locs)
+				if(region.contains(vLoc))
+				{
+				  if(player != null)
+					  plugin.util.sendMessage(player, plugin.i18n.getString("RegionsOverlap", player.getName(), name, region.name));
+				  plugin.getLogger().info("Region \""+name+"\" overlaps with region \""+region.name+"\". Removing.");
+				  return false;
+				}
+		}
+		this.min = min;
+		this.max = max;
+		return true;
 	}
 	
-	public void setLocation(V10Location one, V10Location two) {
-//		settings.remove(RegionSetting.LOCATION); //TODO: We overwrite, so this shouldn't be needed.
-		Location a = one.getHandle();
-		settings.put(RegionSetting.LOCATION, a.getWorld().getName() + ":" + a.toVector().toString() + ":" + two.getHandle().toVector().toString());
-		updateLocation();
+	public boolean setLocation(PortalStick plugin, Player player, V10Location one, V10Location two) {
+		String old = (String)settings.get(RegionSetting.LOCATION);
+		settings.put(RegionSetting.LOCATION, one.world + ":" + one.x+","+one.y+","+one.z + ":" + two.x+","+two.y+","+two.z);
+		if(updateLocation(plugin, player))
+		  return true;
+		settings.put(RegionSetting.LOCATION, old);
+		return false;
 	}
 	
 	//Called when any portal in this region is deleted
@@ -169,8 +215,11 @@ public class Region extends User
 		}
 	}
 		
-	public boolean contains(Vector vector) {
-		return vector.isInAABB(min, max);
+	public boolean contains(V10Location loc) {
+		return loc.world.equals(min.world) &&
+				loc.x >= min.x && loc.x <= max.x &&
+				loc.y >= min.y && loc.y <= max.y &&
+				loc.z >= min.z && loc.z <= max.z;
 	}
 	
 	public boolean getBoolean(RegionSetting setting) {
@@ -183,7 +232,22 @@ public class Region extends User
 		return (List<?>)settings.get(setting);
 	}
 	public String getString(RegionSetting setting) {
-		return (String)settings.get(setting);
+		String ret = null;
+		try
+		{
+			ret = (String)settings.get(setting);
+		}
+		catch(ClassCastException e)
+		{
+			try
+			{
+				ret = ""+getInt(setting);
+			}
+			catch(ClassCastException e1)
+			{
+			}
+		}
+		return ret;
 	}
 	public double getDouble(RegionSetting setting) {
 		return (Double)settings.get(setting);

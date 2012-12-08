@@ -75,7 +75,7 @@ public class PortalStickPlayerListener implements Listener {
 			else
 			  orange = false;
 			
-			if((orange && !region.getBoolean(RegionSetting.ENABLE_BLUE_PORTALS)) || !orange && !region.getBoolean(RegionSetting.ENABLE_ORANGE_PORTALS))
+			if((orange && !region.getBoolean(RegionSetting.ENABLE_ORANGE_PORTALS)) || !orange && !region.getBoolean(RegionSetting.ENABLE_BLUE_PORTALS))
 			  return;
 			
 			List<Block> targetBlocks = event.getPlayer().getLineOfSight(tb, 120);

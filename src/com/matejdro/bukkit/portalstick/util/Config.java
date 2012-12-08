@@ -157,8 +157,8 @@ public class Config {
         //Load all regions
         for (String regionName : regionConfig.getKeys(false))
         	if(!regionName.equals("global"))
-        		plugin.regionManager.loadRegion(regionName);
-        plugin.regionManager.loadRegion("global");
+        		plugin.regionManager.loadRegion(regionName, null, null);
+        plugin.regionManager.loadRegion("global", null, null);
         plugin.getLogger().info(plugin.regionManager.regions.size() + " region(s) loaded");
         
         //Validate regions
@@ -257,7 +257,7 @@ public class Config {
 		  plugin.gelManager.stopGelTube(loc);
 	}
 	
-	public void loadRegionSettings(Region region) {
+	public boolean loadRegionSettings(Region region) {
 		for (RegionSetting setting : RegionSetting.values()) {
 			Object prop = regionConfig.get(region.name + "." + setting.getYaml());
     		if (prop == null)
@@ -266,7 +266,7 @@ public class Config {
     			region.settings.put(setting, prop);
     		regionConfig.set(region.name + "." + setting.getYaml(), region.settings.get(setting));
     	}
-		region.updateLocation();
+		return region.updateLocation(plugin, null);
 	}
 	
 	private File getConfigFile(String filename)
