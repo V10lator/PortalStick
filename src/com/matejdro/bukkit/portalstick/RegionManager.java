@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 
+import com.matejdro.bukkit.portalstick.util.RegionSetting;
+
 import de.V10lator.PortalStick.V10Location;
 
 public class RegionManager {
@@ -22,10 +24,13 @@ public class RegionManager {
 		  region = getRegion(name);
 		if(region == null)
 		  region = new Region(plugin, name);
-		if(plugin.config.loadRegionSettings(region))
+		if(plugin.config.loadRegionSettings(region, player))
 		  regions.put(name, region);
 		else
+		{
 		  region = null;
+		  plugin.config.deleteRegion(name);
+		}
 		return region;
 	}
 	
@@ -41,7 +46,7 @@ public class RegionManager {
 		boolean ret = region.setLocation(player, one, two);
 		if(ret)
 		{
-		  loadRegion(name, player, region);
+		  ret = (loadRegion(name, player, region) != null);
 		  plugin.config.saveAll();
 		}
 		return ret;

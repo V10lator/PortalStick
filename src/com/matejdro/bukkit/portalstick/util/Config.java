@@ -17,6 +17,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
@@ -263,16 +264,19 @@ public class Config {
 		  plugin.gelManager.stopGelTube(loc);
 	}
 	
-	public boolean loadRegionSettings(Region region) {
+	public boolean loadRegionSettings(Region region, Player player) {
 		for (RegionSetting setting : RegionSetting.values()) {
 			Object prop = regionConfig.get(region.name + "." + setting.getYaml());
     		if (prop == null)
-    			region.settings.put(setting, setting.getDefault());
+    		{
+    			if(!region.settings.containsKey(setting))
+    				region.settings.put(setting, setting.getDefault());
+    		}
     		else
     			region.settings.put(setting, prop);
     		regionConfig.set(region.name + "." + setting.getYaml(), region.settings.get(setting));
     	}
-		return region.updateLocation(null);
+		return region.updateLocation(player);
 	}
 	
 	private File getConfigFile(String filename)

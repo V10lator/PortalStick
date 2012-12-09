@@ -33,7 +33,7 @@ public class Region extends User
 	public boolean updateLocation(Player player) {
 		String[] loc = getString(RegionSetting.LOCATION).split(":");
 		V10Location min, max;
-		if(name.equals("global"))
+		if(this.name.equals("global"))
 		  min = max = new V10Location(null, 0, 0, 0);
 		else
 		{
@@ -97,7 +97,10 @@ public class Region extends User
 		settings.put(RegionSetting.LOCATION, one.world + ":" + one.x+","+one.y+","+one.z + ":" + two.x+","+two.y+","+two.z);
 		if(updateLocation(player))
 		  return true;
-		settings.put(RegionSetting.LOCATION, old);
+		if(old == null)
+		  settings.remove(RegionSetting.LOCATION);
+		else
+		  settings.put(RegionSetting.LOCATION, old);
 		return false;
 	}
 	
