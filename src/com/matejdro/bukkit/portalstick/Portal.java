@@ -143,9 +143,11 @@ public class Portal {
 						 
 						 		transmitter = true;
 						 		if (destination.open)
+						 		{
 							 		for (V10Location b2: destination.inside)
 							 		  if(b2 != null)
 							 			b2.getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
+						 		}
 						 		else
 						 			destination.placetorch = true;
 						 }
@@ -287,12 +289,14 @@ public class Portal {
         	}
     	}
     	
-    	if (getDestination() == null)
+    	Portal dest = getDestination();
+    	if (dest == null)
     		close();
     	else
     	{
     		open();
-    		getDestination().open(); //TODO: I think we double-open portals now. Need research where the other open is...
+    		if(!dest.open)
+    		  dest.open(); //TODO: I think we double-open portals now. Need research where the other open is...
     	}
     	
     	
