@@ -51,6 +51,7 @@ public class Config {
 	public boolean RestoreInvOnWorldChange;
 	public List<String> ColorPresets;
 	public int FillPortalBack;
+	public byte portalBackData;
 	
 	public boolean useNativeSounds, useSpoutSounds;
 	public int soundRange;
@@ -121,7 +122,12 @@ public class Config {
         RegionTool = getInt("main.region-tool", 268);
         RestoreInvOnWorldChange = getBoolean("main.restore-inventory-on-world-change", true);
         ColorPresets = getStringList("main.portal-color-presets", Arrays.asList(new String[]{"3-1","2-6","9-10","5-13","8-7","15-4"}));
-        FillPortalBack = getInt("main.fill-portal-back", -1);
+        split = getString("main.fill-portal-back", "-1").split(":");
+        FillPortalBack = Integer.parseInt(split[0]);
+        if(split.length > 1)
+          portalBackData = Byte.parseByte(split[1]);
+        else
+          portalBackData = 0;
         
         //Load sound settings
         useNativeSounds = getBoolean("sounds.use-minecraft-sounds", true);
@@ -222,7 +228,7 @@ public class Config {
 		if (mainConfig.get(path) == null)
 			mainConfig.set(path, def);
 
-	return mainConfig.getStringList(path);
+		return mainConfig.getStringList(path);
 	}
 
 	private boolean getBoolean(String path, Boolean def)

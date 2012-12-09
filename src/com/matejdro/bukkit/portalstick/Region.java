@@ -231,22 +231,13 @@ public class Region extends User
 		return (List<?>)settings.get(setting);
 	}
 	public String getString(RegionSetting setting) {
-		String ret = null;
-		try
-		{
-			ret = (String)settings.get(setting);
-		}
-		catch(ClassCastException e)
-		{
-			try
-			{
-				ret = ""+getInt(setting);
-			}
-			catch(ClassCastException e1)
-			{
-			}
-		}
-		return ret;
+		Object ret = settings.get(setting);
+		if(ret instanceof String)
+		  return (String)ret;
+		else if(ret instanceof Integer || ret instanceof Long)
+		  return ""+ret;
+		
+		return ret.toString();
 	}
 	public double getDouble(RegionSetting setting) {
 		return (Double)settings.get(setting);
