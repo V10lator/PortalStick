@@ -157,7 +157,6 @@ public class PortalManager {
 
 	public void deletePortals(User user)
 	{
-		if (user == null) return;
 		if (user.bluePortal != null) user.bluePortal.delete();
 		if (user.orangePortal != null) user.orangePortal.delete();
 	}
