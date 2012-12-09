@@ -2,7 +2,6 @@ package com.matejdro.bukkit.portalstick;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -30,7 +29,7 @@ public class PortalManager {
 		this.plugin = plugin;
 	}
 	
-	public final HashSet<Portal> portals = new HashSet<Portal>();
+	public final ArrayList<Portal> portals = new ArrayList<Portal>();
 	public final HashMap<V10Location, Portal> borderBlocks = new HashMap<V10Location, Portal>();
 	public final HashMap<V10Location, Portal> behindBlocks = new HashMap<V10Location, Portal>();
 	public final HashMap<V10Location, Portal> insideBlocks = new HashMap<V10Location, Portal>();
