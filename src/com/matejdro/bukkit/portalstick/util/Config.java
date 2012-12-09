@@ -272,7 +272,7 @@ public class Config {
     			region.settings.put(setting, prop);
     		regionConfig.set(region.name + "." + setting.getYaml(), region.settings.get(setting));
     	}
-		return region.updateLocation(plugin, null);
+		return region.updateLocation(null);
 	}
 	
 	private File getConfigFile(String filename)

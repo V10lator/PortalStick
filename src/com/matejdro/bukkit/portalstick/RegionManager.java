@@ -21,7 +21,7 @@ public class RegionManager {
 		if(region == null)
 		  region = getRegion(name);
 		if(region == null)
-		  region = new Region(name);
+		  region = new Region(plugin, name);
 		if(plugin.config.loadRegionSettings(region))
 		  regions.put(name, region);
 		else
@@ -37,8 +37,8 @@ public class RegionManager {
 	
 	public boolean createRegion(Player player, String name, V10Location one, V10Location two) {
 		name = name.toLowerCase();
-		Region region = new Region(name);
-		boolean ret = region.setLocation(plugin, player, one, two);
+		Region region = new Region(plugin, name);
+		boolean ret = region.setLocation(player, one, two);
 		if(ret)
 		{
 		  loadRegion(name, player, region);

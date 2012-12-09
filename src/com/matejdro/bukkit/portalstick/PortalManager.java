@@ -351,7 +351,6 @@ public class PortalManager {
 		}
 		
 		portals.add(portal);
-		region.portals.add(portal);
 		portal.create();
 		
 		return true;
@@ -541,7 +540,6 @@ public class PortalManager {
 			region.bluePortal = portal;
 		}
 		portals.add(portal);
-		region.portals.add(portal);
 
 		portal.create();
 	}

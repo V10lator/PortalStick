@@ -2,7 +2,6 @@ package com.matejdro.bukkit.portalstick;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.entity.Player;
@@ -15,21 +14,23 @@ public class Region extends User
 {
 	public HashMap<RegionSetting, Object> settings = new HashMap<RegionSetting, Object>();
 	
+	private final PortalStick plugin;
+	
 	public V10Location min, max;
-		
-	public HashSet<Portal> portals = new HashSet<Portal>();
+	
 	public final String name;
 	
 	public Portal blueDestination; // Destination of the blue automated portal
 	public Portal orangeDestination; // Destination of the orange automated portal
 	
-	Region(String name)
+	Region(PortalStick plugin, String name)
 	{
 		super("§region§_"+name);
+		this.plugin = plugin;
 		this.name = name;
 	}
 	
-	public boolean updateLocation(PortalStick plugin, Player player) {
+	public boolean updateLocation(Player player) {
 		String[] loc = getString(RegionSetting.LOCATION).split(":");
 		V10Location min, max;
 		if(name.equals("global"))
@@ -91,10 +92,10 @@ public class Region extends User
 		return true;
 	}
 	
-	public boolean setLocation(PortalStick plugin, Player player, V10Location one, V10Location two) {
+	public boolean setLocation(Player player, V10Location one, V10Location two) {
 		String old = (String)settings.get(RegionSetting.LOCATION);
 		settings.put(RegionSetting.LOCATION, one.world + ":" + one.x+","+one.y+","+one.z + ":" + two.x+","+two.y+","+two.z);
-		if(updateLocation(plugin, player))
+		if(updateLocation(player))
 		  return true;
 		settings.put(RegionSetting.LOCATION, old);
 		return false;
@@ -103,7 +104,7 @@ public class Region extends User
 	//Called when any portal in this region is deleted
 	public void portalDeleted(Portal portal)
 	{
-		portals.remove(portal);
+		Region region;
 		
 		//We lost orange destination. Lets find new one.
 		if (portal == orangeDestination)
@@ -111,14 +112,31 @@ public class Region extends User
 			orangeDestination = null;
 			if (bluePortal != null)
 			{
-				for (Portal p: portals)
+				for (Portal p: plugin.portalManager.portals)
 				{
-					if (p.orange) 
+					if (p.orange && p.isRegionPortal())
 					{
-						orangeDestination = p;
-						break;
+						region = plugin.regionManager.getRegion(p.inside[0]);
+						if(region == this)
+						{
+							orangeDestination = p;
+							break;
+						}
 					}
 				}
+				if(orangeDestination == null)
+				  for (Portal p: plugin.portalManager.portals)
+				  {
+					if (p.orange && !p.isRegionPortal())
+					{
+						region = plugin.regionManager.getRegion(p.inside[0]);
+						if(region == this)
+						{
+							orangeDestination = p;
+							break;
+						}
+					}
+				  }
 				
 				if (orangeDestination == null) //Close blue portals if there is no valid destinations.
 					bluePortal.close();
@@ -130,14 +148,32 @@ public class Region extends User
 			blueDestination = null;
 			if (orangePortal != null)
 			{
-				for (Portal p: portals)
+				for (Portal p: plugin.portalManager.portals)
 				{
-					if (!p.orange) 
+					if (!p.orange && p.isRegionPortal()) 
 					{
-						blueDestination = p;
-						break;
+						region = plugin.regionManager.getRegion(p.inside[0]);
+						if(region == this)
+						{
+							blueDestination = p;
+							break;
+						}
 					}
 				}
+				if(blueDestination == null)
+				  for (Portal p: plugin.portalManager.portals)
+				  {
+					if (!p.orange && !p.isRegionPortal())
+					{
+						region = plugin.regionManager.getRegion(p.inside[0]);
+						if(region == this)
+						{
+							blueDestination = p;
+							break;
+						}
+					}
+				  }
+				
 				if (blueDestination == null)
 					orangePortal.close();
 			}
@@ -147,7 +183,7 @@ public class Region extends User
 		//Close all connected portals if region portal is destroyed
 		if (portal.isRegionPortal())
 		{
-			for (Portal p : portals)
+			for (Portal p : plugin.portalManager.portals)
 			{
 				if (p.getDestination() == null && p.open)
 					p.close();
@@ -156,7 +192,7 @@ public class Region extends User
 	}
 	
 	//Called when any portal in this region is created
-	public void portalCreated(PortalStick plugin, Portal portal)
+	public void portalCreated(Portal portal)
 	{
 		if (portal.isRegionPortal())
 		{
@@ -173,11 +209,14 @@ public class Region extends User
 					return;
 			}
 			
-			
-			for (Portal p : portals)
+			Region region;
+			for (Portal p: plugin.portalManager.portals)
 			{
-				if (p.orange == portal.orange) continue;
+				if (p.orange == portal.orange || !p.isRegionPortal()) continue;
 				//Loop through all portals to find destination
+				region = plugin.regionManager.getRegion(p.inside[0]);
+				if(region != this)
+				  continue;
 				if (p.getDestination() == portal)
 					p.open(); //This portal can lead to our new portal, so lets open it.						
 				
@@ -191,12 +230,11 @@ public class Region extends User
 					orangeDestination = p;
 			}
 			
-			Region region;
 			if((portal.orange && orangeDestination == null) || (!portal.orange && blueDestination == null))
 			{
-			  for (Portal p : plugin.portalManager.portals)
+			  for (Portal p: plugin.portalManager.portals)
 			  {
-				if (p.orange == portal.orange) continue;
+				if (p.orange == portal.orange || p.isRegionPortal()) continue;
 				//Loop through all portals to find destination
 				region = plugin.regionManager.getRegion(p.inside[0]);
 				if(region != this)

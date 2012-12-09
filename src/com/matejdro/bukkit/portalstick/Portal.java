@@ -103,8 +103,6 @@ public class Portal {
 			owner.bluePortal = null;
 			
 		plugin.portalManager.portals.remove(this);
-		plugin.regionManager.getRegion(inside[0]).portals.remove(this);	
-		
 		plugin.regionManager.getRegion(inside[0]).portalDeleted(this);
 		
 		Portal oldDestination = getDestination();
@@ -332,7 +330,7 @@ public class Portal {
     	  }
     	}
     	
-    	plugin.regionManager.getRegion(inside[0]).portalCreated(plugin, this);
+    	plugin.regionManager.getRegion(inside[0]).portalCreated(this);
 	}
 	
 	public Portal getDestination()
