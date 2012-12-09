@@ -334,7 +334,7 @@ public class Portal {
     	  }
     	}
     	
-    	plugin.regionManager.getRegion(centerBlock).portalCreated(this);
+    	plugin.regionManager.getRegion(centerBlock).portalCreated(plugin, this);
 	}
 	
 	public Portal getDestination()

@@ -13,7 +13,6 @@ import de.V10lator.PortalStick.V10Location;
 
 public class Region extends User 
 {
-	
 	public HashMap<RegionSetting, Object> settings = new HashMap<RegionSetting, Object>();
 	
 	public V10Location min, max;
@@ -157,7 +156,7 @@ public class Region extends User
 	}
 	
 	//Called when any portal in this region is created
-	public void portalCreated(Portal portal)
+	public void portalCreated(PortalStick plugin, Portal portal)
 	{
 		if (portal.isRegionPortal())
 		{
@@ -184,10 +183,34 @@ public class Region extends User
 				
 				//This portal can be destination to our new portal
 				if (p.orange)
-					if (blueDestination == null) blueDestination = p;
+				{
+					if (blueDestination == null)
+						blueDestination = p;
+				}
+				else if (orangeDestination == null)
+					orangeDestination = p;
+			}
+			
+			Region region;
+			if((portal.orange && orangeDestination == null) || (!portal.orange && blueDestination == null))
+			{
+			  for (Portal p : plugin.portalManager.portals)
+			  {
+				if (p.orange == portal.orange) continue;
+				//Loop through all portals to find destination
+				region = plugin.regionManager.getRegion(p.inside[0]);
+				if(region != this)
+				  continue;
+				if (p.getDestination() == portal)
+					p.open(); //This portal can lead to our new portal, so lets open it.						
+				
+				//This portal can be destination to our new portal
+				if (p.orange)
+					blueDestination = p;
 				else
-					if (orangeDestination == null) orangeDestination = p;
+					orangeDestination = p;
 				break;
+			  }
 			}
 			
 			if (!portal.open && portal.getDestination() != null)
