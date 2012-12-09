@@ -18,7 +18,6 @@ public class Portal {
 	public final V10Location[] teleport;
 	private final V10Location[] behind;
 	public final boolean horizontal;
-	private final V10Location centerBlock;
 	public final User owner;
 	public final boolean orange;
 	public boolean open = false;
@@ -29,7 +28,7 @@ public class Portal {
 	final V10Location[] awayBlocksY = new V10Location[2];
 	private boolean placetorch = false;
 	
-	public Portal(PortalStick plugin, V10Location[] teleport, V10Location CenterBlock, HashSet<V10Location> Border, V10Location[] inside, V10Location[] behind, User Owner, boolean Orange, boolean horizontal, BlockFace Teleportface)
+	public Portal(PortalStick plugin, V10Location[] teleport, HashSet<V10Location> Border, V10Location[] inside, V10Location[] behind, User Owner, boolean Orange, boolean horizontal, BlockFace Teleportface)
 	{
 		this.plugin = plugin;
 		this.teleport = teleport;
@@ -40,7 +39,6 @@ public class Portal {
 		this.horizontal = horizontal;
 		teleportFace = Teleportface;
 		this.behind = behind;
-		centerBlock = CenterBlock;
 		if(horizontal)
 		  awayBlocks = new HashSet<V10Location>();
 		else
@@ -105,9 +103,9 @@ public class Portal {
 			owner.bluePortal = null;
 			
 		plugin.portalManager.portals.remove(this);
-		plugin.regionManager.getRegion(centerBlock).portals.remove(this);	
+		plugin.regionManager.getRegion(inside[0]).portals.remove(this);	
 		
-		plugin.regionManager.getRegion(centerBlock).portalDeleted(this);
+		plugin.regionManager.getRegion(inside[0]).portalDeleted(this);
 		
 		Portal oldDestination = getDestination();
 		if(oldDestination != null)
@@ -334,12 +332,12 @@ public class Portal {
     	  }
     	}
     	
-    	plugin.regionManager.getRegion(centerBlock).portalCreated(plugin, this);
+    	plugin.regionManager.getRegion(inside[0]).portalCreated(plugin, this);
 	}
 	
 	public Portal getDestination()
 	{
-		Region region = plugin.regionManager.getRegion(centerBlock);
+		Region region = plugin.regionManager.getRegion(inside[0]);
 		
 		if (orange)
 		{

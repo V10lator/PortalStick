@@ -194,7 +194,6 @@ public class PortalManager {
 	private PortalCoord generatePortal(V10Location block, BlockFace face)
 	{
 		PortalCoord portal = new PortalCoord();
-		portal.block = block;
 		Block rb = block.getHandle().getBlock();
 		
 		switch(face)
@@ -332,7 +331,7 @@ public class PortalManager {
 			}
 		}
 		
-		Portal portal = new Portal(plugin, portalc.destLoc, portalc.block, portalc.border, portalc.inside, portalc.behind, owner, orange, vertical, portalc.tpFace);
+		Portal portal = new Portal(plugin, portalc.destLoc, portalc.border, portalc.inside, portalc.behind, owner, orange, vertical, portalc.tpFace);
 		
 		
 		if (orange)
@@ -529,7 +528,7 @@ public class PortalManager {
 		if(black)
 		  return;
 		
-		Portal portal = new Portal(plugin, pc.destLoc,  pc.inside[0], pc.border, pc.inside, pc.behind, region, orange, false, pc.tpFace);
+		Portal portal = new Portal(plugin, pc.destLoc, pc.border, pc.inside, pc.behind, region, orange, false, pc.tpFace);
 		
 		if (orange)
 		{
