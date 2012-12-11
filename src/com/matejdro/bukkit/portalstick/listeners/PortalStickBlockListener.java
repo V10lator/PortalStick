@@ -375,6 +375,8 @@ public class PortalStickBlockListener implements Listener
 	  if(is == null)
 		return;
 	  Material mat = is.getType();
+	  if(mat == Material.BUCKET || mat == Material.WATER_BUCKET || mat == Material.LAVA_BUCKET)
+		return;
 	  Region region = plugin.regionManager.getRegion(new V10Location(bs.getLocation()));
 	  if(region.getBoolean(RegionSetting.GEL_TUBE))
 	  {
@@ -438,7 +440,7 @@ public class PortalStickBlockListener implements Listener
 	  }
 	  if(region.getBoolean(RegionSetting.INFINITE_DISPENSERS))
 	  {
-		if(is != null && is.getType() != Material.AIR)
+		if(is.getType() != Material.AIR)
 		  is.setAmount(is.getAmount() + 1);
 	  }
 	}
