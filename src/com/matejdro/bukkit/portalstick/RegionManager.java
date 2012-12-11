@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 
-import com.matejdro.bukkit.portalstick.util.RegionSetting;
-
 import de.V10lator.PortalStick.V10Location;
 
 public class RegionManager {
