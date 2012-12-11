@@ -33,12 +33,11 @@ import de.V10lator.PortalStick.V10Location;
 public class Config {
 	
 	private final PortalStick plugin;
-	private final FileConfiguration mainConfig;
+	private FileConfiguration mainConfig;
 	private final FileConfiguration regionConfig;
 	private final FileConfiguration grillConfig;
 	private final FileConfiguration bridgeConfig;
 	
-	private final File mainConfigFile;
 	private final File regionConfigFile;
 	private final File grillConfigFile;
 	private final File bridgeConfigFile;
@@ -61,17 +60,18 @@ public class Config {
 	
 	public String lang;
 	
+	public boolean debug;
+	
 	public Config (PortalStick instance) {
 		
 		plugin = instance;
 		
-		mainConfigFile = getConfigFile("config.yml");
 		regionConfigFile = getConfigFile("regions.yml");
 		grillConfigFile = getConfigFile("grills.yml");
 		bridgeConfigFile = getConfigFile("bridges.yml");
 		
 		
-		mainConfig = getConfig(mainConfigFile);
+		mainConfig = plugin.getConfig();
 		regionConfig = getConfig(regionConfigFile);
 		grillConfig = getConfig(grillConfigFile);
 		bridgeConfig = getConfig(bridgeConfigFile);
@@ -99,7 +99,7 @@ public class Config {
 	
 	public void load() {
 		try {
-			mainConfig.load(mainConfigFile);
+			mainConfig = plugin.getConfig();
 			regionConfig.load(regionConfigFile);
 			grillConfig.load(grillConfigFile);
 			bridgeConfig.load(bridgeConfigFile);
@@ -157,6 +157,8 @@ public class Config {
         Locale locale = Locale.getDefault();
         lang = getString("Language", locale.getLanguage().toLowerCase()+"_"+locale.getCountry());
         
+        debug = getBoolean("Debug", true); //TODO: True cause beta.
+        
 		//Load all current users
 //		for (Player player : plugin.getServer().getOnlinePlayers())
 //			plugin.userManager.createUser(player);
@@ -166,32 +168,36 @@ public class Config {
         	if(!regionName.equals("global"))
         		plugin.regionManager.loadRegion(regionName, null, null);
         plugin.regionManager.loadRegion("global", null, null);
-        plugin.getLogger().info(plugin.regionManager.regions.size() + " region(s) loaded");
+        if(debug)
+        	plugin.getLogger().info((plugin.regionManager.regions.size()-1) + " (" + plugin.regionManager.regions.size() + ") region(s) loaded");
         
         //Validate regions
         for(Region region: plugin.regionManager.regions.values())
-        	if(!region.validateRedGel())
+        	if(!region.validateRedGel() && debug)
         		plugin.getLogger().info("Inavlid red-gel-max-velocity for region \""+region.name+"\" - fixing!");
         
         //Load grills
         for (String grill : (grillConfig.getStringList("grills")))
         	plugin.grillManager.loadGrill(grill);
-        plugin.getLogger().info(plugin.grillManager.grills.size() + " grill(s) loaded");
+        if(debug)
+        	plugin.getLogger().info(plugin.grillManager.grills.size() + " grill(s) loaded");
         //Load bridges
         for (String bridge : bridgeConfig.getStringList("bridges"))
         	plugin.funnelBridgeManager.loadBridge(bridge);
-        plugin.getLogger().info(plugin.funnelBridgeManager.bridges.size() + " bridge(s) loaded");
+        if(debug)
+        	plugin.getLogger().info(plugin.funnelBridgeManager.bridges.size() + " bridge(s) loaded");
         
         try
         {
           if(plugin.au == null)
-        	plugin.au = new AutoUpdate(plugin, mainConfig);
+        	plugin.au = new AutoUpdate(plugin);
           else
-        	plugin.au.setConfig(mainConfig);
+        	plugin.au.resetConfig();
+          plugin.au.setDebug(debug);
 		} 
         catch (Exception e)
         {
-		  plugin.getLogger().info("Auto update error!");
+		  plugin.getLogger().severe("Auto update error!");
 		  e.printStackTrace();
 		}
         
@@ -300,6 +306,7 @@ public class Config {
 			return config;
 		} catch (Exception e) {
 			plugin.getLogger().severe("Unable to load YAML file " + file.getAbsolutePath());
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -316,9 +323,10 @@ public class Config {
 		{
 			regionConfig.save(regionConfigFile);
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
 			plugin.getLogger().severe("Error while writing to regions.yml");
+			e.printStackTrace();
 		}
 		
 		//Save grills
@@ -331,9 +339,10 @@ public class Config {
 		{
 			grillConfig.save(grillConfigFile);
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
 			plugin.getLogger().severe("Error while writing to grills.yml");
+			e.printStackTrace();
 		}
 		
 		//Save bridges
@@ -346,22 +355,16 @@ public class Config {
 		{
 			bridgeConfig.save(bridgeConfigFile);
 		}
-		catch (Exception ex)
+		catch (Exception e)
 		{
 			plugin.getLogger().severe("Error while writing to bridges.yml");
+			e.printStackTrace();
 		}
 		
 		//Save main
 		mainConfig.set("Language", lang);
-		try
-		{
-			mainConfig.save(mainConfigFile);
-		}
-		catch (Exception ex)
-		{
-			plugin.getLogger().severe("Error while writing to config.yml");
-		}
-			
+		mainConfig.set("Debug", debug);
+		plugin.saveConfig();			
 	}
 	
 	public enum Sound {

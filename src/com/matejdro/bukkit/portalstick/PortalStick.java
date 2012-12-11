@@ -134,7 +134,8 @@ public class PortalStick extends JavaPlugin {
 	public final String PERM_DELETE_GRILL	= "portalstick.deletegrill";
 	public final String PERM_DAMAGE_BOOTS	= "portalstick.damageboots";
 	public final String PERM_TELEPORT 		= "portalstick.teleport";
-	public final String PERM_LANGUAGE		= "portalstick.language";
+	public final String PERM_LANGUAGE		= "portalstick.admin.language";
+	public final String PERM_DEBUG			= "portalstick.admin.debug";
     
 	public boolean hasPermission(Player player, String node) {
 		if(player.hasPermission(node))

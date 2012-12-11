@@ -14,7 +14,7 @@ RegionPointOneSet: '&aPosition 1 de la region est choisie`nTappe /portal setregi
 RegionPointTwoSet: '&aPosition 2 de la region est choisie`nTappe /portal setregion pour creer la region'
 RegionToolNoPointsSelected: '&cIl faut choisir 2 positions'
 CanNotDeleteGlobalRegion: '&cTu ne peux pas supprimer la configuration entiere!'
-RegionsOverlap: '&cErreur: La region &a%1% &cest en contact avec &a%2%'
+RegionsOverlap: '&cErreur: La region &7%1% &cest en contact avec &7%2%'
 InvalidRegionFlag: '&cOption invalide %1%, Choisis parmi les suivantes:'
 InvalidRegionFlagValue: '&cValeur invalide pour l option &7%1%'
 LanguageChanged: '&cLangue changee en %1%!'

@@ -94,7 +94,8 @@ public class Util {
           	}
           	catch(Exception e)
           	{
-          	  plugin.getLogger().info("Warning: Invalid volume \""+split[1]+"\" for sound "+split[0]);
+          	  if(plugin.config.debug)
+          		  plugin.getLogger().info("Warning: Invalid volume \""+split[1]+"\" for sound "+split[0]);
           	  volume = 1.0F;
           	}
           if(split.length > 2)
@@ -105,7 +106,8 @@ public class Util {
         	}
         	catch(Exception e)
           	{
-          	  plugin.getLogger().info("Warning: Invalid pitch \""+split[2]+"\" for sound "+split[0]);
+        	  if(plugin.config.debug)
+        		  plugin.getLogger().info("Warning: Invalid pitch \""+split[2]+"\" for sound "+split[0]);
           	  pitch = 1.0F;
           	}
           }

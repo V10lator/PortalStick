@@ -83,7 +83,8 @@ public class Region extends User
 				{
 				  if(player != null)
 					  plugin.util.sendMessage(player, plugin.i18n.getString("RegionsOverlap", player.getName(), name, region.name));
-				  plugin.getLogger().info("Region \""+name+"\" overlaps with region \""+region.name+"\". Removing.");
+				  if(plugin.config.debug)
+					  plugin.getLogger().info("Region \""+name+"\" overlaps with region \""+region.name+"\". Removing.");
 				  return false;
 				}
 		}
