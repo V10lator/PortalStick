@@ -73,8 +73,8 @@ public class GelManager {
 				{
 				  switch(face)
 				  {
-				  	case NORTH:
-				  	case SOUTH:
+				  	case EAST:
+				  	case WEST:
 				  	  dir = 1;
 				  	  break;
 				  	default:

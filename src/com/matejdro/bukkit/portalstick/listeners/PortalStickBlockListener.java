@@ -392,16 +392,16 @@ public class PortalStickBlockListener implements Listener
 		  switch(d.getData().getData())
 		  {
 		  	case 2:
-		  	  direction = BlockFace.EAST;
+		  	  direction = BlockFace.NORTH;
 		  	  break;
 		  	case 3:
-		  	  direction = BlockFace.WEST;
+		  	  direction = BlockFace.SOUTH;
 		  	  break;
 		  	case 4:
-			  direction = BlockFace.NORTH;
+			  direction = BlockFace.WEST;
 			  break;
 		  	default:
-			  direction = BlockFace.SOUTH;
+			  direction = BlockFace.EAST;
 		  }
 		  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, direction, mat.getId(), is.getData().getData()), 0L, 5L));
 		  plugin.gelManager.activeGelTubes.add(from);
@@ -421,16 +421,16 @@ public class PortalStickBlockListener implements Listener
 			switch(d.getData().getData())
 			{
 			  case 2:
-			    direction = BlockFace.EAST;
+			    direction = BlockFace.NORTH;
 			  	break;
 			  case 3:
-			    direction = BlockFace.WEST;
+			    direction = BlockFace.SOUTH;
 			    break;
 			  case 4:
-				direction = BlockFace.NORTH;
+				direction = BlockFace.WEST;
 				break;
 			  default:
-				direction = BlockFace.SOUTH;
+				direction = BlockFace.EAST;
 			}
 			  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, direction, mat.getId(), is.getData().getData()), 0L, 5L));
 			  plugin.gelManager.activeGelTubes.add(from);
@@ -484,16 +484,16 @@ public class PortalStickBlockListener implements Listener
 		  switch(direction)
 		  {
 		    case NORTH:
-		      vector.setX(-v);
+		      vector.setZ(-v);
 		      break;
 		  	case EAST:
-		  	  vector.setZ(-v);
-		  	  break;
-		  	case SOUTH:
 		  	  vector.setX(v);
 		  	  break;
-		  	default:
+		  	case SOUTH:
 		  	  vector.setZ(v);
+		  	  break;
+		  	default:
+		  	  vector.setX(-v);
 		  }
 		}
 		loc2.setX(loc2.getX()+0.5D);

@@ -366,19 +366,19 @@ public class PortalManager {
 		//Try WEST/EAST
 		if (dir < 90 || dir > 270)
 		{
-			if (placePortal(block, BlockFace.EAST, player, orange, false))
+			if (placePortal(block, BlockFace.NORTH, player, orange, false))
 			  return;
 		}
-		else if (placePortal(block, BlockFace.WEST, player, orange, false))
+		else if (placePortal(block, BlockFace.SOUTH, player, orange, false))
 		  return;
 		
 		//Try NORTH/SOUTH
 		if (dir < 180) 
 		{
-			if (placePortal(block, BlockFace.SOUTH, player, orange, false))
+			if (placePortal(block, BlockFace.EAST, player, orange, false))
 			  return;
 		}
-		else if (placePortal(block, BlockFace.NORTH, player, orange, false))
+		else if (placePortal(block, BlockFace.WEST, player, orange, false))
 		  return;
 		
 		//Try UP/DOWN

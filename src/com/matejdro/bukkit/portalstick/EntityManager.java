@@ -96,26 +96,26 @@ public class EntityManager implements Runnable {
 				switch(face)
 				{
 			  	  case NORTH_WEST:
-			  		z = 0.5D;
-			  	  case NORTH:
 			  		x = 0.5D;
+			  	  case NORTH:
+			  		z = 0.5D;
 			  		nwf = true;
 				  break;
 			  	  case NORTH_EAST:
-			  		x = 1.5D;
+			  		z = 1.5D;
 			  	  case EAST:
-			  		z = 0.5D;
+			  		x = 0.5D;
 			  		nef = true;
 			  		break;
 			  	  case SOUTH_EAST:
-			  		z = 1.5D;
+			  		x = 1.5D;
 			  	  case SOUTH:
-			  		x = 0.5D;
+			  		z = 0.5D;
 			  		break;
 			  	  case SOUTH_WEST:
-			  		x = 0.5D;
-			  	  default:
 			  		z = 0.5D;
+			  	  default:
+			  		x = 0.5D;
 				}
 				if(nef)
 				{
@@ -150,18 +150,18 @@ public class EntityManager implements Runnable {
 		double momentum = 0.0;
 		switch(portal.teleportFace)
 	       {
-	       	case NORTH:
+	       	case WEST:
 	       		momentum = vector.getX();
 	       		break;
-	       	case EAST:
+	       	case NORTH:
 	       		yaw -= 90;
 	       		momentum = vector.getZ();
 	       		break;
-	       	case SOUTH:
+	       	case EAST:
 	       		yaw -= 180;
 	       		momentum = vector.getX();
 	       		break;
-	       	case WEST:
+	       	case SOUTH:
 	       		yaw -= 270;
 	       		momentum = vector.getZ();
 	       		break;
@@ -179,19 +179,19 @@ public class EntityManager implements Runnable {
 		Vector outvector = entity.getVelocity().zero();
 		switch(destination.teleportFace)
         {
-        	case NORTH:
+        	case WEST:
         		yaw += 180;
         		outvector = outvector.setX(momentum);
         		break;
-        	case EAST:
+        	case NORTH:
         		yaw += 270;
         		outvector = outvector.setZ(momentum);
         		break;
-        	case SOUTH:
+        	case EAST:
         		yaw += 360;
         		outvector = outvector.setX(-momentum);
         		break;
-        	case WEST:
+        	case SOUTH:
         		yaw += 450;
         		outvector = outvector.setZ(-momentum);
         		break;
@@ -348,17 +348,16 @@ public class EntityManager implements Runnable {
 				if (face != null) {
 					switch (face) {
 						case NORTH:
-							velocity.setX(d);
-							break;
-						case SOUTH:
-							velocity.setX(-d);
+							velocity.setZ(d);//
 							break;
 						case EAST:
-							velocity.setZ(d);
+							velocity.setX(-d);
 							break;
-						case WEST:
+						case SOUTH:
 							velocity.setZ(-d);
 							break;
+						default:
+							velocity.setX(d);
 					}
 					if (blockStart == blockUnder) {
 						velocity.setX(-velocity.getX());
