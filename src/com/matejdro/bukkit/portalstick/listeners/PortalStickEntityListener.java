@@ -38,6 +38,47 @@ import de.V10lator.PortalStick.V10Location;
 public class PortalStickEntityListener implements Listener {
 	private final PortalStick plugin;
 	
+	private final int[] gelBlacklist = new int[] {
+	  Material.ANVIL.getId(),
+	  Material.CHEST.getId(),
+	  Material.FENCE.getId(),
+	  Material.FENCE_GATE.getId(),
+	  Material.NETHER_FENCE.getId(),
+	  Material.IRON_FENCE.getId(),
+	  Material.GLASS.getId(),
+	  Material.THIN_GLASS.getId(),
+	  Material.BED_BLOCK.getId(),
+	  Material.TRAP_DOOR.getId(),
+	  Material.IRON_DOOR_BLOCK.getId(),
+	  Material.WOODEN_DOOR.getId(),
+	  Material.STONE_PLATE.getId(),
+	  Material.WOOD_PLATE.getId(),
+	  Material.DISPENSER.getId(),
+	  Material.NOTE_BLOCK.getId(),
+	  Material.WORKBENCH.getId(),
+	  Material.FURNACE.getId(),
+	  Material.PISTON_BASE.getId(),
+	  Material.PISTON_EXTENSION.getId(),
+	  Material.PISTON_MOVING_PIECE.getId(),
+	  Material.PISTON_STICKY_BASE.getId(),
+	  Material.BEACON.getId(),
+	  Material.GLOWSTONE.getId(),
+	  Material.REDSTONE_LAMP_OFF.getId(),
+	  Material.REDSTONE_LAMP_ON.getId(),
+	  Material.BEDROCK.getId(),
+	  Material.BURNING_FURNACE.getId(),
+	  Material.COMMAND.getId(),
+	  Material.DRAGON_EGG.getId(),
+	  Material.ENDER_CHEST.getId(),
+	  Material.JACK_O_LANTERN.getId(),
+	  Material.JUKEBOX.getId(),
+	  Material.CAKE_BLOCK.getId(),
+	  Material.ENCHANTMENT_TABLE.getId(),
+	  Material.BREWING_STAND.getId(),
+	  Material.WALL_SIGN.getId(),
+	  Material.SIGN_POST.getId()
+	};
+	
 	public PortalStickEntityListener(PortalStick plugin)
 	{
 		this.plugin = plugin;
@@ -156,11 +197,23 @@ public class PortalStickEntityListener implements Listener {
 		byte data = fb.getBlockData();
 		BlockHolder bh;
 		Block b2;
+		boolean bl;
+		int mat2;
 		for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
 		{
 		  b2 = b.getRelative(face);
-		  if(b2.getType() != Material.AIR && !b2.isLiquid())
+		  if(b2.getType() != Material.AIR && !b2.isLiquid() && b2.getType().isSolid())
 		  {
+			bl = false;
+			mat2 = b2.getTypeId();
+			for(int mat3: gelBlacklist)
+			  if(mat2 == mat3)
+			  {
+				bl = true;
+				break;
+			  }
+			if(bl)
+			  continue;
 			vloc = new V10Location(b2);
 			if(plugin.portalManager.borderBlocks.containsKey(vloc) ||
 					plugin.portalManager.insideBlocks.containsKey(vloc) ||
