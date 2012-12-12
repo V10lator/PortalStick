@@ -16,6 +16,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -168,6 +169,14 @@ public class PortalStickEntityListener implements Listener {
 		user.saveInventory((InventoryHolder)entity);
 	}
 	
+	@EventHandler(ignoreCancelled = true)
+	public void blockLand(EntityChangeBlockEvent event)
+	{
+	  Entity entity = event.getEntity();
+	  if(entity instanceof FallingBlock && !plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()) && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
+	    event.setCancelled(true);
+	}
+	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void despawn(EntityRemoveEvent event)
 	{
@@ -175,14 +184,15 @@ public class PortalStickEntityListener implements Listener {
 	  if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 		return;
 	  
-	  if(plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
+	  
+	  //Remove flying gels from the map. We can't do this if they don't try to place themself in the event above...
+	  //TODO Also remember to merge the two events into one after the CB pull was accepted...
+	  if(entity instanceof FallingBlock && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
 	  {
 		V10Location from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
+		plugin.gelManager.flyingGels.remove(entity.getUniqueId());
 		Location loc = entity.getLocation();
 		V10Location vloc = new V10Location(loc);
-//		if(b.getTypeId() == mat && b.getData() == data)
-//		if(!plugin.grillManager.insideBlocks.containsKey(vloc))
-//		  b.setType(Material.AIR);
 		ArrayList<BlockHolder> blocks;
 		if(plugin.gelManager.gels.containsKey(from))
 		  blocks = plugin.gelManager.gels.get(from);
@@ -191,8 +201,8 @@ public class PortalStickEntityListener implements Listener {
 		  blocks = new ArrayList<BlockHolder>();
 		  plugin.gelManager.gels.put(from, blocks);
 		}
-		Block b = loc.getBlock();
 		FallingBlock fb = (FallingBlock)entity;
+		Block b = loc.getBlock();
 		int mat = fb.getBlockId();
 		byte data = fb.getBlockData();
 		BlockHolder bh;
