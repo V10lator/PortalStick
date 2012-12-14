@@ -71,6 +71,14 @@ public class Util {
     	return str;
     }
     
+    private void playNativeSound(Sound sound, V10Location loc)
+    {
+      boolean oldState = plugin.config.useSpoutSounds;
+      plugin.config.useSpoutSounds = false;
+      playSound(sound, loc);
+      plugin.config.useSpoutSounds = oldState;
+    }
+    
     public void playSound(Sound sound, V10Location loc)
     {
       if (!plugin.regionManager.getRegion(loc).getBoolean(RegionSetting.ENABLE_SOUNDS))
@@ -83,7 +91,12 @@ public class Util {
         {
           String raw = plugin.config.soundNative[sound.ordinal()];
           if(raw == null || raw.equals(""))
+          {
+        	if(plugin.config.debug)
+        	  plugin.getLogger().info("Spout sound "+sound.toString()+" not found! Trying native sound instead.");
+        	playNativeSound(sound, loc);
         	return;
+          }
           String[] split = raw.split(":");
           float volume = 1.0F;
           float pitch = volume;
@@ -118,6 +131,12 @@ public class Util {
           }
           catch(IllegalArgumentException e)
           {
+        	if(plugin.config.debug)
+        	{
+              plugin.getLogger().info("Spout sound "+sound.toString()+" gave an exception! Trying native sound instead.");
+              e.printStackTrace();
+        	}
+        	playNativeSound(sound, loc);
           }
         }
       }
