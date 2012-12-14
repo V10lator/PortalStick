@@ -27,7 +27,6 @@ import com.matejdro.bukkit.portalstick.Portal;
 import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
 
-import de.V10lator.PortalStick.AutoUpdate;
 import de.V10lator.PortalStick.V10Location;
 
 public class Config {
@@ -186,20 +185,6 @@ public class Config {
         	plugin.funnelBridgeManager.loadBridge(bridge);
         if(debug)
         	plugin.getLogger().info(plugin.funnelBridgeManager.bridges.size() + " bridge(s) loaded");
-        
-        try
-        {
-          if(plugin.au == null)
-        	plugin.au = new AutoUpdate(plugin);
-          else
-        	plugin.au.resetConfig();
-          plugin.au.setDebug(debug);
-		} 
-        catch (Exception e)
-        {
-		  plugin.getLogger().severe("Auto update error!");
-		  e.printStackTrace();
-		}
         
         saveAll();
 		
