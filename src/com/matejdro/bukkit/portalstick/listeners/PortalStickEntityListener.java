@@ -184,9 +184,7 @@ public class PortalStickEntityListener implements Listener {
 	  if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 		return;
 	  
-	  
 	  //Remove flying gels from the map. We can't do this if they don't try to place themself in the event above...
-	  //TODO Also remember to merge the two events into one after the CB pull was accepted...
 	  if(entity instanceof FallingBlock && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
 	  {
 		V10Location from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
@@ -248,7 +246,8 @@ public class PortalStickEntityListener implements Listener {
 	  }
 	  
 	  User user = plugin.userManager.getUser(entity);
-//	  System.out.print("Despawned: "+entity.getType());
+	  if(user == null) //TODO: Workaround against BKCommonLib bugs.
+		return;
 	  
 	  Region region = plugin.regionManager.getRegion(new V10Location(entity.getLocation()));
 	  if(entity instanceof InventoryHolder && region.name != "global" && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
