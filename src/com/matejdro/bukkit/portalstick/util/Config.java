@@ -3,7 +3,6 @@ package com.matejdro.bukkit.portalstick.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,7 +28,6 @@ import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
 
 import de.V10lator.PortalStick.V10Location;
-import de.V10lator.PortalStick.Music.StillAlive;
 
 public class Config {
 	
@@ -153,8 +151,6 @@ public class Config {
         soundUrls[Sound.GRILL_EMANCIPATE.ordinal()] = getString("sounds.spout.grill-emancipate-url", "");
         soundUrls[Sound.FAITHPLATE_LAUNCH.ordinal()] = getString("sounds.spout.faith-plate-launch-url", "");
         soundUrls[Sound.GEL_BLUE_BOUNCE.ordinal()] = getString("sounds.spout.blue-gel-bounce-url", "");
-        
-        musicUrls[Music.STILL_ALIVE.ordinal()] = getString("music.spout.still-alive-url", "");
         
         soundRange = getInt("sounds.sound-range", 20);
         
@@ -366,39 +362,5 @@ public class Config {
 		GRILL_EMANCIPATE,
 		FAITHPLATE_LAUNCH,
 		GEL_BLUE_BOUNCE,
-		STILL_ALIVE
-	}
-	
-	public enum Music {
-		STILL_ALIVE(StillAlive.class);
-		
-		private final Constructor<?> music;
-		
-		private Music(Class<?> music)
-		{
-		  Constructor<?> c;
-		  try
-		  {
-			c = music.getConstructor(V10Location.class);
-		  }
-		  catch(Exception e)
-		  {
-			e.printStackTrace();
-			c = null;
-		  }
-		  this.music = c;
-		}
-		
-		public void start(V10Location loc)
-		{
-		  try
-		  {
-			music.newInstance(loc);
-		  }
-		  catch(Exception e)
-		  {
-			e.printStackTrace();
-		  }
-		}
 	}
 }

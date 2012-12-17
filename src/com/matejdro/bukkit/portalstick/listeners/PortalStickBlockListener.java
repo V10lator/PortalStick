@@ -592,7 +592,7 @@ public class PortalStickBlockListener implements Listener
 			 }
 		 }
 		 
-		 //Portal Generators
+		 //Portal Generators & music signs
 		 if (event.getOldCurrent()  == 0 && event.getNewCurrent() > 0)
 		 {
 			 Block block2;

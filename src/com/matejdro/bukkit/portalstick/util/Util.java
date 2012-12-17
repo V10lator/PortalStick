@@ -8,7 +8,6 @@ import org.bukkit.plugin.Plugin;
 import org.getspout.spoutapi.SpoutManager;
 
 import com.matejdro.bukkit.portalstick.PortalStick;
-import com.matejdro.bukkit.portalstick.util.Config.Music;
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
 
 import de.V10lator.PortalStick.V10Location;
@@ -72,33 +71,6 @@ public class Util {
     	return str;
     }
     
-    public void playMusic(Music music, V10Location loc)
-    {
-      if(!plugin.regionManager.getRegion(loc).getBoolean(RegionSetting.ENABLE_SOUNDS))
-      	return;
-      
-      Plugin spoutPlugin = plugin.getServer().getPluginManager().getPlugin("Spout");
-      if(spoutPlugin == null || !plugin.config.useSpoutSounds)
-    	music.start(loc);
-      else
-      {
-        String url = plugin.config.musicUrls[music.ordinal()];
-    	if(url != null && url.length() > 4 && url.length() < 257)
-    	  SpoutManager.getSoundManager().playGlobalCustomSoundEffect(plugin, url, false, loc.getHandle(), plugin.config.soundRange);
-    	else
-    	  playNativeMusic(music, loc);
-      }
-    	  
-    }
-    
-    private void playNativeMusic(Music music, V10Location loc)
-    {
-      boolean oldState = plugin.config.useSpoutSounds;
-      plugin.config.useSpoutSounds = false;
-      playMusic(music, loc);
-      plugin.config.useSpoutSounds = oldState;
-    }
-    
     private void playNativeSound(Sound sound, V10Location loc)
     {
       boolean oldState = plugin.config.useSpoutSounds;
@@ -121,7 +93,7 @@ public class Util {
           if(raw == null || raw.equals(""))
           {
         	if(plugin.config.debug)
-        	  plugin.getLogger().info("Spout sound "+sound.toString()+" not found!");
+        	  plugin.getLogger().info("Sound "+sound.toString()+" not found!");
         	return;
           }
           String[] split = raw.split(":");
