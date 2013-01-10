@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -263,7 +262,6 @@ public class PortalStickEntityListener implements Listener {
 	  Entity entity = event.getEntity();
 	  if(entity instanceof Player || (entity instanceof Vehicle && !(entity instanceof Pig)))
 		return;
-	  World world = entity.getWorld();
 	  plugin.entityManager.onEntityMove(entity, event.getFrom(), event.getTo(), true);
 	}
 }
