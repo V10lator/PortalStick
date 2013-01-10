@@ -22,10 +22,10 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.surgeproject.event.entity.EntityAddEvent;
+import org.surgeproject.event.entity.EntityMoveEvent;
+import org.surgeproject.event.entity.EntityRemoveEvent;
 
-import com.bergerkiller.bukkit.common.events.EntityAddEvent;
-import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
-import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.matejdro.bukkit.portalstick.Grill;
 import com.matejdro.bukkit.portalstick.Portal;
 import com.matejdro.bukkit.portalstick.PortalStick;
@@ -264,6 +264,6 @@ public class PortalStickEntityListener implements Listener {
 	  if(entity instanceof Player || (entity instanceof Vehicle && !(entity instanceof Pig)))
 		return;
 	  World world = entity.getWorld();
-	  plugin.entityManager.onEntityMove(entity, new Location(world, event.getFromX(), event.getFromY(), event.getFromZ(), event.getFromYaw(), event.getFromPitch()), new Location(world, event.getToX(), event.getToY(), event.getToZ(), event.getToYaw(), event.getToPitch()), true);
+	  plugin.entityManager.onEntityMove(entity, event.getFrom(), event.getTo(), true);
 	}
 }

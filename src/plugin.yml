@@ -1,8 +1,7 @@
 name: PortalStick
 main: com.matejdro.bukkit.portalstick.PortalStick
-version: 4.0-beta1
+version: 4.0-beta2
 authors: [matejdro, oliverw92, V10lator]
-depend: [BKCommonLib]
 softdepend: [WorldGuard]
 commands:
   portalstick:

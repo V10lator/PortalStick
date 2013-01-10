@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.matejdro.bukkit.portalstick.commands.BaseCommand;
 import com.matejdro.bukkit.portalstick.commands.DeleteAllCommand;
 import com.matejdro.bukkit.portalstick.commands.DeleteCommand;
@@ -66,15 +65,6 @@ public class PortalStick extends JavaPlugin {
 	}
 	
 	public void onEnable() {
-		if(Common.VERSION < 139)
-		{
-		  getLogger().info("BKCommonLib outdated!");
-		  getServer().getPluginManager().disablePlugin(this);
-		  return;
-		}
-		else if(Common.VERSION > 139)
-		  getLogger().info("WARNING: BKCommonLib to new. Things may be broken!");
-		
 		config = new Config(this);
 		
 		//Register events
