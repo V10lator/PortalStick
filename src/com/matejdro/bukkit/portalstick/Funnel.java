@@ -6,13 +6,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-
-import de.V10lator.PortalStick.V10Location;
+import org.surgedev.util.SurgeLocation;
 
 public class Funnel extends Bridge {
 	private boolean reversed = false;
 	
-	Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
+	Funnel(PortalStick plugin, SurgeLocation CreationBlock, SurgeLocation startingBlock, BlockFace face, HashSet<SurgeLocation> machineBlocks) {
 		super(plugin, CreationBlock, startingBlock, face, machineBlocks);
 	}
 	
@@ -24,14 +23,14 @@ public class Funnel extends Bridge {
 	
 	public BlockFace getDirection(Block block)
 	{
-		V10Location vb = new V10Location(block);
+	    SurgeLocation vb = new SurgeLocation(block);
 		if (!bridgeBlocks.containsKey(vb)) return null;
 		
 		int curnum = bridgeBlocks.get(vb);
 		BlockFace face = null;
 		for (BlockFace check : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN})
 		{
-			vb = new V10Location(block.getRelative(check));
+			vb = new SurgeLocation(block.getRelative(check));
 			if (bridgeBlocks.containsKey(vb) && (curnum - bridgeBlocks.get(vb) == 1 || bridgeBlocks.get(vb) > curnum + 1) )			{
 				face = check;
 				break;
@@ -60,7 +59,7 @@ public class Funnel extends Bridge {
 		return face;
 	}
 	
-	public int getCounter(V10Location block)
+	public int getCounter(SurgeLocation block)
 	{
 		return bridgeBlocks.get(block);
 	}
@@ -72,7 +71,7 @@ public class Funnel extends Bridge {
 		deactivate();
 		
 		BlockFace face = facingSide;
-		V10Location nextV10Location = startBlock;
+		SurgeLocation nextV10Location = startBlock;
 		Block nextBlock = nextV10Location.getHandle().getBlock();
 		int counter = reversed ? 1 : 8;
 		while (true)
@@ -96,7 +95,7 @@ public class Funnel extends Bridge {
 			{
 			  portal = plugin.portalManager.borderBlocks.get(nextV10Location);
 			  if(portal.open)
-				nextV10Location = new V10Location(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+				nextV10Location = new SurgeLocation(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
 			  else
 				return;
 			}
@@ -133,14 +132,14 @@ public class Funnel extends Bridge {
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextV10Location, this);
 			
 			nextBlock = nextBlock.getRelative(face);
-			nextV10Location = new V10Location(nextBlock);
+			nextV10Location = new SurgeLocation(nextBlock);
 		}
 	}
 	
 	@Override
 	public void deactivate()
 	{
-		for (V10Location b : bridgeBlocks.keySet())
+		for (SurgeLocation b : bridgeBlocks.keySet())
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.funnelBridgeManager.bridgeBlocks.remove(b);

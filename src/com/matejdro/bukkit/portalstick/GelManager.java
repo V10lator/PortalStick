@@ -15,30 +15,29 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
+import org.surgedev.util.BlockStorage;
+import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
-
-import de.V10lator.PortalStick.BlockHolder;
-import de.V10lator.PortalStick.V10Location;
 
 public class GelManager {
 	private final PortalStick plugin;
 	final HashMap<String, Float> onRedGel = new HashMap<String, Float>();
 	private final HashSet<Entity> ignore = new HashSet<Entity>();
 	final HashMap<String, Integer> redTasks = new HashMap<String, Integer>();
-	public final HashMap<V10Location, Integer> tubePids = new HashMap<V10Location, Integer>();
-	public final HashSet<V10Location> activeGelTubes = new HashSet<V10Location>();
-	public final HashMap<UUID, V10Location> flyingGels = new HashMap<UUID, V10Location>();
-	public final HashMap<V10Location, ArrayList<BlockHolder>> gels = new HashMap<V10Location, ArrayList<BlockHolder>>();
-	public final HashMap<BlockHolder, BlockHolder> gelMap = new HashMap<BlockHolder, BlockHolder>();
+	public final HashMap<SurgeLocation, Integer> tubePids = new HashMap<SurgeLocation, Integer>();
+	public final HashSet<SurgeLocation> activeGelTubes = new HashSet<SurgeLocation>();
+	public final HashMap<UUID, SurgeLocation> flyingGels = new HashMap<UUID, SurgeLocation>();
+	public final HashMap<SurgeLocation, ArrayList<BlockStorage>> gels = new HashMap<SurgeLocation, ArrayList<BlockStorage>>();
+	public final HashMap<BlockStorage, BlockStorage> gelMap = new HashMap<BlockStorage, BlockStorage>();
 	
 	GelManager(PortalStick plugin)
 	{
 		this.plugin = plugin;
 	}
 	
-	public void useGel(Entity entity, V10Location locTo, Vector vector, Block block, Block under, HashMap<BlockFace, Block> faceMap)
+	public void useGel(Entity entity, SurgeLocation locTo, Vector vector, Block block, Block under, HashMap<BlockFace, Block> faceMap)
 	{
 		Region region = plugin.regionManager.getRegion(locTo);
 		
@@ -64,7 +63,7 @@ public class GelManager {
 			  }
 			  if(plugin.blockUtil.compareBlockToString(block2, bg))
 			  {
-				if(isPortal(new V10Location(block2)))
+				if(isPortal(new SurgeLocation(block2)))
 				  continue;
 				byte dir;
 				if(face == null)
@@ -88,12 +87,12 @@ public class GelManager {
 		}
 	}
 	
-	private boolean isPortal(V10Location vl)
+	private boolean isPortal(SurgeLocation vl)
 	{
-	  for(V10Location loc: plugin.portalManager.borderBlocks.keySet())
+	  for(SurgeLocation loc: plugin.portalManager.borderBlocks.keySet())
 		if(loc.equals(vl))
 		  return true;
-	  for(V10Location loc: plugin.portalManager.insideBlocks.keySet())
+	  for(SurgeLocation loc: plugin.portalManager.insideBlocks.keySet())
 		if(loc.equals(vl))
 		  return true;
 	  return false;
@@ -146,7 +145,7 @@ public class GelManager {
 		}
 		entity.setVelocity(vector);
 		
-		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new V10Location(loc));
+		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new SurgeLocation(loc));
 		
 		ignore.add(entity);
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 5L);
@@ -158,7 +157,7 @@ public class GelManager {
 		return false;
 	  
 	  final Player player = (Player)entity;
-	  if(isPortal(new V10Location(under)))
+	  if(isPortal(new SurgeLocation(under)))
 	  {
 		resetPlayer(player);
 		return false;
@@ -195,18 +194,18 @@ public class GelManager {
 	  redTasks.remove(pn);
 	}
 	
-	public void stopGelTube(V10Location loc)
+	public void stopGelTube(SurgeLocation loc)
 	{
 	  if(!tubePids.containsKey(loc))
 		return;
 	  plugin.getServer().getScheduler().cancelTask(tubePids.get(loc));
 	  tubePids.remove(loc);
 	  activeGelTubes.remove(loc);
-	  ArrayList<BlockHolder> tc = new ArrayList<BlockHolder>();
+	  ArrayList<BlockStorage> tc = new ArrayList<BlockStorage>();
 	  Portal portal;
 	  if(gels.containsKey(loc))
 	  {
-		for(BlockHolder bh: gels.get(loc))
+		for(BlockStorage bh: gels.get(loc))
 		{
 		  if(plugin.portalManager.insideBlocks.containsKey(loc))
 		  {
@@ -217,16 +216,16 @@ public class GelManager {
 			  portal.close();
 		  }
 		  else
-			bh.reset();
+			plugin.resetBlock(bh);
 		  gelMap.remove(bh);
 		  tc.add(bh);
 		}
 		gels.remove(loc);
-		for(ArrayList<BlockHolder> blocks: gels.values())
-		  for(BlockHolder bh: tc)
+		for(ArrayList<BlockStorage> blocks: gels.values())
+		  for(BlockStorage bh: tc)
 			blocks.remove(bh);
 	  }
-	  World world = plugin.getServer().getWorld(loc.world);
+	  World world = loc.getWorld();
 	  UUID uuid;
 	  for(Chunk c: world.getLoadedChunks())
 		for(Entity e: c.getEntities())
@@ -240,10 +239,10 @@ public class GelManager {
 		}
 	}
 	
-	public void removeGel(BlockHolder bh)
+	public void removeGel(BlockStorage bh)
 	{
 	  gelMap.remove(bh);
-	  for(ArrayList<BlockHolder> blocks: gels.values())
+	  for(ArrayList<BlockStorage> blocks: gels.values())
 		blocks.remove(bh);
 	}
 }

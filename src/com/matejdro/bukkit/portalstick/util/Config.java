@@ -18,16 +18,15 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.surgeproject.event.entity.EntityAddEvent;
-import org.surgeproject.event.entity.EntityRemoveEvent;
+import org.surgedev.event.entity.EntityAddEvent;
+import org.surgedev.event.entity.EntityRemoveEvent;
+import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.Bridge;
 import com.matejdro.bukkit.portalstick.Grill;
 import com.matejdro.bukkit.portalstick.Portal;
 import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
-
-import de.V10lator.PortalStick.V10Location;
 
 public class Config {
 	
@@ -252,7 +251,7 @@ public class Config {
 			p.delete();
 		plugin.portalManager.portals.clear();
 		plugin.grillManager.deleteAll();
-		for(V10Location loc: plugin.gelManager.gels.keySet())
+		for(SurgeLocation loc: plugin.gelManager.gels.keySet())
 		  plugin.gelManager.stopGelTube(loc);
 	}
 	

@@ -3,8 +3,7 @@ package com.matejdro.bukkit.portalstick;
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
-
-import de.V10lator.PortalStick.V10Location;
+import org.surgedev.util.SurgeLocation;
 
 public class RegionManager {
 	private final PortalStick plugin;
@@ -38,7 +37,7 @@ public class RegionManager {
 		plugin.config.deleteRegion(name);
 	}
 	
-	public boolean createRegion(Player player, String name, V10Location one, V10Location two) {
+	public boolean createRegion(Player player, String name, SurgeLocation one, SurgeLocation two) {
 		name = name.toLowerCase();
 		Region region = new Region(plugin, name);
 		boolean ret = region.setLocation(player, one, two);
@@ -50,7 +49,7 @@ public class RegionManager {
 		return ret;
 	}
 	
-	public Region getRegion(V10Location location) {
+	public Region getRegion(SurgeLocation location) {
 		for (Region region : regions.values())
 			if (region.contains(location) && !region.name.equals("global"))
 				return region;

@@ -5,18 +5,17 @@ import java.util.HashSet;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.surgedev.util.BlockStorage;
+import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
 
-import de.V10lator.PortalStick.BlockHolder;
-import de.V10lator.PortalStick.V10Location;
-
 public class Portal {
 	private final PortalStick plugin;
-	final HashSet<V10Location> border;
-	public final V10Location[] inside;
-	public final V10Location[] teleport;
-	private final V10Location[] behind;
+	final HashSet<SurgeLocation> border;
+	public final SurgeLocation[] inside;
+	public final SurgeLocation[] teleport;
+	private final SurgeLocation[] behind;
 	public final boolean horizontal;
 	public final User owner;
 	public final boolean orange;
@@ -24,11 +23,11 @@ public class Portal {
 	boolean disabled = false;
 	public boolean transmitter = false;
 	public final BlockFace teleportFace;
-	private final HashSet<V10Location> awayBlocks;
-	final V10Location[] awayBlocksY = new V10Location[2];
+	private final HashSet<SurgeLocation> awayBlocks;
+	final SurgeLocation[] awayBlocksY = new SurgeLocation[2];
 	private boolean placetorch = false;
 	
-	public Portal(PortalStick plugin, V10Location[] teleport, HashSet<V10Location> Border, V10Location[] inside, V10Location[] behind, User Owner, boolean Orange, boolean horizontal, BlockFace Teleportface)
+	public Portal(PortalStick plugin, SurgeLocation[] teleport, HashSet<SurgeLocation> Border, SurgeLocation[] inside, SurgeLocation[] behind, User Owner, boolean Orange, boolean horizontal, BlockFace Teleportface)
 	{
 		this.plugin = plugin;
 		this.teleport = teleport;
@@ -40,34 +39,34 @@ public class Portal {
 		teleportFace = Teleportface;
 		this.behind = behind;
 		if(horizontal)
-		  awayBlocks = new HashSet<V10Location>();
+		  awayBlocks = new HashSet<SurgeLocation>();
 		else
 		  awayBlocks = null;
 	}
 	
 	public void delete()
 	{
-		BlockHolder bh;
-		for (V10Location loc: border)
+		BlockStorage bh;
+		for (SurgeLocation loc: border)
 		{
 			if (plugin.portalManager.oldBlocks.containsKey(loc))
 			{
 				bh = plugin.portalManager.oldBlocks.get(loc);
-				bh.reset();
+				plugin.resetBlock(bh);
 				if(plugin.gelManager.gelMap.containsKey(bh))
 					plugin.gelManager.removeGel(bh);
 				plugin.portalManager.oldBlocks.remove(loc);
 			}
 			plugin.portalManager.borderBlocks.remove(loc);
 		}
-		for (V10Location loc: inside)
+		for (SurgeLocation loc: inside)
 		{
 		  if(loc == null)
 			continue;
 		  if (plugin.portalManager.oldBlocks.containsKey(loc))
 			{
 				bh = plugin.portalManager.oldBlocks.get(loc);
-				bh.reset();
+				plugin.resetBlock(bh);
 				if(plugin.gelManager.gelMap.containsKey(bh))
 					plugin.gelManager.removeGel(bh);
 				plugin.portalManager.oldBlocks.remove(loc);
@@ -76,12 +75,12 @@ public class Portal {
 		}
 		if (plugin.config.FillPortalBack > -1)
 		{
-			for (V10Location loc: behind)
+			for (SurgeLocation loc: behind)
 			{
 				if (plugin.portalManager.oldBlocks.containsKey(loc))
 				{
 					bh = plugin.portalManager.oldBlocks.get(loc);
-					bh.reset();
+					plugin.resetBlock(bh);
 					if(plugin.gelManager.gelMap.containsKey(bh))
 						plugin.gelManager.removeGel(bh);
 					plugin.portalManager.oldBlocks.remove(loc);
@@ -91,7 +90,7 @@ public class Portal {
 		}
 		if(horizontal)
 		{
-		  for(V10Location l: awayBlocks)
+		  for(SurgeLocation l: awayBlocks)
 			plugin.portalManager.awayBlocks.remove(l);
 		  plugin.portalManager.awayBlocksY.remove(awayBlocksY[0]);
 		  plugin.portalManager.awayBlocksY.remove(awayBlocksY[1]);
@@ -116,13 +115,13 @@ public class Portal {
 		Region region = plugin.regionManager.getRegion(inside[0]);
 		
 		Block b;
-//		BlockHolder bh;
-		for (V10Location loc: inside)
+//		BlockStorage bh;
+		for (SurgeLocation loc: inside)
     	{
 		  if(loc == null)
 			continue;
 			b = loc.getHandle().getBlock();
-//			bh = new BlockHolder(b);
+//			bh = new BlockStorage(b);
 //			if(plugin.gelManager.gelMap.containsKey(bh))
 //			  plugin.gelManager.removeGel(bh);
 			b.setType(Material.AIR); 
@@ -140,7 +139,7 @@ public class Portal {
 						 		transmitter = true;
 						 		if (destination.open)
 						 		{
-							 		for (V10Location b2: destination.inside)
+							 		for (SurgeLocation b2: destination.inside)
 							 		  if(b2 != null)
 							 			b2.getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
 						 		}
@@ -170,7 +169,7 @@ public class Portal {
 		else
 			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);
 		int w = Material.WOOL.getId();
-		for (V10Location b: inside)
+		for (SurgeLocation b: inside)
     	{
 		  if(b != null)
 		  {
@@ -190,16 +189,16 @@ public class Portal {
 		else
 			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);			
 		
-		for (V10Location b: border)
+		for (SurgeLocation b: border)
     		b.getHandle().getBlock().setData(color);
 
 		if (!open)
-			for (V10Location b: inside)
+			for (SurgeLocation b: inside)
 			  if(b != null)
 	    		b.getHandle().getBlock().setData(color);
 		
 		if (plugin.config.CompactPortal)
-			for (V10Location b: behind)
+			for (SurgeLocation b: behind)
 	    		b.getHandle().getBlock().setData(color);
 	}
 	
@@ -212,9 +211,9 @@ public class Portal {
 			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);			
 
 		Block rb;
-		BlockHolder bh;
+		BlockStorage bh;
 		int wool = Material.WOOL.getId();
-    	for (V10Location loc: border)
+    	for (SurgeLocation loc: border)
     	{
     		if (plugin.portalManager.insideBlocks.containsKey(loc))
     			plugin.portalManager.insideBlocks.get(loc).delete();
@@ -224,7 +223,7 @@ public class Portal {
     		rb = loc.getHandle().getBlock();
     		if(!plugin.portalManager.oldBlocks.containsKey(loc))
     		{
-    		  bh = new BlockHolder(rb);
+    		  bh = new BlockStorage(rb);
     		  if(plugin.gelManager.gelMap.containsKey(bh))
     		  {
     			bh = plugin.gelManager.gelMap.get(bh);
@@ -235,12 +234,12 @@ public class Portal {
     		rb.setTypeIdAndData(wool, color, false);
     		plugin.portalManager.borderBlocks.put(loc, this);
        	}
-    	for (V10Location loc: inside)
+    	for (SurgeLocation loc: inside)
     	{
     	  if(loc != null && !plugin.portalManager.oldBlocks.containsKey(loc))
     	  {
     		rb = loc.getHandle().getBlock();
-    		bh = new BlockHolder(rb);
+    		bh = new BlockStorage(rb);
     		if(plugin.gelManager.gelMap.containsKey(bh))
     		{
       		  bh = plugin.gelManager.gelMap.get(bh);
@@ -252,7 +251,7 @@ public class Portal {
     	byte data;
     	if (plugin.config.FillPortalBack > -1)
     	{
-    		for (V10Location loc: behind)
+    		for (SurgeLocation loc: behind)
         	{
         		if (plugin.portalManager.borderBlocks.containsKey(loc))
         			plugin.portalManager.borderBlocks.get(loc).delete();
@@ -262,7 +261,7 @@ public class Portal {
         		rb = loc.getHandle().getBlock();
         		if(!plugin.portalManager.oldBlocks.containsKey(loc))
         		{
-        		  bh = new BlockHolder(rb);
+        		  bh = new BlockStorage(rb);
         		  if(plugin.gelManager.gelMap.containsKey(bh))
         		  {
         			bh = plugin.gelManager.gelMap.get(bh);
@@ -296,8 +295,8 @@ public class Portal {
     	}
     	
     	
-    	V10Location oloc;
-    	V10Location loc;
+    	SurgeLocation oloc;
+    	SurgeLocation loc;
     	int i;
     	oloc = inside[0].clone();
     	plugin.portalManager.insideBlocks.put(inside[0], this);
@@ -310,7 +309,7 @@ public class Portal {
     	  {
     		if(y != 0)
     		{
-    		  loc = new V10Location(oloc.world, oloc.x, oloc.y + y, oloc.z);
+    		  loc = new SurgeLocation(oloc.getWorldName(), oloc.getX(), oloc.getY() + y, oloc.getZ());
     		  plugin.portalManager.awayBlocksY.put(loc, this);
     		  if(y < 1)
     			i = 0;
@@ -322,7 +321,7 @@ public class Portal {
     		{
     		  for (int z = -1;z<2;z++)
     		  {
-    			loc = new V10Location(oloc.world, oloc.x + x, oloc.y + y, oloc.z + z);
+    			loc = new SurgeLocation(oloc.getWorldName(), oloc.getX() + x, oloc.getY() + y, oloc.getZ() + z);
     			plugin.portalManager.awayBlocks.put(loc, this);
     			awayBlocks.add(loc);
     		  }

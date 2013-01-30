@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.Portal;
 import com.matejdro.bukkit.portalstick.PortalStick;
@@ -25,8 +26,6 @@ import com.matejdro.bukkit.portalstick.Region;
 import com.matejdro.bukkit.portalstick.User;
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
-
-import de.V10lator.PortalStick.V10Location;
 
 public class PortalStickPlayerListener implements Listener {
 	private final PortalStick plugin;
@@ -58,7 +57,7 @@ public class PortalStickPlayerListener implements Listener {
 			
 			
 			event.setCancelled(true);
-			Region region = plugin.regionManager.getRegion(new V10Location(player.getLocation()));
+			Region region = plugin.regionManager.getRegion(new SurgeLocation(player.getLocation()));
 			HashSet<Byte> tb = new HashSet<Byte>();
 			for (int i : region.getList(RegionSetting.TRANSPARENT_BLOCKS).toArray(new Integer[0]))
 				tb.add((byte) i);
@@ -82,12 +81,12 @@ public class PortalStickPlayerListener implements Listener {
 			if (targetBlocks.size() < 1)
 				return;
 			
-			V10Location loc;
+			SurgeLocation loc;
 			if (region.getBoolean(RegionSetting.PREVENT_PORTAL_THROUGH_PORTAL))
 			{
 				for (Block b : targetBlocks)
 				{
-					loc = new V10Location(b);
+					loc = new SurgeLocation(b);
 					for (Portal p : plugin.portalManager.portals)
 					{
 					  for(int i = 0; i < 2; i++)
@@ -108,13 +107,13 @@ public class PortalStickPlayerListener implements Listener {
 					if ((b.getType() == Material.IRON_DOOR_BLOCK || b.getType() == Material.WOODEN_DOOR) && ((b.getData() & 4) != 4) )
 					{
 						plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
-						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new V10Location(b));
+						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new SurgeLocation(b));
 						return;
 					}
 					else if (b.getType() == Material.TRAP_DOOR && (b.getData() & 4) == 0)
 					{
 						plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
-						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new V10Location(b));
+						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new SurgeLocation(b));
 						return;
 
 					}
@@ -124,26 +123,26 @@ public class PortalStickPlayerListener implements Listener {
 			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR || tb.contains((byte) event.getClickedBlock().getTypeId()))
 			{
 				Block b = targetBlocks.get(targetBlocks.size() - 1);
-				loc = new V10Location(b);
+				loc = new SurgeLocation(b);
 		        if (targetBlocks.size() < 2)
 		        	plugin.portalManager.placePortal(loc, event.getPlayer(), orange);
 		        else
 		    	   plugin.portalManager.placePortal(loc, b.getFace(targetBlocks.get(targetBlocks.size() - 2)), event.getPlayer(), orange, true);
 			}
 			else
-				plugin.portalManager.placePortal(new V10Location(event.getClickedBlock()), event.getBlockFace(), event.getPlayer(), orange, true);
+				plugin.portalManager.placePortal(new SurgeLocation(event.getClickedBlock()), event.getBlockFace(), event.getPlayer(), orange, true);
 		}
 		//Region tool
 		else if (user.usingTool && player.getItemInHand().getTypeId() == plugin.config.RegionTool)
 		{
 			switch (event.getAction()) {
 				case RIGHT_CLICK_BLOCK:
-					user.pointTwo = new V10Location(event.getClickedBlock());
+					user.pointTwo = new SurgeLocation(event.getClickedBlock());
 					plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointTwoSet", player.getName()));
 					event.setCancelled(true);
 					break;
 				case LEFT_CLICK_BLOCK:
-					user.pointOne = new V10Location(event.getClickedBlock());
+					user.pointOne = new SurgeLocation(event.getClickedBlock());
 					plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointOneSet", player.getName()));
 					event.setCancelled(true);
 			}
@@ -151,7 +150,7 @@ public class PortalStickPlayerListener implements Listener {
 		//Flint and steel
 		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
 		{
-			V10Location loc = new V10Location(event.getClickedBlock());
+			SurgeLocation loc = new SurgeLocation(event.getClickedBlock());
 			if (plugin.grillManager.createGrill(player, loc) || plugin.funnelBridgeManager.placeGlassBridge(player, loc)) 
 				event.setCancelled(true);
 		}
@@ -160,7 +159,7 @@ public class PortalStickPlayerListener implements Listener {
 		//Color changing
 		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getTypeId() == 0 && event.getClickedBlock().getType() == Material.WOOL)
 		{
-			V10Location loc = new V10Location(event.getClickedBlock());
+			SurgeLocation loc = new SurgeLocation(event.getClickedBlock());
 			Portal portal = plugin.portalManager.borderBlocks.get(loc);
 			if (portal == null) portal = plugin.portalManager.insideBlocks.get(loc);
 			if (portal == null && plugin.config.CompactPortal) portal = plugin.portalManager.behindBlocks.get(loc);
@@ -201,7 +200,7 @@ public class PortalStickPlayerListener implements Listener {
 	  Item item = event.getItem();
 	  if(plugin.config.DisabledWorlds.contains(item.getWorld().getName()))
 		return;
-	  V10Location iloc = new V10Location(item.getLocation());
+	  SurgeLocation iloc = new SurgeLocation(item.getLocation());
 	  Region region = plugin.regionManager.getRegion(iloc);
 	  Player player = event.getPlayer();
 	  User user = plugin.userManager.getUser(player);
@@ -215,19 +214,19 @@ public class PortalStickPlayerListener implements Listener {
 		if(is.getTypeId() == id)
 		  return;
 	  }
-	  V10Location ploc = new V10Location(player.getLocation());
+	  SurgeLocation ploc = new SurgeLocation(player.getLocation());
 	  int a, b;
 	  boolean x;
-	  if(ploc.x != iloc.x)
+	  if(ploc.getX() != iloc.getX())
 	  {
-		a = ploc.x;
-		b = iloc.x;
+		a = (int)ploc.getX();
+		b = (int)iloc.getX();
 		x = true;
 	  }
-	  else if(ploc.z != iloc.z)
+	  else if(ploc.getZ() != iloc.getZ())
 	  {
-		a = ploc.z;
-		b = iloc.z;
+		a = (int)ploc.getZ();
+		b = (int)iloc.getZ();
 		x = false;
 	  }
 	  else
@@ -241,9 +240,9 @@ public class PortalStickPlayerListener implements Listener {
 	  for(; a < b; a++)
 	  {
 		if(x)
-		  iloc = new V10Location(iloc.world, a, iloc.y, iloc.z);
+		  iloc = new SurgeLocation(iloc.getWorldName(), a, iloc.getY(), iloc.getZ());
 		else
-		  iloc = new V10Location(iloc.world, iloc.x, iloc.y, a);
+		  iloc = new SurgeLocation(iloc.getWorldName(), iloc.getX(), iloc.getY(), a);
 	    if(plugin.grillManager.insideBlocks.containsKey(iloc))
 	    {
 	      if(plugin.grillManager.insideBlocks.get(iloc).disabled)
@@ -267,7 +266,7 @@ public class PortalStickPlayerListener implements Listener {
 	  if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
 		return;
 	  Player player = event.getPlayer();
-	  Region region = plugin.regionManager.getRegion(new V10Location(player.getLocation()));
+	  Region region = plugin.regionManager.getRegion(new SurgeLocation(player.getLocation()));
 	  
 	  if(!region.getBoolean(RegionSetting.GRILLS_CLEAR_ITEM_DROPS))
 		return;

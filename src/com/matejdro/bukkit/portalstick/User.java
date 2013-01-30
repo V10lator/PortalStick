@@ -10,16 +10,15 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-
-import de.V10lator.PortalStick.V10Location;
+import org.surgedev.util.SurgeLocation;
 
 public class User {
 	public Portal bluePortal;
 	public Portal orangePortal;
 	private ItemStack[] inventory;
 	private ItemStack[] armor;
-	public V10Location pointOne;
-	public V10Location pointTwo;
+	public SurgeLocation pointOne;
+	public SurgeLocation pointTwo;
 	public boolean usingTool = false;
 	public int colorPreset = 0;
 	public final String name;

@@ -7,11 +7,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
-
-import de.V10lator.PortalStick.V10Location;
+import org.surgedev.util.SurgeLocation;
 
 public class BlockUtil {
-	public boolean compareBlockToString(V10Location block, String blockData)
+	public boolean compareBlockToString(SurgeLocation block, String blockData)
 	{
 	  return compareBlockToString(block.getHandle().getBlock(), blockData);
 	}
@@ -24,7 +23,7 @@ public class BlockUtil {
 			return block.getTypeId() == Integer.parseInt(blockArr[0]);
 	}
 	
-	public void setBlockData(V10Location block, String blockData) {
+	public void setBlockData(SurgeLocation block, String blockData) {
 	  setBlockData(block.getHandle().getBlock(), blockData);
 	}
 
