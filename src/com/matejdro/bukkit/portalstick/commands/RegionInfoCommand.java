@@ -1,10 +1,11 @@
 package com.matejdro.bukkit.portalstick.commands;
 
 import org.bukkit.entity.Player;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
+
+import de.V10lator.PortalStick.V10Location;
 
 public class RegionInfoCommand extends BaseCommand {
 
@@ -13,7 +14,7 @@ public class RegionInfoCommand extends BaseCommand {
 	}
 	
 	public boolean execute() {
-		Region region = plugin.regionManager.getRegion(new SurgeLocation(player.getLocation()));
+		Region region = plugin.regionManager.getRegion(new V10Location(player.getLocation()));
 		plugin.util.sendMessage(sender, "&7- &c" + region.name + " &7- &c" + region.min.toString() + " &7-&c " + region.max.toString());
 		return true;
 	}

@@ -17,11 +17,11 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.util.Vector;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
 
+import de.V10lator.PortalStick.V10Location;
 import de.V10lator.PortalStick.V10Teleport;
 
 public class EntityManager implements Runnable {
@@ -34,7 +34,7 @@ public class EntityManager implements Runnable {
 		plugin = instance;
 	}
 
-	public V10Teleport teleport(Entity entity, Location oloc, SurgeLocation locTo, Vector vector, boolean really)
+	public V10Teleport teleport(Entity entity, Location oloc, V10Location locTo, Vector vector, boolean really)
 	{
 		if (entity == null || entity.isDead() || blockedEntities.contains(entity))
 		  return null;
@@ -77,7 +77,7 @@ public class EntityManager implements Runnable {
 			  return null;
 			
 			destination = portal.getDestination();
-			if(destination.horizontal || portal.teleport[0].getY() <= locTo.getY())
+			if(destination.horizontal || portal.teleport[0].y <= locTo.y)
 			  teleport = destination.teleport[0].getHandle();
 			else
 			  teleport = destination.teleport[1].getHandle();
@@ -119,15 +119,15 @@ public class EntityManager implements Runnable {
 				}
 				if(nef)
 				{
-				  if(oloc.getX() - locTo.getX() > x || oloc.getZ() - locTo.getZ() < z)
+				  if(oloc.getX() - locTo.x > x || oloc.getZ() - locTo.z < z)
 					return null;
 				}
 				else if(nwf)
 				{
-				  if(oloc.getX() - locTo.getX() < x || oloc.getZ() - locTo.getZ() > z)
+				  if(oloc.getX() - locTo.x < x || oloc.getZ() - locTo.z > z)
 					return null;
 				}
-				else if(oloc.getX() - locTo.getX() > x || oloc.getZ() - locTo.getZ() > z)
+				else if(oloc.getX() - locTo.x > x || oloc.getZ() - locTo.z > z)
 				  return null; 
 			  }
 			  else
@@ -257,9 +257,9 @@ public class EntityManager implements Runnable {
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){public void run(){destination.disabled = false;}}, 10L);
 		
 		if (portal.orange)
-			plugin.util.playSound(Sound.PORTAL_EXIT_ORANGE, new SurgeLocation(teleport));
+			plugin.util.playSound(Sound.PORTAL_EXIT_ORANGE, new V10Location(teleport));
 		else
-			plugin.util.playSound(Sound.PORTAL_EXIT_BLUE, new SurgeLocation(teleport));
+			plugin.util.playSound(Sound.PORTAL_EXIT_BLUE, new V10Location(teleport));
 		
 		return new V10Teleport(teleport, outvector);
 	}
@@ -270,7 +270,7 @@ public class EntityManager implements Runnable {
 		faceCache.clear();
 	}
 	
-	HashMap<SurgeLocation, HashMap<BlockFace, Block>> faceCache = new HashMap<SurgeLocation, HashMap<BlockFace, Block>>();
+	HashMap<V10Location, HashMap<BlockFace, Block>> faceCache = new HashMap<V10Location, HashMap<BlockFace, Block>>();
 	
 	public Location onEntityMove(final Entity entity, Location locFrom, Location locTo, boolean tp)
 	{
@@ -282,11 +282,11 @@ public class EntityManager implements Runnable {
 		  return null;
 		
 		Vector vec2 = locTo.toVector();
-		SurgeLocation vlocTo = new SurgeLocation(locTo);
+		V10Location vlocTo = new V10Location(locTo);
 		Location oloc = locTo;
 		locTo = vlocTo.getHandle();
 		Vector vec1 = locFrom.toVector();
-		SurgeLocation vlocFrom = new SurgeLocation(locFrom);
+		V10Location vlocFrom = new V10Location(locFrom);
 		if(vlocTo.equals(vlocFrom))
 		  return null;
 		
@@ -364,7 +364,7 @@ public class EntityManager implements Runnable {
 						velocity.setZ(-velocity.getZ());
 					}
 					entity.setVelocity(velocity);
-					plugin.util.playSound(Sound.FAITHPLATE_LAUNCH, new SurgeLocation(blockStart.getLocation()));
+					plugin.util.playSound(Sound.FAITHPLATE_LAUNCH, new V10Location(blockStart.getLocation()));
 					return null;
 				}
 			}
@@ -378,7 +378,7 @@ public class EntityManager implements Runnable {
 		  if(to != null)
 		  {
 			ret = to.to;
-			vlocTo = new SurgeLocation(ret);
+			vlocTo = new V10Location(ret);
 			plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){public void run(){entity.setVelocity(to.velocity);}});
 		  }
 		}

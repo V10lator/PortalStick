@@ -9,9 +9,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
+
+import de.V10lator.PortalStick.V10Location;
 
 public class FunnelBridgeManager {
 	private final PortalStick plugin;
@@ -23,13 +24,13 @@ public class FunnelBridgeManager {
 	
 	public HashSet<Bridge> bridges = new HashSet<Bridge>();
 	public HashMap<Portal, Bridge> involvedPortals = new HashMap<Portal, Bridge>();
-	public HashMap<SurgeLocation, Bridge> bridgeBlocks = new HashMap<SurgeLocation, Bridge>();
-	public HashMap<SurgeLocation, Bridge> bridgeMachineBlocks = new HashMap<SurgeLocation, Bridge>();
+	public HashMap<V10Location, Bridge> bridgeBlocks = new HashMap<V10Location, Bridge>();
+	public HashMap<V10Location, Bridge> bridgeMachineBlocks = new HashMap<V10Location, Bridge>();
 //	private HashSet<Entity> inFunnel = new HashSet<Entity>();
-	HashMap<Entity, List<SurgeLocation>> glassBlocks = new HashMap<Entity, List<SurgeLocation>>();
+	HashMap<Entity, List<V10Location>> glassBlocks = new HashMap<Entity, List<V10Location>>();
 //	private HashMap<V10Location, Entity> glassBlockOwners = new HashMap<V10Location, Entity>();
 
-	public boolean placeGlassBridge(Player player, SurgeLocation first)
+	public boolean placeGlassBridge(Player player, V10Location first)
 	{
 		if (player != null && !plugin.hasPermission(player, plugin.PERM_CREATE_BRIDGE))
 		  return false;
@@ -38,7 +39,7 @@ public class FunnelBridgeManager {
 		if (!region.getBoolean(RegionSetting.ENABLE_HARD_GLASS_BRIDGES))
 		  return false;
 		
-		HashSet<SurgeLocation> machineBlocks = new HashSet<SurgeLocation>();
+		HashSet<V10Location> machineBlocks = new HashSet<V10Location>();
 
 		//Check if two blocks are iron
 		if (!plugin.blockUtil.compareBlockToString(first, region.getString(RegionSetting.HARD_GLASS_BRIDGE_BASE_MATERIAL)) && !plugin.blockUtil.compareBlockToString(first, region.getString(RegionSetting.FUNNEL_BASE_MATERIAL))) return false;
@@ -58,8 +59,8 @@ public class FunnelBridgeManager {
 		Block startingBlock = firstIron.getRelative(face);
 		Block secondIron = startingBlock.getRelative(face);
 		
-		machineBlocks.add(new SurgeLocation(firstIron));
-		machineBlocks.add(new SurgeLocation(secondIron));
+		machineBlocks.add(new V10Location(firstIron));
+		machineBlocks.add(new V10Location(secondIron));
 		
 		//Check if two irons have redstone torches on them
 		Boolean havetorch = false;
@@ -68,7 +69,7 @@ public class FunnelBridgeManager {
 			if (firstIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
-				machineBlocks.add(new SurgeLocation(firstIron.getRelative(check)));
+				machineBlocks.add(new V10Location(firstIron.getRelative(check)));
 				break;
 			}
 		}
@@ -79,7 +80,7 @@ public class FunnelBridgeManager {
 			if (secondIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
-				machineBlocks.add(new SurgeLocation(secondIron.getRelative(check)));
+				machineBlocks.add(new V10Location(secondIron.getRelative(check)));
 				break;
 			}
 		}
@@ -98,14 +99,14 @@ public class FunnelBridgeManager {
 		if (face == null) return false;
 		
 		Bridge bridge;
-		first = new SurgeLocation(firstIron);
+		first = new V10Location(firstIron);
 		if (plugin.blockUtil.compareBlockToString(firstIron, region.getString(RegionSetting.HARD_GLASS_BRIDGE_BASE_MATERIAL)))
-			bridge = new Bridge(plugin, first, new SurgeLocation(startingBlock), face, machineBlocks);
+			bridge = new Bridge(plugin, first, new V10Location(startingBlock), face, machineBlocks);
 		else
-			bridge = new Funnel(plugin, first, new SurgeLocation(startingBlock), face, machineBlocks);
+			bridge = new Funnel(plugin, first, new V10Location(startingBlock), face, machineBlocks);
 		bridge.activate();
 		
-		for (SurgeLocation b: machineBlocks)
+		for (V10Location b: machineBlocks)
 			bridgeMachineBlocks.put(b, bridge);
 		bridges.add(bridge);
 		plugin.config.saveAll();
@@ -120,12 +121,12 @@ public class FunnelBridgeManager {
 		
 		for (Bridge cbridge : bridges)
 		{
-			for (SurgeLocation b: portal.inside)
+			for (V10Location b: portal.inside)
 			{
 			  if(b != null && cbridge.isBlockNextToBridge(b))
 				cbridge.activate();
 			}
-			for (SurgeLocation b: portal.border)
+			for (V10Location b: portal.border)
 			{
 				if (cbridge.isBlockNextToBridge(b))
 					cbridge.activate();
@@ -133,7 +134,7 @@ public class FunnelBridgeManager {
 		}
 	}
 	
-	public void updateBridge(final SurgeLocation block)
+	public void updateBridge(final V10Location block)
 	{
 		//delay to make sure all blocks have updated
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -151,7 +152,7 @@ public class FunnelBridgeManager {
 	
 	public void loadBridge(String blockloc) {
 		String[] locarr = blockloc.split(",");
-		if (!placeGlassBridge(null, new SurgeLocation(plugin.getServer().getWorld(locarr[0]).getBlockAt((int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3])))))
+		if (!placeGlassBridge(null, new V10Location(plugin.getServer().getWorld(locarr[0]).getBlockAt((int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3])))))
 			plugin.config.deleteBridge(blockloc);
 	}
 	

@@ -24,8 +24,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import org.surgedev.util.BlockStorage;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.Bridge;
 import com.matejdro.bukkit.portalstick.Funnel;
@@ -34,6 +32,9 @@ import com.matejdro.bukkit.portalstick.Portal;
 import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
+
+import de.V10lator.PortalStick.BlockHolder;
+import de.V10lator.PortalStick.V10Location;
 
 public class PortalStickBlockListener implements Listener
 {
@@ -50,12 +51,12 @@ public class PortalStickBlockListener implements Listener
 	public void onBlockBreak(BlockBreakEvent event)
 	{
 	  Block block = event.getBlock();
-	  SurgeLocation loc = new SurgeLocation(block);
-	  if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
+	  V10Location loc = new V10Location(block);
+	  if(plugin.config.DisabledWorlds.contains(loc.world))
 		return;
 	  
 	  //Delete from gel maps
-	  BlockStorage bh = new BlockStorage(block);
+	  BlockHolder bh = new BlockHolder(block);
 	  if(plugin.gelManager.gelMap.containsKey(bh))
 	    plugin.gelManager.removeGel(bh);
 	  
@@ -132,7 +133,7 @@ public class PortalStickBlockListener implements Listener
 		for (int i = 0; i < 4; i++)
 		{
 		  BlockFace face = BlockFace.values()[i];
-		  loc = new SurgeLocation(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
+		  loc = new V10Location(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
 		  if (plugin.portalManager.insideBlocks.containsKey(loc)) 
 		  {
 			portal = plugin.portalManager.insideBlocks.get(loc);
@@ -143,7 +144,7 @@ public class PortalStickBlockListener implements Listener
 			if (destination == null || destination.transmitter)
 			  continue;
 			
-			for (SurgeLocation b: destination.inside)
+			for (V10Location b: destination.inside)
 			  if(b != null)
 				b.getHandle().getBlock().setType(Material.AIR);
 			portal.transmitter = false;
@@ -158,11 +159,11 @@ public class PortalStickBlockListener implements Listener
 	  Block block = event.getBlock();
 	  if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 		return;
-	  SurgeLocation loc;
+	  V10Location loc;
 	  Region region;
 	  for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
 	  {
-		loc = new SurgeLocation(block.getRelative(face));
+		loc = new V10Location(block.getRelative(face));
 		if (plugin.portalManager.borderBlocks.containsKey(loc) ||
 				plugin.portalManager.behindBlocks.containsKey(loc))
 		{
@@ -177,7 +178,7 @@ public class PortalStickBlockListener implements Listener
 			return;
 		  Portal dest = portal.getDestination();
 		  
-		  SurgeLocation destl;
+		  V10Location destl;
 		  if(dest.horizontal || portal.inside[0].equals(loc))
 			destl = dest.teleport[0];
 		  else
@@ -199,8 +200,8 @@ public class PortalStickBlockListener implements Listener
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBurn2(BlockBurnEvent event) {	
-		SurgeLocation loc = new SurgeLocation(event.getBlock());
-		if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
+		V10Location loc = new V10Location(event.getBlock());
+		if(plugin.config.DisabledWorlds.contains(loc.world))
 		  return;
 		if (plugin.portalManager.borderBlocks.containsKey(loc) ||
 				plugin.portalManager.insideBlocks.containsKey(loc) ||
@@ -222,7 +223,7 @@ public class PortalStickBlockListener implements Listener
 		Material block = event.getBlock().getType();
 		
 		//Prevent obstructing funnel
-		if (plugin.funnelBridgeManager.bridgeBlocks.containsKey(new SurgeLocation(event.getBlock())))
+		if (plugin.funnelBridgeManager.bridgeBlocks.containsKey(new V10Location(event.getBlock())))
 		{
 			event.setCancelled(true);
 			return;
@@ -231,7 +232,7 @@ public class PortalStickBlockListener implements Listener
 		if (block == Material.RAILS || block == Material.POWERED_RAIL || block == Material.DETECTOR_RAIL)
 		  return;
 		
-		if (plugin.portalManager.insideBlocks.containsKey(new SurgeLocation(event.getBlockPlaced())))
+		if (plugin.portalManager.insideBlocks.containsKey(new V10Location(event.getBlockPlaced())))
 		  event.setCancelled(true);
 	}
 	
@@ -241,7 +242,7 @@ public class PortalStickBlockListener implements Listener
 		Block block = event.getBlock();
 		if(block.getType() != Material.SUGAR_CANE_BLOCK || plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 		  return;
-		if(plugin.grillManager.insideBlocks.containsKey(new SurgeLocation(block)))
+		if(plugin.grillManager.insideBlocks.containsKey(new V10Location(block)))
 		  event.setCancelled(true);
 	}
 	
@@ -250,18 +251,18 @@ public class PortalStickBlockListener implements Listener
 	{
 		if(plugin.config.DisabledWorlds.contains(event.getBlock().getLocation().getWorld().getName()))
 		  return;
-		if(plugin.grillManager.insideBlocks.containsKey(new SurgeLocation(event.getBlock().getRelative(BlockFace.DOWN))))
+		if(plugin.grillManager.insideBlocks.containsKey(new V10Location(event.getBlock().getRelative(BlockFace.DOWN))))
 		  event.setCancelled(true);
 	}
 	
 	@EventHandler()
 	public void onBlockFromTo(BlockFromToEvent event) {
 		Block from = event.getBlock();
-		SurgeLocation loc = new SurgeLocation(from);
-		if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
+		V10Location loc = new V10Location(from);
+		if(plugin.config.DisabledWorlds.contains(loc.world))
 		  return;
 		Block to = event.getToBlock();
-		SurgeLocation tb = new SurgeLocation(to);
+		V10Location tb = new V10Location(to);
 		 Region region = plugin.regionManager.getRegion(loc);
 		 //Liquid teleporting
 			if (region. //TODO: region is null! - Seems to be solved.
@@ -291,7 +292,7 @@ public class PortalStickBlockListener implements Listener
 							blockt2 = Material.STATIONARY_LAVA.getId();
 					}
 					
-					SurgeLocation dest;
+					V10Location dest;
 					Portal destination = portal.getDestination();
 					if(destination.horizontal || portal.inside[0].equals(tb))
 					  dest = destination.teleport[0];
@@ -358,7 +359,7 @@ public class PortalStickBlockListener implements Listener
 	  Material mat = is.getType();
 	  if(mat == Material.BUCKET || mat == Material.WATER_BUCKET || mat == Material.LAVA_BUCKET)
 		return;
-	  Region region = plugin.regionManager.getRegion(new SurgeLocation(bs.getLocation()));
+	  Region region = plugin.regionManager.getRegion(new V10Location(bs.getLocation()));
 	  if(region.getBoolean(RegionSetting.GEL_TUBE))
 	  {
 		ItemStack gel = plugin.util.getItemData(region.getString(RegionSetting.RED_GEL_BLOCK));
@@ -366,7 +367,7 @@ public class PortalStickBlockListener implements Listener
 		{
 		  event.setCancelled(true);
 		  Block to = d.getBlock();
-		  SurgeLocation from = new SurgeLocation(to);
+		  V10Location from = new V10Location(to);
 		  if(plugin.gelManager.activeGelTubes.contains(from))
 			return;
 		  BlockFace direction;
@@ -395,7 +396,7 @@ public class PortalStickBlockListener implements Listener
 		  {
 			event.setCancelled(true);
 			Block to = d.getBlock();
-			SurgeLocation from = new SurgeLocation(to);
+			V10Location from = new V10Location(to);
 			if(plugin.gelManager.activeGelTubes.contains(from))
 			  return;
 			BlockFace direction;
@@ -428,12 +429,12 @@ public class PortalStickBlockListener implements Listener
 	
 	private class GelTube implements Runnable
 	{
-	  private final SurgeLocation loc;
+	  private final V10Location loc;
 	  private final BlockFace direction;
 	  private final int mat;
 	  private final byte data;
 	  
-	  private GelTube(SurgeLocation loc, BlockFace direction, int mat, byte data)
+	  private GelTube(V10Location loc, BlockFace direction, int mat, byte data)
 	  {
 		this.loc = loc;
 		this.direction = direction;
@@ -492,8 +493,8 @@ public class PortalStickBlockListener implements Listener
 		if(event.getOldCurrent() == event.getNewCurrent())
 		  return;
 		 Block block = event.getBlock();
-		 SurgeLocation loc = new SurgeLocation(block);
-		 if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
+		 V10Location loc = new V10Location(block);
+		 if(plugin.config.DisabledWorlds.contains(loc.world))
 			 return;
 		 
 		 Region region = plugin.regionManager.getRegion(loc);
@@ -507,7 +508,7 @@ public class PortalStickBlockListener implements Listener
 			 for (int i = 0; i < 5; i++)
 			 {
 				 face = BlockFace.values()[i];
-				 loc = new SurgeLocation(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
+				 loc = new V10Location(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
 				 if (plugin.portalManager.insideBlocks.containsKey(loc)) 
 					 {
 					 	Portal portal = plugin.portalManager.insideBlocks.get(loc);
@@ -529,7 +530,7 @@ public class PortalStickBlockListener implements Listener
 					 		mat1 = Material.AIR;
 					 		mat2 = Material.REDSTONE_TORCH_ON;
 					 	}
-					 	for (SurgeLocation b: destination.inside)
+					 	for (V10Location b: destination.inside)
 					 	{
 					 	  if(b != null)
 					 	  {
@@ -549,7 +550,7 @@ public class PortalStickBlockListener implements Listener
 			 Grill grill = null;
 			 for (int i = 0; i < 5; i++)
 			 { 
-				grill = plugin.grillManager.borderBlocks.get(new SurgeLocation(block.getRelative(BlockFace.values()[i])));
+				grill = plugin.grillManager.borderBlocks.get(new V10Location(block.getRelative(BlockFace.values()[i])));
 				if (grill != null)
 				{
 				  if (event.getNewCurrent() > 0)
@@ -567,10 +568,10 @@ public class PortalStickBlockListener implements Listener
 			 boolean cblock = false;
 			 for (int i = 0; i < 5; i++)
 			 {
-				 bridge = plugin.funnelBridgeManager.bridgeMachineBlocks.get(new SurgeLocation(block.getRelative(BlockFace.values()[i])));
+				 bridge = plugin.funnelBridgeManager.bridgeMachineBlocks.get(new V10Location(block.getRelative(BlockFace.values()[i])));
 				 if (bridge != null) 
 				 {
-					 cblock = new SurgeLocation(block.getRelative(BlockFace.values()[i])).equals(bridge.creationBlock);
+					 cblock = new V10Location(block.getRelative(BlockFace.values()[i])).equals(bridge.creationBlock);
 					 break;
 				 }
 			 }
@@ -609,10 +610,10 @@ public class PortalStickBlockListener implements Listener
 	 {
 		if(plugin.config.DisabledWorlds.contains(event.getBlock().getLocation().getWorld().getName()))
 			  return;
-		 Region region = plugin.regionManager.getRegion(new SurgeLocation(event.getBlock()));
+		 Region region = plugin.regionManager.getRegion(new V10Location(event.getBlock()));
 
 		 BlockBreakEvent bbe;
-		 SurgeLocation loc = new SurgeLocation(event.getBlock().getRelative(event.getDirection()));
+		 V10Location loc = new V10Location(event.getBlock().getRelative(event.getDirection()));
 		 if(plugin.portalManager.insideBlocks.containsKey(loc))
 		 {
 			 Portal portal = plugin.portalManager.insideBlocks.get(loc);
@@ -644,7 +645,7 @@ public class PortalStickBlockListener implements Listener
 			 if(!region.getBoolean(RegionSetting.ENABLE_PISTON_BLOCK_TELEPORT))
 				 return;
 			 
-			 loc = new SurgeLocation(b.getRelative(event.getDirection()));
+			 loc = new V10Location(b.getRelative(event.getDirection()));
 			 if(!plugin.portalManager.insideBlocks.containsKey(loc))
 				 continue;
 			 
@@ -653,7 +654,7 @@ public class PortalStickBlockListener implements Listener
 				 continue;
 			 
 			 Portal destP = portal.getDestination();
-			 SurgeLocation dest;
+			 V10Location dest;
 			 
 			 if(destP.horizontal || portal.inside[0].equals(loc))
 				 dest = destP.teleport[0];
@@ -711,18 +712,18 @@ public class PortalStickBlockListener implements Listener
 			 return;
 		 }
 		 
-		 Region region = plugin.regionManager.getRegion(new SurgeLocation(event.getBlock()));
+		 Region region = plugin.regionManager.getRegion(new V10Location(event.getBlock()));
 		 
 		 if(!region.getBoolean(RegionSetting.ENABLE_PISTON_BLOCK_TELEPORT))
 			 return;
 		 
-		 SurgeLocation loc = new SurgeLocation(block);
+		 V10Location loc = new V10Location(block);
 		 Portal portal = plugin.portalManager.insideBlocks.get(loc);
 		 
 		 if (portal != null)
 		 {
 			 Portal destP = portal.getDestination();
-			 SurgeLocation dest;
+			 V10Location dest;
 			 if(destP.horizontal || portal.inside[0].equals(loc))
 				 dest = destP.teleport[0];
 			 else
@@ -743,18 +744,18 @@ public class PortalStickBlockListener implements Listener
 		 }
 		 
 		 //Update bridge if piston made space
-		 plugin.funnelBridgeManager.updateBridge(new SurgeLocation(event.getRetractLocation()));
+		 plugin.funnelBridgeManager.updateBridge(new V10Location(event.getRetractLocation()));
 	 }
 	 
 	private class LiquidCheck implements Runnable
 	{
-	  private final SurgeLocation source;
-	  private final SurgeLocation destination;
+	  private final V10Location source;
+	  private final V10Location destination;
 	  private final Portal exit;
 	  private final int mat1, mat2;
 	  private int pid;
 	  
-	  private LiquidCheck(SurgeLocation source, SurgeLocation destination, Portal exit, int mat1, int mat2)
+	  private LiquidCheck(V10Location source, V10Location destination, Portal exit, int mat1, int mat2)
 	  {
 		this.source = source;
 		this.destination = destination;

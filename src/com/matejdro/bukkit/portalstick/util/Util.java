@@ -6,10 +6,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.getspout.spoutapi.SpoutManager;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
+
+import de.V10lator.PortalStick.V10Location;
 
 public class Util {
 	private final PortalStick plugin;
@@ -70,7 +71,7 @@ public class Util {
     	return str;
     }
     
-    private void playNativeSound(Sound sound, SurgeLocation loc)
+    private void playNativeSound(Sound sound, V10Location loc)
     {
       boolean oldState = plugin.config.useSpoutSounds;
       plugin.config.useSpoutSounds = false;
@@ -78,7 +79,7 @@ public class Util {
       plugin.config.useSpoutSounds = oldState;
     }
     
-    public void playSound(Sound sound, SurgeLocation loc)
+    public void playSound(Sound sound, V10Location loc)
     {
       if (!plugin.regionManager.getRegion(loc).getBoolean(RegionSetting.ENABLE_SOUNDS))
     	return;

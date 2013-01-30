@@ -14,11 +14,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
-import org.surgedev.util.BlockStorage;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
+
+import de.V10lator.PortalStick.BlockHolder;
+import de.V10lator.PortalStick.V10Location;
 
 public class PortalManager {
 	private final PortalStick plugin;
@@ -29,12 +30,12 @@ public class PortalManager {
 	}
 	
 	public final ArrayList<Portal> portals = new ArrayList<Portal>();
-	public final HashMap<SurgeLocation, Portal> borderBlocks = new HashMap<SurgeLocation, Portal>();
-	public final HashMap<SurgeLocation, Portal> behindBlocks = new HashMap<SurgeLocation, Portal>();
-	public final HashMap<SurgeLocation, Portal> insideBlocks = new HashMap<SurgeLocation, Portal>();
-	final HashMap<SurgeLocation, Portal> awayBlocks = new HashMap<SurgeLocation, Portal>();
-	final HashMap<SurgeLocation, Portal> awayBlocksY = new HashMap<SurgeLocation, Portal>();
-	public final HashMap<SurgeLocation, BlockStorage> oldBlocks = new HashMap<SurgeLocation, BlockStorage>();
+	public final HashMap<V10Location, Portal> borderBlocks = new HashMap<V10Location, Portal>();
+	public final HashMap<V10Location, Portal> behindBlocks = new HashMap<V10Location, Portal>();
+	public final HashMap<V10Location, Portal> insideBlocks = new HashMap<V10Location, Portal>();
+	final HashMap<V10Location, Portal> awayBlocks = new HashMap<V10Location, Portal>();
+	final HashMap<V10Location, Portal> awayBlocksY = new HashMap<V10Location, Portal>();
+	public final HashMap<V10Location, BlockHolder> oldBlocks = new HashMap<V10Location, BlockHolder>();
 
 	public void checkEntityMove(Entity e, Region regionFrom, Region regionTo)
 	{
@@ -69,9 +70,9 @@ public class PortalManager {
 		int id;
 		ArrayList<Portal> overlap = new ArrayList<Portal>();
 		boolean ol;
-		BlockStorage bh;
+		BlockHolder bh;
 		Block block;
-		for (SurgeLocation loc: portal.border)
+		for (V10Location loc: portal.border)
 		{
 			if(borderBlocks.containsKey(loc))
 			{
@@ -98,18 +99,18 @@ public class PortalManager {
 			  region = plugin.regionManager.getRegion(loc);
 			  if(!region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL))
 			  {
-				bh = new BlockStorage(block);
+				bh = new BlockHolder(block);
 				if(plugin.gelManager.gelMap.containsKey(bh))
 				{
 				  bh = plugin.gelManager.gelMap.get(bh);
-				  id = bh.getID();
+				  id = bh.id;
 				}
 				if(!region.getList(RegionSetting.PORTAL_BLOCKS).contains(id))
 				  return false;
 			  }
 			}
 		}
-		for (SurgeLocation loc: portal.inside)
+		for (V10Location loc: portal.inside)
 		{
 			if(loc == null)
 			  continue;
@@ -138,11 +139,11 @@ public class PortalManager {
 			  region = plugin.regionManager.getRegion(loc);
 			  if(!region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL))
 			  {
-				bh = new BlockStorage(block);
+				bh = new BlockHolder(block);
 				if(plugin.gelManager.gelMap.containsKey(bh))
 				{
 				  bh = plugin.gelManager.gelMap.get(bh);
-				  id = bh.getID();
+				  id = bh.id;
 				}
 				if(!region.getList(RegionSetting.PORTAL_BLOCKS).contains(id))
 				  return false;
@@ -160,24 +161,24 @@ public class PortalManager {
 		if (user.orangePortal != null) user.orangePortal.delete();
 	}
 
-	private PortalCoord generateHorizontalPortal(SurgeLocation block, BlockFace face)
+	private PortalCoord generateHorizontalPortal(V10Location block, BlockFace face)
 	{
 		PortalCoord portal = generatePortal(block, face); // 0
 		if(!checkPortal(portal))
 		{
-		  block = new SurgeLocation(block.getHandle().getBlock().getRelative(BlockFace.DOWN)); // -1
+		  block = new V10Location(block.getHandle().getBlock().getRelative(BlockFace.DOWN)); // -1
 		  portal = generatePortal(block, face);
 		  if(!checkPortal(portal))
 		  {
-			block = new SurgeLocation(block.getHandle().getBlock().getRelative(BlockFace.DOWN)); // -2 TODO: Doesn't work
+			block = new V10Location(block.getHandle().getBlock().getRelative(BlockFace.DOWN)); // -2 TODO: Doesn't work
 			portal = generatePortal(block, face);
 			if(!checkPortal(portal))
 			{
-			  block = new SurgeLocation(block.getHandle().getBlock().getRelative(BlockFace.UP, 3)); // 1 (-2 + 3)
+			  block = new V10Location(block.getHandle().getBlock().getRelative(BlockFace.UP, 3)); // 1 (-2 + 3)
 			  portal = generatePortal(block, face);
 			  if(!checkPortal(portal))
 			  {
-				block = new SurgeLocation(block.getHandle().getBlock().getRelative(BlockFace.UP)); // 2
+				block = new V10Location(block.getHandle().getBlock().getRelative(BlockFace.UP)); // 2
 				portal = generatePortal(block, face);
 				if(!checkPortal(portal))
 				  portal.finished = true;
@@ -188,7 +189,7 @@ public class PortalManager {
 		return portal;
 	}
 
-	private PortalCoord generatePortal(SurgeLocation block, BlockFace face)
+	private PortalCoord generatePortal(V10Location block, BlockFace face)
 	{
 		PortalCoord portal = new PortalCoord();
 		Block rb = block.getHandle().getBlock();
@@ -199,24 +200,24 @@ public class PortalManager {
 		  case UP:
 			if (!plugin.config.CompactPortal || plugin.config.FillPortalBack < 0)
 			{
-				portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.NORTH)));
+				portal.border.add(new V10Location(rb.getRelative(BlockFace.NORTH)));
 				if(!plugin.config.CompactPortal)
 				{
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.NORTH_WEST))); 
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.WEST)));
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.SOUTH_WEST)));
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.SOUTH)));
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.SOUTH_EAST)));
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.EAST)));
-				  portal.border.add(new SurgeLocation(rb.getRelative(BlockFace.NORTH_EAST)));
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.NORTH_WEST))); 
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.WEST)));
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.SOUTH_WEST)));
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.SOUTH)));
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.SOUTH_EAST)));
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.EAST)));
+				  portal.border.add(new V10Location(rb.getRelative(BlockFace.NORTH_EAST)));
 				}
 			}
 			
-			portal.inside[0] = new SurgeLocation(rb);
+			portal.inside[0] = new V10Location(rb);
 	    	
-	    	portal.destLoc[0] = new SurgeLocation(rb.getRelative(face));
+	    	portal.destLoc[0] = new V10Location(rb.getRelative(face));
 	    	face = face.getOppositeFace();
-			portal.behind[0] = new SurgeLocation(rb.getRelative(face));
+			portal.behind[0] = new V10Location(rb.getRelative(face));
 	    	portal.tpFace = face;
 	    	portal.vertical = true;
 	    	return portal;
@@ -252,49 +253,49 @@ public class PortalManager {
 	    if (!plugin.config.CompactPortal || plugin.config.FillPortalBack < 0)
 	    {
 	      Block block2 = rb.getRelative(BlockFace.DOWN, 2);
-	      portal.border.add(new SurgeLocation(block2));
+	      portal.border.add(new V10Location(block2));
 	      
 	      if(!plugin.config.CompactPortal)
 	      {
 	    	block2 = block2.getRelative(face);
-	    	portal.border.add(new SurgeLocation(block2));
+	    	portal.border.add(new V10Location(block2));
 	    	for(int i = 0; i < 3; i++)
 		    {
 	    	  block2 = block2.getRelative(BlockFace.UP);
-	    	  portal.border.add(new SurgeLocation(block2));
+	    	  portal.border.add(new V10Location(block2));
 		    }
 	    	face = face.getOppositeFace();
 	    	for(int i = 0; i < 2; i++)
 	    	{
 	    	  block2 = block2.getRelative(face);
-	    	  portal.border.add(new SurgeLocation(block2));
+	    	  portal.border.add(new V10Location(block2));
 	    	}
 	    	for(int i = 0; i < 3; i++)
 	    	{
 	    	  block2 = block2.getRelative(BlockFace.DOWN);
-	    	  portal.border.add(new SurgeLocation(block2));
+	    	  portal.border.add(new V10Location(block2));
 	    	}
 	      }
 	    }
 	    
 	    portal.inside[1] = block;
 	    Block block2 = rb.getRelative(BlockFace.DOWN);
-	    portal.inside[0] = new SurgeLocation(block2);
+	    portal.inside[0] = new V10Location(block2);
 	    
 	    Block block3 = block2.getRelative(portal.tpFace.getOppositeFace());
-	    portal.destLoc[0] = new SurgeLocation(block3);
-	    portal.destLoc[1] = new SurgeLocation(block3.getRelative(BlockFace.UP));
+	    portal.destLoc[0] = new V10Location(block3);
+	    portal.destLoc[1] = new V10Location(block3.getRelative(BlockFace.UP));
 	    
 	    portal.vertical = false;
 	    
 	    block2 = block2.getRelative(portal.tpFace);
-	    portal.behind[0] = new SurgeLocation(block2);
-	    portal.behind[1] = new SurgeLocation(block2.getRelative(BlockFace.UP));
+	    portal.behind[0] = new V10Location(block2);
+	    portal.behind[1] = new V10Location(block2.getRelative(BlockFace.UP));
 	    
 		return portal;
 	}
 
-	public boolean placePortal(SurgeLocation block, BlockFace face, Player player, boolean orange, boolean end)
+	public boolean placePortal(V10Location block, BlockFace face, Player player, boolean orange, boolean end)
 	{
 		//Check if player can place here
 		Location loc = block.getHandle();
@@ -354,10 +355,10 @@ public class PortalManager {
 		
 	}
  
-	public void placePortal(SurgeLocation block, Player player, boolean orange)
+	public void placePortal(V10Location block, Player player, boolean orange)
 	{
 		
-		float dir = (float)Math.toDegrees(Math.atan2(player.getLocation().getBlockX() - block.getX(), block.getZ() - player.getLocation().getBlockZ()));
+		float dir = (float)Math.toDegrees(Math.atan2(player.getLocation().getBlockX() - block.x, block.z - player.getLocation().getBlockZ()));
 		dir = dir % 360;
 	    if(dir < 0)
 	    	dir += 360;
@@ -381,7 +382,7 @@ public class PortalManager {
 		  return;
 		
 		//Try UP/DOWN
-		if (player.getEyeLocation().getY() >= block.getY() )
+		if (player.getEyeLocation().getY() >= block.y )
 		{
 			if (placePortal(block, BlockFace.UP, player, orange, false))
 			  return;
@@ -497,7 +498,7 @@ public class PortalManager {
 		
 		//Find portal surface:
 		PortalCoord pc = null;
-		Region region = plugin.regionManager.getRegion(new SurgeLocation(rb));
+		Region region = plugin.regionManager.getRegion(new V10Location(rb));
 		boolean ap = region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL);
 		List<?> pb = region.getList(RegionSetting.PORTAL_BLOCKS);
 		ArrayList<Portal> oldPortals = new ArrayList<Portal>();
@@ -572,7 +573,7 @@ public class PortalManager {
 	private boolean checkBlockType(Block block, ArrayList<Portal> oldPortals, PortalCoord pc, boolean ap, List<?> pb, boolean border, int ii)
 	{
 	  Portal oldPortal;
-	  SurgeLocation loc = new SurgeLocation(block);
+	  V10Location loc = new V10Location(block);
 	  if(borderBlocks.containsKey(loc))
 		oldPortal = borderBlocks.get(loc);
 	  else if(insideBlocks.containsKey(loc))
@@ -591,10 +592,10 @@ public class PortalManager {
 		{
 		  pc.inside[ii] = loc;
 		  block = block.getRelative(pc.tpFace.getOppositeFace());
-		  loc = new SurgeLocation(block);
+		  loc = new V10Location(block);
 		  pc.destLoc[ii] = loc;
 		  block = block.getRelative(pc.tpFace, 2);
-		  loc = new SurgeLocation(block);
+		  loc = new V10Location(block);
 		  pc.behind[ii] = loc;
 		}
 	  }
@@ -606,10 +607,10 @@ public class PortalManager {
 		{
 		  pc.inside[ii] = loc;
 		  block = block.getRelative(pc.tpFace.getOppositeFace());
-		  loc = new SurgeLocation(block);
+		  loc = new V10Location(block);
 		  pc.destLoc[ii] = loc;
 		  block = block.getRelative(pc.tpFace, 2);
-		  loc = new SurgeLocation(block);
+		  loc = new V10Location(block);
 		  pc.behind[ii] = loc;
 		}
 	  }

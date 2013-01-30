@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.entity.Player;
-import org.surgedev.util.SurgeLocation;
 
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
+
+import de.V10lator.PortalStick.V10Location;
 
 public class Region extends User 
 {
@@ -15,7 +16,7 @@ public class Region extends User
 	
 	private final PortalStick plugin;
 	
-	public SurgeLocation min, max;
+	public V10Location min, max;
 	
 	public final String name;
 	
@@ -31,9 +32,9 @@ public class Region extends User
 	
 	public boolean updateLocation(Player player) {
 		String[] loc = getString(RegionSetting.LOCATION).split(":");
-		SurgeLocation min, max;
+		V10Location min, max;
 		if(this.name.equals("global"))
-		  min = max = new SurgeLocation("", 0, 0, 0);
+		  min = max = new V10Location(null, 0, 0, 0);
 		else
 		{
 		  String[] loc1 = loc[1].split(",");
@@ -66,18 +67,18 @@ public class Region extends User
 			bZ = tmp;
 		  }
 		  
-		  ArrayList<SurgeLocation> locs = new ArrayList<SurgeLocation>(); 
+		  ArrayList<V10Location> locs = new ArrayList<V10Location>(); 
 		  for(int x = aX; x <= bX; x++)
 			for(int y = aY; y <= bY; y++)
 			  for(int z = aZ; z <= bZ; z++)
-				locs.add(new SurgeLocation(loc[0], x, y, z));
+				locs.add(new V10Location(loc[0], x, y, z));
 		  
-		  min = new SurgeLocation(loc[0], aX, aY, aZ);
-		  max = new SurgeLocation(loc[0], bX, bY, bZ);
+		  min = new V10Location(loc[0], aX, aY, aZ);
+		  max = new V10Location(loc[0], bX, bY, bZ);
 		  
 		  for(Region region: plugin.regionManager.regions.values())
 			if(region != this && !region.name.equals("global"))
-			  for(SurgeLocation vLoc: locs)
+			  for(V10Location vLoc: locs)
 				if(region.contains(vLoc))
 				{
 				  if(player != null)
@@ -92,9 +93,9 @@ public class Region extends User
 		return true;
 	}
 	
-	public boolean setLocation(Player player, SurgeLocation one, SurgeLocation two) {
+	public boolean setLocation(Player player, V10Location one, V10Location two) {
 		String old = (String)settings.get(RegionSetting.LOCATION);
-		settings.put(RegionSetting.LOCATION, one.getWorldName() + ":" + one.getX()+","+one.getY()+","+one.getZ() + ":" + two.getX()+","+two.getY()+","+two.getZ());
+		settings.put(RegionSetting.LOCATION, one.world + ":" + one.x+","+one.y+","+one.z + ":" + two.x+","+two.y+","+two.z);
 		if(updateLocation(player))
 		  return true;
 		if(old == null)
@@ -278,11 +279,11 @@ public class Region extends User
 		}
 	}
 		
-	public boolean contains(SurgeLocation loc) {
-		return loc.getWorldName().equals(min.getWorldName()) &&
-				loc.getX() >= min.getX() && loc.getX() <= max.getX() &&
-				loc.getY() >= min.getY() && loc.getY() <= max.getY() &&
-				loc.getZ() >= min.getZ() && loc.getZ() <= max.getZ();
+	public boolean contains(V10Location loc) {
+		return loc.world.equals(min.world) &&
+				loc.x >= min.x && loc.x <= max.x &&
+				loc.y >= min.y && loc.y <= max.y &&
+				loc.z >= min.z && loc.z <= max.z;
 	}
 	
 	public boolean getBoolean(RegionSetting setting) {

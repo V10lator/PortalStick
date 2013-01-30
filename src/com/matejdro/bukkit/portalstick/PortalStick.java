@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Server;
-import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.surgedev.util.BlockStorage;
 
 import com.matejdro.bukkit.portalstick.commands.BaseCommand;
 import com.matejdro.bukkit.portalstick.commands.DeleteAllCommand;
@@ -139,13 +137,6 @@ public class PortalStick extends JavaPlugin {
 				return true;
 		}
 		return player.hasPermission("*");
-	}
-	
-	void resetBlock(BlockStorage block) {
-	    Block b = block.getLocation().getBlock();
-	    if(b != null) {
-	        b.setTypeIdAndData(block.getID(), block.getData(), true);
-	    }
 	}
 }
 		    

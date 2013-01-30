@@ -21,11 +21,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.surgedev.event.entity.EntityAddEvent;
-import org.surgedev.event.entity.EntityMoveEvent;
-import org.surgedev.event.entity.EntityRemoveEvent;
-import org.surgedev.util.BlockStorage;
-import org.surgedev.util.SurgeLocation;
+import org.surgeproject.event.entity.EntityAddEvent;
+import org.surgeproject.event.entity.EntityMoveEvent;
+import org.surgeproject.event.entity.EntityRemoveEvent;
 
 import com.matejdro.bukkit.portalstick.Grill;
 import com.matejdro.bukkit.portalstick.Portal;
@@ -33,6 +31,9 @@ import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
 import com.matejdro.bukkit.portalstick.User;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
+
+import de.V10lator.PortalStick.BlockHolder;
+import de.V10lator.PortalStick.V10Location;
 
 public class PortalStickEntityListener implements Listener {
 	private final PortalStick plugin;
@@ -93,7 +94,7 @@ public class PortalStickEntityListener implements Listener {
 			Player player = (Player)event.getEntity();
 			if (!plugin.hasPermission(player, plugin.PERM_DAMAGE_BOOTS))
 			  return;
-			Region region = plugin.regionManager.getRegion(new SurgeLocation(player.getLocation()));
+			Region region = plugin.regionManager.getRegion(new V10Location(player.getLocation()));
 			ItemStack is = player.getInventory().getBoots();
 			if (event.getCause() == DamageCause.FALL && region.getBoolean(RegionSetting.ENABLE_FALL_DAMAGE_BOOTS))
 			{
@@ -113,15 +114,15 @@ public class PortalStickEntityListener implements Listener {
 	{
 		if(plugin.config.DisabledWorlds.contains(event.getLocation().getWorld().getName()))
 		  return;
-		Region region = plugin.regionManager.getRegion(new SurgeLocation(event.getLocation()));
+		Region region = plugin.regionManager.getRegion(new V10Location(event.getLocation()));
 		Iterator<Block> iter = event.blockList().iterator();
 		Block block;
-		SurgeLocation loc;
+		V10Location loc;
 		Portal portal;
 		while(iter.hasNext())
 		{
 			block = iter.next();
-			loc = new SurgeLocation(block.getLocation());
+			loc = new V10Location(block.getLocation());
 			if (block.getType() == Material.WOOL)
 			{
 				portal = plugin.portalManager.borderBlocks.get(loc);
@@ -162,7 +163,7 @@ public class PortalStickEntityListener implements Listener {
 //	  System.out.print("Spawned: "+entity.getType());
 	  plugin.userManager.createUser(entity);
 	  User user = plugin.userManager.getUser(entity);
-	  Region region = plugin.regionManager.getRegion(new SurgeLocation(entity.getLocation()));
+	  Region region = plugin.regionManager.getRegion(new V10Location(entity.getLocation()));
 	  if(entity instanceof InventoryHolder && !region.name.equals("global") && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
 		user.saveInventory((InventoryHolder)entity);
 	}
@@ -185,23 +186,23 @@ public class PortalStickEntityListener implements Listener {
 	  //Remove flying gels from the map. We can't do this if they don't try to place themself in the event above...
 	  if(entity instanceof FallingBlock && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
 	  {
-		SurgeLocation from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
+		V10Location from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
 		plugin.gelManager.flyingGels.remove(entity.getUniqueId());
 		Location loc = entity.getLocation();
-		SurgeLocation vloc = new SurgeLocation(loc);
-		ArrayList<BlockStorage> blocks;
+		V10Location vloc = new V10Location(loc);
+		ArrayList<BlockHolder> blocks;
 		if(plugin.gelManager.gels.containsKey(from))
 		  blocks = plugin.gelManager.gels.get(from);
 		else
 		{
-		  blocks = new ArrayList<BlockStorage>();
+		  blocks = new ArrayList<BlockHolder>();
 		  plugin.gelManager.gels.put(from, blocks);
 		}
 		FallingBlock fb = (FallingBlock)entity;
 		Block b = loc.getBlock();
 		int mat = fb.getBlockId();
 		byte data = fb.getBlockData();
-		BlockStorage bh;
+		BlockHolder bh;
 		Block b2;
 		boolean bl;
 		int mat2;
@@ -220,7 +221,7 @@ public class PortalStickEntityListener implements Listener {
 			  }
 			if(bl)
 			  continue;
-			vloc = new SurgeLocation(b2);
+			vloc = new V10Location(b2);
 			if(plugin.portalManager.borderBlocks.containsKey(vloc) ||
 					plugin.portalManager.insideBlocks.containsKey(vloc) ||
 					plugin.portalManager.behindBlocks.containsKey(vloc) ||
@@ -229,7 +230,7 @@ public class PortalStickEntityListener implements Listener {
 					plugin.funnelBridgeManager.bridgeBlocks.containsKey(vloc) ||
 					plugin.funnelBridgeManager.bridgeMachineBlocks.containsKey(vloc))
 			  continue;
-			bh = new BlockStorage(b2);
+			bh = new BlockHolder(b2);
 			if(!blocks.contains(bh))
 			{
 			  if(plugin.gelManager.gelMap.containsKey(bh))
@@ -247,7 +248,7 @@ public class PortalStickEntityListener implements Listener {
 	  if(user == null) //TODO: Workaround against BKCommonLib bugs.
 		return;
 	  
-	  Region region = plugin.regionManager.getRegion(new SurgeLocation(entity.getLocation()));
+	  Region region = plugin.regionManager.getRegion(new V10Location(entity.getLocation()));
 	  if(entity instanceof InventoryHolder && region.name != "global" && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
 		user.revertInventory((InventoryHolder)entity);
 	  plugin.userManager.deleteUser(user);
