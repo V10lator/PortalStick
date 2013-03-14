@@ -21,9 +21,9 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.surgeproject.event.entity.EntityAddEvent;
-import org.surgeproject.event.entity.EntityMoveEvent;
-import org.surgeproject.event.entity.EntityRemoveEvent;
+import org.libigot.event.entity.EntityAddEvent;
+import org.libigot.event.entity.EntityMoveEvent;
+import org.libigot.event.entity.EntityRemoveEvent;
 
 import com.matejdro.bukkit.portalstick.Grill;
 import com.matejdro.bukkit.portalstick.Portal;

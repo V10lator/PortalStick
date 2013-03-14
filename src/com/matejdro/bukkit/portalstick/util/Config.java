@@ -18,8 +18,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.surgeproject.event.entity.EntityAddEvent;
-import org.surgeproject.event.entity.EntityRemoveEvent;
+import org.libigot.event.entity.EntityAddEvent;
+import org.libigot.event.entity.EntityRemoveEvent;
 
 import com.matejdro.bukkit.portalstick.Bridge;
 import com.matejdro.bukkit.portalstick.Grill;
