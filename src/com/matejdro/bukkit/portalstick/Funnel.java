@@ -6,13 +6,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-
-import de.V10lator.PortalStick.V10Location;
+import org.libigot.LibigotLocation;
 
 public class Funnel extends Bridge {
 	private boolean reversed = false;
 	
-	Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
+	Funnel(PortalStick plugin, LibigotLocation CreationBlock, LibigotLocation startingBlock, BlockFace face, HashSet<LibigotLocation> machineBlocks) {
 		super(plugin, CreationBlock, startingBlock, face, machineBlocks);
 	}
 	
@@ -24,14 +23,14 @@ public class Funnel extends Bridge {
 	
 	public BlockFace getDirection(Block block)
 	{
-		V10Location vb = new V10Location(block);
+		LibigotLocation vb = new LibigotLocation(block);
 		if (!bridgeBlocks.containsKey(vb)) return null;
 		
 		int curnum = bridgeBlocks.get(vb);
 		BlockFace face = null;
 		for (BlockFace check : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN})
 		{
-			vb = new V10Location(block.getRelative(check));
+			vb = new LibigotLocation(block.getRelative(check));
 			if (bridgeBlocks.containsKey(vb) && (curnum - bridgeBlocks.get(vb) == 1 || bridgeBlocks.get(vb) > curnum + 1) )			{
 				face = check;
 				break;
@@ -60,7 +59,7 @@ public class Funnel extends Bridge {
 		return face;
 	}
 	
-	public int getCounter(V10Location block)
+	public int getCounter(LibigotLocation block)
 	{
 		return bridgeBlocks.get(block);
 	}
@@ -72,38 +71,38 @@ public class Funnel extends Bridge {
 		deactivate();
 		
 		BlockFace face = facingSide;
-		V10Location nextV10Location = startBlock;
-		Block nextBlock = nextV10Location.getHandle().getBlock();
+		LibigotLocation nextLibigotLocation = startBlock;
+		Block nextBlock = nextLibigotLocation.getHandle().getBlock();
 		int counter = reversed ? 1 : 8;
 		while (true)
 		{
 			Portal portal = null;
-			if(plugin.portalManager.insideBlocks.containsKey(nextV10Location))
+			if(plugin.portalManager.insideBlocks.containsKey(nextLibigotLocation))
 			{
-			  portal = plugin.portalManager.insideBlocks.get(nextV10Location);
+			  portal = plugin.portalManager.insideBlocks.get(nextLibigotLocation);
 			  if(portal.open)
 			  {
 				Portal destP = portal.getDestination();
-				if(destP.horizontal ||portal.inside[0].equals(nextV10Location))
-				  nextV10Location = destP.teleport[0];
+				if(destP.horizontal ||portal.inside[0].equals(nextLibigotLocation))
+				  nextLibigotLocation = destP.teleport[0];
 				else
-				  nextV10Location = destP.teleport[1];
+				  nextLibigotLocation = destP.teleport[1];
 			  }
 			  else
 				return;
 			}
-			else if(plugin.portalManager.borderBlocks.containsKey(nextV10Location))
+			else if(plugin.portalManager.borderBlocks.containsKey(nextLibigotLocation))
 			{
-			  portal = plugin.portalManager.borderBlocks.get(nextV10Location);
+			  portal = plugin.portalManager.borderBlocks.get(nextLibigotLocation);
 			  if(portal.open)
-				nextV10Location = new V10Location(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+				nextLibigotLocation = new LibigotLocation(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
 			  else
 				return;
 			}
 			
 			if(portal != null && portal.open)
 			{
-			  nextBlock = nextV10Location.getHandle().getBlock();
+			  nextBlock = nextLibigotLocation.getHandle().getBlock();
 			  
 			  face = portal.getDestination().teleportFace.getOppositeFace();
 			  
@@ -129,18 +128,18 @@ public class Funnel extends Bridge {
 			}
 			counter--;
 				
-			bridgeBlocks.put(nextV10Location, counter);
-			plugin.funnelBridgeManager.bridgeBlocks.put(nextV10Location, this);
+			bridgeBlocks.put(nextLibigotLocation, counter);
+			plugin.funnelBridgeManager.bridgeBlocks.put(nextLibigotLocation, this);
 			
 			nextBlock = nextBlock.getRelative(face);
-			nextV10Location = new V10Location(nextBlock);
+			nextLibigotLocation = new LibigotLocation(nextBlock);
 		}
 	}
 	
 	@Override
 	public void deactivate()
 	{
-		for (V10Location b : bridgeBlocks.keySet())
+		for (LibigotLocation b : bridgeBlocks.keySet())
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.funnelBridgeManager.bridgeBlocks.remove(b);

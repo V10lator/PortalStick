@@ -67,6 +67,7 @@ public class I18n
 		out.flush();
 		out.close();
 	  }
+	  jar.close();
 	}
 	catch(Exception e)
 	{

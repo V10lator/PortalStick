@@ -19,21 +19,20 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
+import org.libigot.LibigotLocation;
 
 import com.matejdro.bukkit.portalstick.util.Config.Sound;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
 
-import de.V10lator.PortalStick.V10Location;
-
 public class GrillManager {
 	
 	public final List<Grill> grills = new ArrayList<Grill>();
-	public final HashMap<V10Location, Grill> insideBlocks = new HashMap<V10Location, Grill>();
-	public final HashMap<V10Location, Grill> borderBlocks = new HashMap<V10Location, Grill>();
+	public final HashMap<LibigotLocation, Grill> insideBlocks = new HashMap<LibigotLocation, Grill>();
+	public final HashMap<LibigotLocation, Grill> borderBlocks = new HashMap<LibigotLocation, Grill>();
 	private final PortalStick plugin; 
 	
-	private HashSet<V10Location> border;
-	private HashSet<V10Location> inside;
+	private HashSet<LibigotLocation> border;
+	private HashSet<LibigotLocation> inside;
 	private boolean complete;
 	private int max = 0;
 	
@@ -44,7 +43,7 @@ public class GrillManager {
 	public void loadGrill(String blockloc) {
 		String[] locarr = blockloc.split(",");
 		String world = locarr[0];
-		if (!placeRecursiveEmancipationGrill(new V10Location(plugin.getServer().getWorld(world).getBlockAt((int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3])))))
+		if (!placeRecursiveEmancipationGrill(new LibigotLocation(plugin.getServer().getWorld(world).getBlockAt((int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3])))))
 			plugin.config.deleteGrill(blockloc);
 	}
 	
@@ -56,7 +55,7 @@ public class GrillManager {
 		borderBlocks.clear();
 	}
     
-    public boolean createGrill(Player player, V10Location block) {
+    public boolean createGrill(Player player, LibigotLocation block) {
     	boolean ret;
     	if(!plugin.hasPermission(player, plugin.PERM_CREATE_GRILL))
     	  ret = false;
@@ -70,7 +69,7 @@ public class GrillManager {
     	return ret;
     }
     
-    public boolean placeRecursiveEmancipationGrill(V10Location initial) {
+    public boolean placeRecursiveEmancipationGrill(LibigotLocation initial) {
     	Region region = plugin.regionManager.getRegion(initial);
     	String borderID = region.getString(RegionSetting.GRILL_MATERIAL);
     	
@@ -83,8 +82,8 @@ public class GrillManager {
     			return false;
     	
     	//Attempt to get complete border
-    	border = new HashSet<V10Location>();
-    	inside = new HashSet<V10Location>();
+    	border = new HashSet<LibigotLocation>();
+    	inside = new HashSet<LibigotLocation>();
     	startRecurse(initial, borderID, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.DOWN, BlockFace.UP);
     	if (!complete)
     		startRecurse(initial, borderID, BlockFace.UP, BlockFace.WEST, BlockFace.EAST, BlockFace.DOWN, BlockFace.SOUTH, BlockFace.NORTH);
@@ -101,7 +100,7 @@ public class GrillManager {
     }
     
     
-    private void startRecurse(V10Location initial, String id, BlockFace one, BlockFace two, BlockFace three, BlockFace four, BlockFace iOne, BlockFace iTwo) {
+    private void startRecurse(LibigotLocation initial, String id, BlockFace one, BlockFace two, BlockFace three, BlockFace four, BlockFace iOne, BlockFace iTwo) {
     	border.clear();
     	inside.clear();
     	max = 0;
@@ -113,19 +112,19 @@ public class GrillManager {
     		complete = false;
     }
     
-    private void generateInsideBlocks(String borderID, V10Location initial, BlockFace iOne, BlockFace iTwo) {
+    private void generateInsideBlocks(String borderID, LibigotLocation initial, BlockFace iOne, BlockFace iTwo) {
     	
     	//Work out maximums and minimums
-    	Vector max = border.toArray(new V10Location[0])[0].getHandle().toVector();
-    	Vector min = border.toArray(new V10Location[0])[0].getHandle().toVector();
+    	Vector max = border.toArray(new LibigotLocation[0])[0].getHandle().toVector();
+    	Vector min = border.toArray(new LibigotLocation[0])[0].getHandle().toVector();
     	
-    	for (V10Location block : border.toArray(new V10Location[0])) {
-    		if (block.x >= max.getX()) max.setX(block.x);
-    		if (block.y >= max.getY()) max.setY(block.y);
-    		if (block.z >= max.getZ()) max.setZ(block.z);
-    		if (block.x <= min.getX()) min.setX(block.x);
-    		if (block.y <= min.getY()) min.setY(block.y);
-    		if (block.z <= min.getZ()) min.setZ(block.z);
+    	for (LibigotLocation block : border.toArray(new LibigotLocation[0])) {
+    		if (block.getX() >= max.getX()) max.setX(block.getX());
+    		if (block.getY() >= max.getY()) max.setY(block.getY());
+    		if (block.getZ() >= max.getZ()) max.setZ(block.getZ());
+    		if (block.getX() <= min.getX()) min.setX(block.getX());
+    		if (block.getY() <= min.getY()) min.setY(block.getY());
+    		if (block.getZ() <= min.getZ()) min.setZ(block.getZ());
     	}
     	
     	//Loop through all blocks in the min-max range checking for 'inside' blocks
@@ -136,7 +135,7 @@ public class GrillManager {
     		for (int x = (int)min.getX(); x <= (int)max.getX(); x++) {
     			for (int z = (int)min.getZ(); z <= (int)max.getZ(); z++) {
     				rb = world.getBlockAt(x, y, z);
-    				initial = new V10Location(rb);
+    				initial = new LibigotLocation(rb);
     				if (border.contains(initial) || inside.contains(initial))
     	    			continue;
     	    		boolean add = true;
@@ -163,7 +162,7 @@ public class GrillManager {
     	}
     }
     
-    private void recurse(V10Location initial, String id, V10Location vb, BlockFace one, BlockFace two, BlockFace three, BlockFace four) {
+    private void recurse(LibigotLocation initial, String id, LibigotLocation vb, BlockFace one, BlockFace two, BlockFace three, BlockFace four) {
     	if (max >= 100) return;
     	if (vb.equals(initial) && border.size() > 2) {
     		complete = true;
@@ -173,10 +172,10 @@ public class GrillManager {
     		border.add(vb);
     		max++;
     		Block b = vb.getHandle().getBlock();
-    		recurse(initial, id, new V10Location(b.getRelative(one)), one, two, three, four);
-    		recurse(initial, id, new V10Location(b.getRelative(two)), one, two, three, four);
-    		recurse(initial, id, new V10Location(b.getRelative(three)), one, two, three, four);
-    		recurse(initial, id, new V10Location(b.getRelative(four)), one, two, three, four);
+    		recurse(initial, id, new LibigotLocation(b.getRelative(one)), one, two, three, four);
+    		recurse(initial, id, new LibigotLocation(b.getRelative(two)), one, two, three, four);
+    		recurse(initial, id, new LibigotLocation(b.getRelative(three)), one, two, three, four);
+    		recurse(initial, id, new LibigotLocation(b.getRelative(four)), one, two, three, four);
     	}
     }
 
@@ -409,6 +408,6 @@ public class GrillManager {
 	  World world = loc.getWorld();
 	  for(int i = 0; i < 9; i++)
 		world.playEffect(loc, Effect.SMOKE, i, 16);
-	  plugin.util.playSound(Sound.GRILL_EMANCIPATE, new V10Location(loc));
+	  plugin.util.playSound(Sound.GRILL_EMANCIPATE, new LibigotLocation(loc));
 	}
 }

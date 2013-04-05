@@ -24,6 +24,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.libigot.LibigotLocation;
+import org.libigot.block.BlockStorage;
 
 import com.matejdro.bukkit.portalstick.Bridge;
 import com.matejdro.bukkit.portalstick.Funnel;
@@ -32,9 +34,6 @@ import com.matejdro.bukkit.portalstick.Portal;
 import com.matejdro.bukkit.portalstick.PortalStick;
 import com.matejdro.bukkit.portalstick.Region;
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
-
-import de.V10lator.PortalStick.BlockHolder;
-import de.V10lator.PortalStick.V10Location;
 
 public class PortalStickBlockListener implements Listener
 {
@@ -51,12 +50,12 @@ public class PortalStickBlockListener implements Listener
 	public void onBlockBreak(BlockBreakEvent event)
 	{
 	  Block block = event.getBlock();
-	  V10Location loc = new V10Location(block);
-	  if(plugin.config.DisabledWorlds.contains(loc.world))
+	  LibigotLocation loc = new LibigotLocation(block);
+	  if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
 		return;
 	  
 	  //Delete from gel maps
-	  BlockHolder bh = new BlockHolder(block);
+	  BlockStorage bh = new BlockStorage(block);
 	  if(plugin.gelManager.gelMap.containsKey(bh))
 	    plugin.gelManager.removeGel(bh);
 	  
@@ -133,7 +132,7 @@ public class PortalStickBlockListener implements Listener
 		for (int i = 0; i < 4; i++)
 		{
 		  BlockFace face = BlockFace.values()[i];
-		  loc = new V10Location(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
+		  loc = new LibigotLocation(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
 		  if (plugin.portalManager.insideBlocks.containsKey(loc)) 
 		  {
 			portal = plugin.portalManager.insideBlocks.get(loc);
@@ -144,7 +143,7 @@ public class PortalStickBlockListener implements Listener
 			if (destination == null || destination.transmitter)
 			  continue;
 			
-			for (V10Location b: destination.inside)
+			for (LibigotLocation b: destination.inside)
 			  if(b != null)
 				b.getHandle().getBlock().setType(Material.AIR);
 			portal.transmitter = false;
@@ -159,11 +158,11 @@ public class PortalStickBlockListener implements Listener
 	  Block block = event.getBlock();
 	  if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 		return;
-	  V10Location loc;
+	  LibigotLocation loc;
 	  Region region;
 	  for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
 	  {
-		loc = new V10Location(block.getRelative(face));
+		loc = new LibigotLocation(block.getRelative(face));
 		if (plugin.portalManager.borderBlocks.containsKey(loc) ||
 				plugin.portalManager.behindBlocks.containsKey(loc))
 		{
@@ -178,7 +177,7 @@ public class PortalStickBlockListener implements Listener
 			return;
 		  Portal dest = portal.getDestination();
 		  
-		  V10Location destl;
+		  LibigotLocation destl;
 		  if(dest.horizontal || portal.inside[0].equals(loc))
 			destl = dest.teleport[0];
 		  else
@@ -200,8 +199,8 @@ public class PortalStickBlockListener implements Listener
 	
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBurn2(BlockBurnEvent event) {	
-		V10Location loc = new V10Location(event.getBlock());
-		if(plugin.config.DisabledWorlds.contains(loc.world))
+		LibigotLocation loc = new LibigotLocation(event.getBlock());
+		if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
 		  return;
 		if (plugin.portalManager.borderBlocks.containsKey(loc) ||
 				plugin.portalManager.insideBlocks.containsKey(loc) ||
@@ -223,7 +222,7 @@ public class PortalStickBlockListener implements Listener
 		Material block = event.getBlock().getType();
 		
 		//Prevent obstructing funnel
-		if (plugin.funnelBridgeManager.bridgeBlocks.containsKey(new V10Location(event.getBlock())))
+		if (plugin.funnelBridgeManager.bridgeBlocks.containsKey(new LibigotLocation(event.getBlock())))
 		{
 			event.setCancelled(true);
 			return;
@@ -232,7 +231,7 @@ public class PortalStickBlockListener implements Listener
 		if (block == Material.RAILS || block == Material.POWERED_RAIL || block == Material.DETECTOR_RAIL)
 		  return;
 		
-		if (plugin.portalManager.insideBlocks.containsKey(new V10Location(event.getBlockPlaced())))
+		if (plugin.portalManager.insideBlocks.containsKey(new LibigotLocation(event.getBlockPlaced())))
 		  event.setCancelled(true);
 	}
 	
@@ -242,7 +241,7 @@ public class PortalStickBlockListener implements Listener
 		Block block = event.getBlock();
 		if(block.getType() != Material.SUGAR_CANE_BLOCK || plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 		  return;
-		if(plugin.grillManager.insideBlocks.containsKey(new V10Location(block)))
+		if(plugin.grillManager.insideBlocks.containsKey(new LibigotLocation(block)))
 		  event.setCancelled(true);
 	}
 	
@@ -251,18 +250,18 @@ public class PortalStickBlockListener implements Listener
 	{
 		if(plugin.config.DisabledWorlds.contains(event.getBlock().getLocation().getWorld().getName()))
 		  return;
-		if(plugin.grillManager.insideBlocks.containsKey(new V10Location(event.getBlock().getRelative(BlockFace.DOWN))))
+		if(plugin.grillManager.insideBlocks.containsKey(new LibigotLocation(event.getBlock().getRelative(BlockFace.DOWN))))
 		  event.setCancelled(true);
 	}
 	
 	@EventHandler()
 	public void onBlockFromTo(BlockFromToEvent event) {
 		Block from = event.getBlock();
-		V10Location loc = new V10Location(from);
-		if(plugin.config.DisabledWorlds.contains(loc.world))
+		LibigotLocation loc = new LibigotLocation(from);
+		if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
 		  return;
 		Block to = event.getToBlock();
-		V10Location tb = new V10Location(to);
+		LibigotLocation tb = new LibigotLocation(to);
 		 Region region = plugin.regionManager.getRegion(loc);
 		 //Liquid teleporting
 			if (region. //TODO: region is null! - Seems to be solved.
@@ -292,7 +291,7 @@ public class PortalStickBlockListener implements Listener
 							blockt2 = Material.STATIONARY_LAVA.getId();
 					}
 					
-					V10Location dest;
+					LibigotLocation dest;
 					Portal destination = portal.getDestination();
 					if(destination.horizontal || portal.inside[0].equals(tb))
 					  dest = destination.teleport[0];
@@ -357,9 +356,9 @@ public class PortalStickBlockListener implements Listener
 	  if(is == null)
 		return;
 	  Material mat = is.getType();
-	  if(mat == Material.BUCKET || mat == Material.WATER_BUCKET || mat == Material.LAVA_BUCKET)
+	  if(mat == Material.BUCKET || mat == Material.WATER_BUCKET || mat == Material.LAVA_BUCKET || mat == Material.FLINT_AND_STEEL)
 		return;
-	  Region region = plugin.regionManager.getRegion(new V10Location(bs.getLocation()));
+	  Region region = plugin.regionManager.getRegion(new LibigotLocation(bs.getLocation()));
 	  if(region.getBoolean(RegionSetting.GEL_TUBE))
 	  {
 		ItemStack gel = plugin.util.getItemData(region.getString(RegionSetting.RED_GEL_BLOCK));
@@ -367,25 +366,10 @@ public class PortalStickBlockListener implements Listener
 		{
 		  event.setCancelled(true);
 		  Block to = d.getBlock();
-		  V10Location from = new V10Location(to);
+		  LibigotLocation from = new LibigotLocation(to);
 		  if(plugin.gelManager.activeGelTubes.contains(from))
 			return;
-		  BlockFace direction;
-		  switch(d.getData().getData())
-		  {
-		  	case 2:
-		  	  direction = BlockFace.NORTH;
-		  	  break;
-		  	case 3:
-		  	  direction = BlockFace.SOUTH;
-		  	  break;
-		  	case 4:
-			  direction = BlockFace.WEST;
-			  break;
-		  	default:
-			  direction = BlockFace.EAST;
-		  }
-		  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, direction, mat.getId(), is.getData().getData()), 0L, 5L));
+		  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, ((org.bukkit.material.Dispenser) d.getData()).getFacing(), mat.getId(), is.getData().getData()), 0L, 5L));
 		  plugin.gelManager.activeGelTubes.add(from);
 		  return;
 		}
@@ -396,27 +380,12 @@ public class PortalStickBlockListener implements Listener
 		  {
 			event.setCancelled(true);
 			Block to = d.getBlock();
-			V10Location from = new V10Location(to);
+			LibigotLocation from = new LibigotLocation(to);
 			if(plugin.gelManager.activeGelTubes.contains(from))
 			  return;
-			BlockFace direction;
-			switch(d.getData().getData())
-			{
-			  case 2:
-			    direction = BlockFace.NORTH;
-			  	break;
-			  case 3:
-			    direction = BlockFace.SOUTH;
-			    break;
-			  case 4:
-				direction = BlockFace.WEST;
-				break;
-			  default:
-				direction = BlockFace.EAST;
-			}
-			  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, direction, mat.getId(), is.getData().getData()), 0L, 5L));
-			  plugin.gelManager.activeGelTubes.add(from);
-			  return;
+			plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, ((org.bukkit.material.Dispenser) d.getData()).getFacing(), mat.getId(), is.getData().getData()), 0L, 5L));
+			plugin.gelManager.activeGelTubes.add(from);
+			return;
 		  }
 		}
 	  }
@@ -429,12 +398,12 @@ public class PortalStickBlockListener implements Listener
 	
 	private class GelTube implements Runnable
 	{
-	  private final V10Location loc;
+	  private final LibigotLocation loc;
 	  private final BlockFace direction;
 	  private final int mat;
 	  private final byte data;
 	  
-	  private GelTube(V10Location loc, BlockFace direction, int mat, byte data)
+	  private GelTube(LibigotLocation loc, BlockFace direction, int mat, byte data)
 	  {
 		this.loc = loc;
 		this.direction = direction;
@@ -463,7 +432,7 @@ public class PortalStickBlockListener implements Listener
 		  vector.setY(-v);
 		else
 		{
-		  switch(direction)
+/*		  switch(direction)
 		  {
 		    case NORTH:
 		      vector.setZ(-v);
@@ -476,7 +445,7 @@ public class PortalStickBlockListener implements Listener
 		  	  break;
 		  	default:
 		  	  vector.setX(-v);
-		  }
+		  }*/
 		}
 		loc2.setX(loc2.getX()+0.5D);
 		loc2.setZ(loc2.getZ()+0.5D);
@@ -493,8 +462,8 @@ public class PortalStickBlockListener implements Listener
 		if(event.getOldCurrent() == event.getNewCurrent())
 		  return;
 		 Block block = event.getBlock();
-		 V10Location loc = new V10Location(block);
-		 if(plugin.config.DisabledWorlds.contains(loc.world))
+		 LibigotLocation loc = new LibigotLocation(block);
+		 if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
 			 return;
 		 
 		 Region region = plugin.regionManager.getRegion(loc);
@@ -508,7 +477,7 @@ public class PortalStickBlockListener implements Listener
 			 for (int i = 0; i < 5; i++)
 			 {
 				 face = BlockFace.values()[i];
-				 loc = new V10Location(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
+				 loc = new LibigotLocation(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
 				 if (plugin.portalManager.insideBlocks.containsKey(loc)) 
 					 {
 					 	Portal portal = plugin.portalManager.insideBlocks.get(loc);
@@ -530,7 +499,7 @@ public class PortalStickBlockListener implements Listener
 					 		mat1 = Material.AIR;
 					 		mat2 = Material.REDSTONE_TORCH_ON;
 					 	}
-					 	for (V10Location b: destination.inside)
+					 	for (LibigotLocation b: destination.inside)
 					 	{
 					 	  if(b != null)
 					 	  {
@@ -550,7 +519,7 @@ public class PortalStickBlockListener implements Listener
 			 Grill grill = null;
 			 for (int i = 0; i < 5; i++)
 			 { 
-				grill = plugin.grillManager.borderBlocks.get(new V10Location(block.getRelative(BlockFace.values()[i])));
+				grill = plugin.grillManager.borderBlocks.get(new LibigotLocation(block.getRelative(BlockFace.values()[i])));
 				if (grill != null)
 				{
 				  if (event.getNewCurrent() > 0)
@@ -568,10 +537,10 @@ public class PortalStickBlockListener implements Listener
 			 boolean cblock = false;
 			 for (int i = 0; i < 5; i++)
 			 {
-				 bridge = plugin.funnelBridgeManager.bridgeMachineBlocks.get(new V10Location(block.getRelative(BlockFace.values()[i])));
+				 bridge = plugin.funnelBridgeManager.bridgeMachineBlocks.get(new LibigotLocation(block.getRelative(BlockFace.values()[i])));
 				 if (bridge != null) 
 				 {
-					 cblock = new V10Location(block.getRelative(BlockFace.values()[i])).equals(bridge.creationBlock);
+					 cblock = new LibigotLocation(block.getRelative(BlockFace.values()[i])).equals(bridge.creationBlock);
 					 break;
 				 }
 			 }
@@ -610,10 +579,10 @@ public class PortalStickBlockListener implements Listener
 	 {
 		if(plugin.config.DisabledWorlds.contains(event.getBlock().getLocation().getWorld().getName()))
 			  return;
-		 Region region = plugin.regionManager.getRegion(new V10Location(event.getBlock()));
+		 Region region = plugin.regionManager.getRegion(new LibigotLocation(event.getBlock()));
 
 		 BlockBreakEvent bbe;
-		 V10Location loc = new V10Location(event.getBlock().getRelative(event.getDirection()));
+		 LibigotLocation loc = new LibigotLocation(event.getBlock().getRelative(event.getDirection()));
 		 if(plugin.portalManager.insideBlocks.containsKey(loc))
 		 {
 			 Portal portal = plugin.portalManager.insideBlocks.get(loc);
@@ -645,7 +614,7 @@ public class PortalStickBlockListener implements Listener
 			 if(!region.getBoolean(RegionSetting.ENABLE_PISTON_BLOCK_TELEPORT))
 				 return;
 			 
-			 loc = new V10Location(b.getRelative(event.getDirection()));
+			 loc = new LibigotLocation(b.getRelative(event.getDirection()));
 			 if(!plugin.portalManager.insideBlocks.containsKey(loc))
 				 continue;
 			 
@@ -654,7 +623,7 @@ public class PortalStickBlockListener implements Listener
 				 continue;
 			 
 			 Portal destP = portal.getDestination();
-			 V10Location dest;
+			 LibigotLocation dest;
 			 
 			 if(destP.horizontal || portal.inside[0].equals(loc))
 				 dest = destP.teleport[0];
@@ -712,18 +681,18 @@ public class PortalStickBlockListener implements Listener
 			 return;
 		 }
 		 
-		 Region region = plugin.regionManager.getRegion(new V10Location(event.getBlock()));
+		 Region region = plugin.regionManager.getRegion(new LibigotLocation(event.getBlock()));
 		 
 		 if(!region.getBoolean(RegionSetting.ENABLE_PISTON_BLOCK_TELEPORT))
 			 return;
 		 
-		 V10Location loc = new V10Location(block);
+		 LibigotLocation loc = new LibigotLocation(block);
 		 Portal portal = plugin.portalManager.insideBlocks.get(loc);
 		 
 		 if (portal != null)
 		 {
 			 Portal destP = portal.getDestination();
-			 V10Location dest;
+			 LibigotLocation dest;
 			 if(destP.horizontal || portal.inside[0].equals(loc))
 				 dest = destP.teleport[0];
 			 else
@@ -744,18 +713,18 @@ public class PortalStickBlockListener implements Listener
 		 }
 		 
 		 //Update bridge if piston made space
-		 plugin.funnelBridgeManager.updateBridge(new V10Location(event.getRetractLocation()));
+		 plugin.funnelBridgeManager.updateBridge(new LibigotLocation(event.getRetractLocation()));
 	 }
 	 
 	private class LiquidCheck implements Runnable
 	{
-	  private final V10Location source;
-	  private final V10Location destination;
+	  private final LibigotLocation source;
+	  private final LibigotLocation destination;
 	  private final Portal exit;
 	  private final int mat1, mat2;
 	  private int pid;
 	  
-	  private LiquidCheck(V10Location source, V10Location destination, Portal exit, int mat1, int mat2)
+	  private LiquidCheck(LibigotLocation source, LibigotLocation destination, Portal exit, int mat1, int mat2)
 	  {
 		this.source = source;
 		this.destination = destination;

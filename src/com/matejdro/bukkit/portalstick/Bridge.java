@@ -7,22 +7,19 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-
-import de.V10lator.PortalStick.V10Location;
-
-//import de.V10lator.PortalStick.V10Location;
+import org.libigot.LibigotLocation;
 
 public class Bridge {
 	final PortalStick plugin;
 	
-	public final LinkedHashMap<V10Location, Integer> bridgeBlocks = new LinkedHashMap<V10Location, Integer>();
+	public final LinkedHashMap<LibigotLocation, Integer> bridgeBlocks = new LinkedHashMap<LibigotLocation, Integer>();
 	public final HashSet<Portal> involvedPortals = new HashSet<Portal>();
-	HashSet<V10Location> bridgeMachineBlocks = new HashSet<V10Location>();
-	V10Location startBlock;
-	public V10Location creationBlock;
+	HashSet<LibigotLocation> bridgeMachineBlocks = new HashSet<LibigotLocation>();
+	LibigotLocation startBlock;
+	public LibigotLocation creationBlock;
 	BlockFace facingSide;
 
-	Bridge(PortalStick plugin, V10Location creationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks)
+	Bridge(PortalStick plugin, LibigotLocation creationBlock, LibigotLocation startingBlock, BlockFace face, HashSet<LibigotLocation> machineBlocks)
 	{
 		this.plugin = plugin;
 		startBlock = startingBlock;
@@ -42,7 +39,7 @@ public class Bridge {
 		deactivate();
 		
 		BlockFace face = facingSide;
-		V10Location nextV10Location = startBlock;
+		LibigotLocation nextV10Location = startBlock;
 		Block nextBlock = nextV10Location.getHandle().getBlock();
 		Portal portal;
 		while(true)
@@ -66,7 +63,7 @@ public class Bridge {
 			{
 			  portal = plugin.portalManager.borderBlocks.get(nextV10Location);
 			  if(portal.open)
-				nextV10Location = new V10Location(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+				nextV10Location = new LibigotLocation(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
 			  else
 				return;
 			}
@@ -87,17 +84,17 @@ public class Bridge {
 			bridgeBlocks.put(nextV10Location, 0);
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextV10Location, this);
 			
-			if(!nextBlock.getWorld().isChunkLoaded((nextV10Location.x + face.getModX()) / 16,(nextV10Location.z + face.getModX()) / 16))
+			if(!nextBlock.getWorld().isChunkLoaded(((int)nextV10Location.getX() + face.getModX()) / 16,((int)nextV10Location.getZ() + face.getModX()) / 16))
 			  return;
 			
 			nextBlock = nextBlock.getRelative(face);
-			nextV10Location = new V10Location(nextBlock);
+			nextV10Location = new LibigotLocation(nextBlock);
 		}
 	}
 	
 	public void deactivate()
 	{
-		for (V10Location b : bridgeBlocks.keySet())
+		for (LibigotLocation b : bridgeBlocks.keySet())
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.funnelBridgeManager.bridgeBlocks.remove(b);
@@ -111,16 +108,16 @@ public class Bridge {
 	public void delete()
 	{
 		deactivate();
-		for (V10Location b: bridgeMachineBlocks)
+		for (LibigotLocation b: bridgeMachineBlocks)
 			plugin.funnelBridgeManager.bridgeMachineBlocks.remove(b);
 	}
 	
-	public boolean isBlockNextToBridge(V10Location check)
+	public boolean isBlockNextToBridge(LibigotLocation check)
 	{
 		BlockFace[] faces = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
-		for (V10Location b : bridgeBlocks.keySet())
+		for (LibigotLocation b : bridgeBlocks.keySet())
 			for (BlockFace face : faces)
-				if (new V10Location(b.getHandle().getBlock().getRelative(face)).equals(check)) return true;
+				if (new LibigotLocation(b.getHandle().getBlock().getRelative(face)).equals(check)) return true;
 		return false;
 	}
 	

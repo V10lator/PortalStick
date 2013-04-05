@@ -9,10 +9,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.libigot.LibigotLocation;
 
 import com.matejdro.bukkit.portalstick.util.RegionSetting;
-
-import de.V10lator.PortalStick.V10Location;
 
 public class FunnelBridgeManager {
 	private final PortalStick plugin;
@@ -24,13 +23,13 @@ public class FunnelBridgeManager {
 	
 	public HashSet<Bridge> bridges = new HashSet<Bridge>();
 	public HashMap<Portal, Bridge> involvedPortals = new HashMap<Portal, Bridge>();
-	public HashMap<V10Location, Bridge> bridgeBlocks = new HashMap<V10Location, Bridge>();
-	public HashMap<V10Location, Bridge> bridgeMachineBlocks = new HashMap<V10Location, Bridge>();
+	public HashMap<LibigotLocation, Bridge> bridgeBlocks = new HashMap<LibigotLocation, Bridge>();
+	public HashMap<LibigotLocation, Bridge> bridgeMachineBlocks = new HashMap<LibigotLocation, Bridge>();
 //	private HashSet<Entity> inFunnel = new HashSet<Entity>();
-	HashMap<Entity, List<V10Location>> glassBlocks = new HashMap<Entity, List<V10Location>>();
-//	private HashMap<V10Location, Entity> glassBlockOwners = new HashMap<V10Location, Entity>();
+	HashMap<Entity, List<LibigotLocation>> glassBlocks = new HashMap<Entity, List<LibigotLocation>>();
+//	private HashMap<LibigotLocation, Entity> glassBlockOwners = new HashMap<LibigotLocation, Entity>();
 
-	public boolean placeGlassBridge(Player player, V10Location first)
+	public boolean placeGlassBridge(Player player, LibigotLocation first)
 	{
 		if (player != null && !plugin.hasPermission(player, plugin.PERM_CREATE_BRIDGE))
 		  return false;
@@ -39,7 +38,7 @@ public class FunnelBridgeManager {
 		if (!region.getBoolean(RegionSetting.ENABLE_HARD_GLASS_BRIDGES))
 		  return false;
 		
-		HashSet<V10Location> machineBlocks = new HashSet<V10Location>();
+		HashSet<LibigotLocation> machineBlocks = new HashSet<LibigotLocation>();
 
 		//Check if two blocks are iron
 		if (!plugin.blockUtil.compareBlockToString(first, region.getString(RegionSetting.HARD_GLASS_BRIDGE_BASE_MATERIAL)) && !plugin.blockUtil.compareBlockToString(first, region.getString(RegionSetting.FUNNEL_BASE_MATERIAL))) return false;
@@ -59,8 +58,8 @@ public class FunnelBridgeManager {
 		Block startingBlock = firstIron.getRelative(face);
 		Block secondIron = startingBlock.getRelative(face);
 		
-		machineBlocks.add(new V10Location(firstIron));
-		machineBlocks.add(new V10Location(secondIron));
+		machineBlocks.add(new LibigotLocation(firstIron));
+		machineBlocks.add(new LibigotLocation(secondIron));
 		
 		//Check if two irons have redstone torches on them
 		Boolean havetorch = false;
@@ -69,7 +68,7 @@ public class FunnelBridgeManager {
 			if (firstIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
-				machineBlocks.add(new V10Location(firstIron.getRelative(check)));
+				machineBlocks.add(new LibigotLocation(firstIron.getRelative(check)));
 				break;
 			}
 		}
@@ -80,7 +79,7 @@ public class FunnelBridgeManager {
 			if (secondIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
-				machineBlocks.add(new V10Location(secondIron.getRelative(check)));
+				machineBlocks.add(new LibigotLocation(secondIron.getRelative(check)));
 				break;
 			}
 		}
@@ -99,14 +98,14 @@ public class FunnelBridgeManager {
 		if (face == null) return false;
 		
 		Bridge bridge;
-		first = new V10Location(firstIron);
+		first = new LibigotLocation(firstIron);
 		if (plugin.blockUtil.compareBlockToString(firstIron, region.getString(RegionSetting.HARD_GLASS_BRIDGE_BASE_MATERIAL)))
-			bridge = new Bridge(plugin, first, new V10Location(startingBlock), face, machineBlocks);
+			bridge = new Bridge(plugin, first, new LibigotLocation(startingBlock), face, machineBlocks);
 		else
-			bridge = new Funnel(plugin, first, new V10Location(startingBlock), face, machineBlocks);
+			bridge = new Funnel(plugin, first, new LibigotLocation(startingBlock), face, machineBlocks);
 		bridge.activate();
 		
-		for (V10Location b: machineBlocks)
+		for (LibigotLocation b: machineBlocks)
 			bridgeMachineBlocks.put(b, bridge);
 		bridges.add(bridge);
 		plugin.config.saveAll();
@@ -121,12 +120,12 @@ public class FunnelBridgeManager {
 		
 		for (Bridge cbridge : bridges)
 		{
-			for (V10Location b: portal.inside)
+			for (LibigotLocation b: portal.inside)
 			{
 			  if(b != null && cbridge.isBlockNextToBridge(b))
 				cbridge.activate();
 			}
-			for (V10Location b: portal.border)
+			for (LibigotLocation b: portal.border)
 			{
 				if (cbridge.isBlockNextToBridge(b))
 					cbridge.activate();
@@ -134,7 +133,7 @@ public class FunnelBridgeManager {
 		}
 	}
 	
-	public void updateBridge(final V10Location block)
+	public void updateBridge(final LibigotLocation block)
 	{
 		//delay to make sure all blocks have updated
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -152,7 +151,7 @@ public class FunnelBridgeManager {
 	
 	public void loadBridge(String blockloc) {
 		String[] locarr = blockloc.split(",");
-		if (!placeGlassBridge(null, new V10Location(plugin.getServer().getWorld(locarr[0]).getBlockAt((int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3])))))
+		if (!placeGlassBridge(null, new LibigotLocation(plugin.getServer().getWorld(locarr[0]).getBlockAt((int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3])))))
 			plugin.config.deleteBridge(blockloc);
 	}
 	
@@ -164,11 +163,11 @@ public class FunnelBridgeManager {
 	
 /*	public Funnel getFunnelInEntity(Entity entity)
 	{
-		Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
-		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(0,0,-1)));
-		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(0,0,1)));
-		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(-1,0,0)));
-		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(1,0,0)));
+		Bridge bridge = bridgeBlocks.get(new LibigotLocation(entity.getLocation()));
+		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) < 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(entity.getLocation().getBlock().getRelative(0,0,-1)));
+		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) > 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(entity.getLocation().getBlock().getRelative(0,0,1)));
+		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) < 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(entity.getLocation().getBlock().getRelative(-1,0,0)));
+		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) > 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(entity.getLocation().getBlock().getRelative(1,0,0)));
 
 		if (bridge == null)
 		{
@@ -178,17 +177,17 @@ public class FunnelBridgeManager {
 				loc.subtract(0, 1, 0);
 				
 				bridge = bridgeBlocks.get(loc.getBlock());
-				if (bridge == null && ((loc.getZ() - (double) loc.getBlockZ()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(loc.getBlock().getRelative(0,0,-1)));
-				if (bridge == null && ((loc.getZ() - (double) loc.getBlockZ()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(loc.getBlock().getRelative(0,0,1)));
-				if (bridge == null && ((loc.getX() - (double) loc.getBlockX()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(loc.getBlock().getRelative(-1,0,0)));
-				if (bridge == null && ((loc.getX() - (double) loc.getBlockX()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(loc.getBlock().getRelative(1,0,0)));
+				if (bridge == null && ((loc.getZ() - (double) loc.getBlockZ()) < 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(loc.getBlock().getRelative(0,0,-1)));
+				if (bridge == null && ((loc.getZ() - (double) loc.getBlockZ()) > 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(loc.getBlock().getRelative(0,0,1)));
+				if (bridge == null && ((loc.getX() - (double) loc.getBlockX()) < 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(loc.getBlock().getRelative(-1,0,0)));
+				if (bridge == null && ((loc.getX() - (double) loc.getBlockX()) > 0.5)) bridge = bridgeBlocks.get(new LibigotLocation(loc.getBlock().getRelative(1,0,0)));
 
 				if (bridge != null && bridge instanceof Funnel)
 				{
-					List<V10Location> list = glassBlocks.get(entity);
+					List<LibigotLocation> list = glassBlocks.get(entity);
 					if (list == null)
 					{
-						list = new ArrayList<V10Location>();
+						list = new ArrayList<LibigotLocation>();
 						glassBlocks.put(entity, list);
 					}
 						
@@ -196,7 +195,7 @@ public class FunnelBridgeManager {
 					if (block.isEmpty())
 					{
 						block.setType(Material.GLASS);
-						list.add(new V10Location(block));
+						list.add(new LibigotLocation(block));
 					}
 					
 					break;
@@ -228,16 +227,16 @@ public class FunnelBridgeManager {
 	private void EntityEntersFunnel(Entity entity)
 	{
 		inFunnel.add(entity);
-		List<V10Location> list = glassBlocks.get(entity);
+		List<LibigotLocation> list = glassBlocks.get(entity);
 		if (list == null)
-			glassBlocks.put(entity, new ArrayList<V10Location>());
+			glassBlocks.put(entity, new ArrayList<LibigotLocation>());
 	}
 	
 	public void EntityExitsFunnel(Entity entity)
 	{
-		List<V10Location> list = glassBlocks.get(entity);
+		List<LibigotLocation> list = glassBlocks.get(entity);
 		if (list != null) 
-			for (V10Location b : list)
+			for (LibigotLocation b : list)
 				b.getHandle().getBlock().setType(Material.AIR);
 		inFunnel.remove(entity);
 	
@@ -261,35 +260,35 @@ public class FunnelBridgeManager {
 			
 			Block pblock = entity.getLocation().getBlock().getRelative(BlockFace.DOWN);
 			
-			if (face != BlockFace.UP && face != BlockFace.DOWN && funnel.bridgeBlocks.containsKey(new V10Location(pblock.getRelative(BlockFace.UP))))
+			if (face != BlockFace.UP && face != BlockFace.DOWN && funnel.bridgeBlocks.containsKey(new LibigotLocation(pblock.getRelative(BlockFace.UP))))
 			{
 				if (pblock.getRelative(face).getType() == Material.AIR) 
 				{
 						Block block = pblock.getRelative(face);
 						block.setType(Material.GLASS);
-						V10Location loc = new V10Location(block);
+						LibigotLocation loc = new LibigotLocation(block);
 						glassBlocks.get(entity).add(loc);
 						glassBlockOwners.put(loc, entity);
 				}
 				else if (pblock.getRelative(face).getType() == Material.GLASS)
 				{
-					glassBlockOwners.put(new V10Location(pblock.getRelative(face)), entity);
+					glassBlockOwners.put(new LibigotLocation(pblock.getRelative(face)), entity);
 				}
 								
 				if (pblock.getRelative(face, 2).getType() == Material.AIR) 
 				{
 						Block block = pblock.getRelative(face, 2);
 						block.setType(Material.GLASS);
-						V10Location loc = new V10Location(block);
+						LibigotLocation loc = new LibigotLocation(block);
 						glassBlocks.get(entity).add(loc);
 						glassBlockOwners.put(loc, entity);
 				}
 				else if (pblock.getRelative(face, 2).getType() == Material.GLASS)
 				{
-					glassBlockOwners.put(new V10Location(pblock.getRelative(face, 2)), entity);
+					glassBlockOwners.put(new LibigotLocation(pblock.getRelative(face, 2)), entity);
 				}
 				Block block;
-				for (V10Location loc : glassBlocks.get(entity).toArray(new V10Location[0]))
+				for (LibigotLocation loc : glassBlocks.get(entity).toArray(new LibigotLocation[0]))
 				{
 					if (loc.getHandle().distanceSquared(entity.getLocation()) > 4) 
 					{
