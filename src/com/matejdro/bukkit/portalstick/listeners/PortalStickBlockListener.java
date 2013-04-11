@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
+import org.bukkit.block.Dropper;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.libigot.LibigotLocation;
@@ -349,14 +351,15 @@ public class PortalStickBlockListener implements Listener
 	  if(plugin.config.DisabledWorlds.contains(event.getBlock().getLocation().getWorld().getName()))
 		return;
 	  BlockState bs = event.getBlock().getState();
-	  if(!(bs instanceof Dispenser))
+	  boolean dropper = bs instanceof Dropper;
+	  if(!(bs instanceof Dispenser) && !dropper)
 		return;
-	  Dispenser d = (Dispenser)bs;
-	  ItemStack is = d.getInventory().getItem(4);
+	  InventoryHolder ih = (InventoryHolder) bs;
+	  ItemStack is = ih.getInventory().getItem(4);
 	  if(is == null)
 		return;
 	  Material mat = is.getType();
-	  if(mat == Material.BUCKET || mat == Material.WATER_BUCKET || mat == Material.LAVA_BUCKET || mat == Material.FLINT_AND_STEEL)
+	  if(!dropper && (mat == Material.BUCKET || mat == Material.WATER_BUCKET || mat == Material.LAVA_BUCKET || mat == Material.FLINT_AND_STEEL))
 		return;
 	  Region region = plugin.regionManager.getRegion(new LibigotLocation(bs.getLocation()));
 	  if(region.getBoolean(RegionSetting.GEL_TUBE))
@@ -365,11 +368,11 @@ public class PortalStickBlockListener implements Listener
 		if(mat == gel.getType() && is.getDurability() == gel.getDurability())
 		{
 		  event.setCancelled(true);
-		  Block to = d.getBlock();
+		  Block to = bs.getBlock();
 		  LibigotLocation from = new LibigotLocation(to);
 		  if(plugin.gelManager.activeGelTubes.contains(from))
 			return;
-		  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, ((org.bukkit.material.Dispenser) d.getData()).getFacing(), mat.getId(), is.getData().getData()), 0L, 5L));
+		  plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, ((org.bukkit.material.DirectionalContainer) bs.getData()).getFacing(), mat.getId(), is.getData().getData()), 0L, 5L));
 		  plugin.gelManager.activeGelTubes.add(from);
 		  return;
 		}
@@ -379,11 +382,11 @@ public class PortalStickBlockListener implements Listener
 		  if(mat == gel.getType() && is.getDurability() == gel.getDurability())
 		  {
 			event.setCancelled(true);
-			Block to = d.getBlock();
+			Block to = bs.getBlock();
 			LibigotLocation from = new LibigotLocation(to);
 			if(plugin.gelManager.activeGelTubes.contains(from))
 			  return;
-			plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, ((org.bukkit.material.Dispenser) d.getData()).getFacing(), mat.getId(), is.getData().getData()), 0L, 5L));
+			plugin.gelManager.tubePids.put(from, plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new GelTube(from, ((org.bukkit.material.DirectionalContainer) bs.getData()).getFacing(), mat.getId(), is.getData().getData()), 0L, 5L));
 			plugin.gelManager.activeGelTubes.add(from);
 			return;
 		  }
