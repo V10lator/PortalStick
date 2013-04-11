@@ -302,7 +302,7 @@ public class PortalStickBlockListener implements Listener
 					if (destb.getType() == Material.AIR)
 					{
 					  destb.setTypeId(blockt);
-					  LiquidCheck lc = new LiquidCheck(loc, dest, destination, blockt2, blockt);
+					  LiquidCheck lc = new LiquidCheck(loc, dest, portal, destination, blockt2, blockt);
 					  lc.setPid(plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, lc, 10L, 10L));  
 					}
 					event.setCancelled(true);
@@ -432,7 +432,7 @@ public class PortalStickBlockListener implements Listener
 		  vector.setY(-v);
 		else
 		{
-/*		  switch(direction)
+		  switch(direction)
 		  {
 		    case NORTH:
 		      vector.setZ(-v);
@@ -443,9 +443,15 @@ public class PortalStickBlockListener implements Listener
 		  	case SOUTH:
 		  	  vector.setZ(v);
 		  	  break;
+		  	case UP:
+		  	    vector.setY(v);
+		  	    break;
+		  	case DOWN:
+		  	    vector.setY(-v);
+		  	    break;
 		  	default:
 		  	  vector.setX(-v);
-		  }*/
+		  }
 		}
 		loc2.setX(loc2.getX()+0.5D);
 		loc2.setZ(loc2.getZ()+0.5D);
@@ -562,7 +568,7 @@ public class PortalStickBlockListener implements Listener
 		 }
 		 
 		 //Portal Generators & music signs
-		 if (event.getOldCurrent()  == 0 && event.getNewCurrent() > 0)
+		 if (event.getOldCurrent() == 0 && event.getNewCurrent() > 0)
 		 {
 			 Block block2;
 			 for (int i = 0; i < 5; i++)
@@ -574,7 +580,7 @@ public class PortalStickBlockListener implements Listener
 		 }
 	 }
 	 
-	@EventHandler(ignoreCancelled = true)
+	 @EventHandler(ignoreCancelled = true)
 	 public void onBlockPistonExtend(BlockPistonExtendEvent event) 
 	 {
 		if(plugin.config.DisabledWorlds.contains(event.getBlock().getLocation().getWorld().getName()))
@@ -612,7 +618,7 @@ public class PortalStickBlockListener implements Listener
 			 }
 			 
 			 if(!region.getBoolean(RegionSetting.ENABLE_PISTON_BLOCK_TELEPORT))
-				 return;
+				 continue;
 			 
 			 loc = new LibigotLocation(b.getRelative(event.getDirection()));
 			 if(!plugin.portalManager.insideBlocks.containsKey(loc))
@@ -637,14 +643,19 @@ public class PortalStickBlockListener implements Listener
 				 destB.setTypeIdAndData(b.getType().getId(), b.getData(), true);
 				 final Block b2 = b.getRelative(event.getDirection());
 				 blockedPistonBlocks.add(b2);
+				 final Material mat = b.getType();
 				 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable()
 				 {
 					 public void run()
 					 {
-						 b2.setType(Material.AIR);
+					     if(b2.getType() == mat) {
+					         b2.setType(Material.AIR);
+					     } else if(b.getType() == mat) {
+					         b.setType(Material.AIR);
+					     }
 						 blockedPistonBlocks.remove(b2);
 					 }
-				 }, 2L);
+				 }, 1L);
 			 }
 			 else
 				 event.setCancelled(true);
@@ -718,16 +729,16 @@ public class PortalStickBlockListener implements Listener
 	 
 	private class LiquidCheck implements Runnable
 	{
-	  private final LibigotLocation source;
-	  private final LibigotLocation destination;
-	  private final Portal exit;
+	  private final LibigotLocation source, destination;
+	  private final Portal entrance, exit;
 	  private final int mat1, mat2;
 	  private int pid;
 	  
-	  private LiquidCheck(LibigotLocation source, LibigotLocation destination, Portal exit, int mat1, int mat2)
+	  private LiquidCheck(LibigotLocation source, LibigotLocation destination, Portal entrance, Portal exit, int mat1, int mat2)
 	  {
 		this.source = source;
 		this.destination = destination;
+		this.entrance = entrance;
 		this.exit = exit;
 		this.mat1 = mat1;
 		this.mat2 = mat2;
@@ -755,9 +766,13 @@ public class PortalStickBlockListener implements Listener
 		  return;
 		}
 		Block destination = loc.getBlock();
-		if(!exit.open || source.getTypeId() != mat1 || source.getTypeId() != mat2)
+		boolean valid = plugin.portalManager.portals.contains(entrance) && plugin.portalManager.portals.contains(exit);
+		if(valid) {
+	        valid = source.getTypeId() == mat1 || source.getTypeId() == mat2;
+	    }
+		if(!exit.open || !valid)
 		{
-		  if(destination.getTypeId() == mat1)
+		  if(destination.getTypeId() == mat1 || destination.getTypeId() == mat2)
 			destination.setType(Material.AIR);
 		  plugin.getServer().getScheduler().cancelTask(pid);
 		}
