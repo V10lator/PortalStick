@@ -10,7 +10,6 @@ import java.util.jar.JarFile;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.matejdro.bukkit.portalstick.PortalStick;
 
 public class I18n
 {
