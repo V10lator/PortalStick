@@ -492,27 +492,18 @@ public class PortalStickBlockListener implements Listener
 		 Region region = plugin.regionManager.getRegion(loc);
 		 
 		 //Redstone teleportation
-		 if (region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER))
-		 {			 
-			 Location l = block.getLocation();
-			 BlockFace face;
-			 Block block2;
-			 String worldName = l.getWorld().getName();
-			 for (int i = 0; i < 5; i++)
-			 {
-				 face = BlockFace.values()[i];
-				 loc = new V10Location(worldName, l.getBlockX() + face.getModX(), l.getBlockY() + face.getModY(), l.getBlockZ() + face.getModZ());
-				 if (plugin.portalManager.insideBlocks.containsKey(loc)) 
-					 {
-					 	Portal portal = plugin.portalManager.insideBlocks.get(loc);
-					 	if (!portal.open) continue;
-					 
-					 	Portal destination = portal.getDestination();
-					 	if (destination == null || destination.transmitter) continue;
-					 	
-					 	portal.switchRedstoneTransmitter(newC > 0);
-					 }
-			 }	 
+		 if (region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER)) {
+		     boolean stop = false;
+		     for(Portal portal: plugin.portalManager.portals) {
+		         for(V10Location ploc: portal.coord.teleport)
+		             if(loc.equals(ploc)) {
+		                 portal.switchRedstoneTransmitter(newC > 0);
+		                 stop = true;
+		                 break;
+		             }
+		         if(stop)
+		             break;
+		     }
 		 }
 		 
 		 //Turning off grills

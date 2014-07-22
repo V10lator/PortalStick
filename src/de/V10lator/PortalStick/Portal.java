@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 
 import de.V10lator.PortalStick.util.BlockStorage;
 import de.V10lator.PortalStick.util.V10Location;
@@ -134,6 +133,11 @@ public class Portal {
 	    transmitter = on;
 	    if(destination == null)
 	        return;
+	    
+	    if(destination.transmitter) {
+	        transmitter = false;
+	        return;
+	    }
 	    
 	    if(!destination.open) {
 	        destination.placetorch = on;
