@@ -112,8 +112,8 @@ public class Config {
           portalToolData = Short.parseShort(split[1]);
         else
           portalToolData = 0;
-        portalToolName = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-name", "&6Portal &9Gun"));
-        portalToolDesc = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-description", "&aThis is to shoot portals.\n&2Greetings Aperture Science."));
+        portalToolName = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-name", "&6Aperture Science Handheld Portal Device"));
+        portalToolDesc = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-description", "&aThanks to the ASHPD,\n&2the impossible is easy."));
         CompactPortal = getBoolean("main.compact-portal", false);
         RegionTool = getInt("main.region-tool", 268);
         RestoreInvOnWorldChange = getBoolean("main.restore-inventory-on-world-change", true);
