@@ -253,39 +253,12 @@ public class PortalStickBlockListener implements Listener
 	public void onBlockPhysics(BlockPhysicsEvent event)
 	{
 	    Block block = event.getBlock();
-	    if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName())) {
+	    if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 	        return;
-	    }
-		if(torches.contains(new V10Location(block))) {
+		if(torches.contains(new V10Location(block)) ||
+		        (block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block))))
 		    event.setCancelled(true);
-		    return;
-		}
-		if(block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block))) {
-		  event.setCancelled(true);
-		}
 	}
-	
-	
-	
-	@EventHandler(ignoreCancelled = true)
-    public void onBlockPhysi(BlockFadeEvent event)
-    {
-        Block block = event.getBlock();
-        if(block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block))) {
-          event.setCancelled(true);
-          plugin.getLogger().info("DEBUG: Block Fade!");
-        }
-    }
-	
-	   @EventHandler(ignoreCancelled = true)
-	    public void onBlockPhys(LeavesDecayEvent event)
-	    {
-	        Block block = event.getBlock();
-	        if(block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block))) {
-	          event.setCancelled(true);
-	          plugin.getLogger().info("DEBUG: Leaves Decay!");
-	        }
-	    }
 	
 	@EventHandler(ignoreCancelled = true)
 	public void noGrowingGrills(BlockGrowEvent event)
