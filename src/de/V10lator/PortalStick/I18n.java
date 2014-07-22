@@ -104,7 +104,8 @@ public class I18n
   
   public String getString(String node, String ... replace)
   {
-	if(lang.contains(node))
+      //TODO: lang should never be null but (not reproduceable for me) it is after /portalstick reload
+	if(lang != null && lang.contains(node))
 	  node = lang.getString(node);
 	else if(fallback.contains(node))
 	  node = fallback.getString(node);
