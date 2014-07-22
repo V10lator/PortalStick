@@ -5,17 +5,18 @@ import java.util.HashSet;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.libigot.LibigotLocation;
+
+import de.V10lator.PortalStick.util.V10Location;
 
 public class Grill {
 	private final PortalStick plugin;
 	
-	final HashSet<LibigotLocation> border;
-	private final HashSet<LibigotLocation> inside;
-	final LibigotLocation firstBlock;
+	final HashSet<V10Location> border;
+	private final HashSet<V10Location> inside;
+	final V10Location firstBlock;
 	public boolean disabled;
 	
-	public Grill(PortalStick plugin, HashSet<LibigotLocation> Border, HashSet<LibigotLocation> Inside, LibigotLocation FirstBlock)
+	public Grill(PortalStick plugin, HashSet<V10Location> Border, HashSet<V10Location> Inside, V10Location FirstBlock)
 	{
 		this.plugin = plugin;
 		border = Border;
@@ -31,13 +32,13 @@ public class Grill {
 		plugin.grillManager.grills.remove(this);
 		plugin.config.saveAll();
 		
-		for (LibigotLocation b : border)
+		for (V10Location b : border)
 			plugin.grillManager.borderBlocks.remove(b);
 	}
 	
 	public void deleteInside()
 	{
-		for (LibigotLocation b: inside)
+		for (V10Location b: inside)
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.grillManager.insideBlocks.remove(b);
@@ -46,7 +47,7 @@ public class Grill {
 	
 	public void disable()
 	{
-		for (LibigotLocation b: inside)
+		for (V10Location b: inside)
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			disabled = true;
@@ -55,7 +56,7 @@ public class Grill {
 	
 	public void enable()
 	{
-		for (LibigotLocation b: inside)
+		for (V10Location b: inside)
 		{
 			b.getHandle().getBlock().setType(Material.SUGAR_CANE_BLOCK);
 			disabled = false;
@@ -66,7 +67,7 @@ public class Grill {
 	{
 		boolean complete = true;
 		Block rb;
-		for (LibigotLocation b: inside)
+		for (V10Location b: inside)
     	{
 			rb = b.getHandle().getBlock();
 			plugin.grillManager.insideBlocks.put(b, this);
@@ -76,7 +77,7 @@ public class Grill {
 			}
 			
     	}
-		for (LibigotLocation b : border)
+		for (V10Location b : border)
 			plugin.grillManager.borderBlocks.put(b, this);
 		return complete;
 	}

@@ -3,7 +3,8 @@ package de.V10lator.PortalStick;
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
-import org.libigot.LibigotLocation;
+
+import de.V10lator.PortalStick.util.V10Location;
 
 public class RegionManager {
 	private final PortalStick plugin;
@@ -37,7 +38,7 @@ public class RegionManager {
 		plugin.config.deleteRegion(name);
 	}
 	
-	public boolean createRegion(Player player, String name, LibigotLocation one, LibigotLocation two) {
+	public boolean createRegion(Player player, String name, V10Location one, V10Location two) {
 		name = name.toLowerCase();
 		Region region = new Region(plugin, name);
 		boolean ret = region.setLocation(player, one, two);
@@ -49,7 +50,7 @@ public class RegionManager {
 		return ret;
 	}
 	
-	public Region getRegion(LibigotLocation location) {
+	public Region getRegion(V10Location location) {
 		for (Region region : regions.values())
 			if (region.contains(location) && !region.name.equals("global"))
 				return region;

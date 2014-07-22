@@ -46,6 +46,8 @@ public enum RegionSetting {
 	RED_GEL_MAX_VELOCITY("red-gel-max-velocity", 0.7, true),
 	FAITH_PLATE_BLOCK("aerial-faith-plate-block", "57", true),
 	FAITH_PLATE_POWER("aerial-faith-plate-power", "6-2", true),
+	ENABLE_TURRETS("turrets-enabled", true, true),
+	TURRETS_ATTACK_EVERYTHING("turrets-attack-mobs", true, true),
 	ENABLE_SOUNDS("enable-sounds", true, true),
 	PROTECT_PORTALS_FROM_TNT("protect-portals-from-tnt", false, true),
 	ENABLE_REDSTONE_TRANSFER("enable-transferring-redstone-current", true, true),

@@ -1,8 +1,6 @@
 package de.V10lator.PortalStick.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,16 +9,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.libigot.LibigotLocation;
-import org.libigot.event.entity.EntityAddEvent;
-import org.libigot.event.entity.EntityRemoveEvent;
+
+import com.bergerkiller.bukkit.common.events.EntityAddEvent;
+import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 
 import de.V10lator.PortalStick.Bridge;
 import de.V10lator.PortalStick.Grill;
@@ -43,6 +41,7 @@ public class Config {
 	public HashSet<String> DisabledWorlds;
 	public int PortalTool;
 	public short portalToolData; //Short for spout compatiblity!
+	public String portalToolName, portalToolDesc;
 	public boolean CompactPortal;
 	public Region GlobalRegion;
 	public int RegionTool;
@@ -94,7 +93,6 @@ public class Config {
 		bridgeConfig.set("bridges", list);
 		saveAll();
 	}
-
 	
 	public void load() {
 		try {
@@ -102,11 +100,7 @@ public class Config {
 			regionConfig.load(regionConfigFile);
 			grillConfig.load(grillConfigFile);
 			bridgeConfig.load(bridgeConfigFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InvalidConfigurationException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
         
@@ -118,6 +112,8 @@ public class Config {
           portalToolData = Short.parseShort(split[1]);
         else
           portalToolData = 0;
+        portalToolName = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-name", "&6Portal &9Gun"));
+        portalToolDesc = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-description", "&aThis is to shoot portals.\n&2Greetings Aperture Science."));
         CompactPortal = getBoolean("main.compact-portal", false);
         RegionTool = getInt("main.region-tool", 268);
         RestoreInvOnWorldChange = getBoolean("main.restore-inventory-on-world-change", true);
@@ -135,7 +131,7 @@ public class Config {
         soundNative[Sound.PORTAL_CREATE_ORANGE.ordinal()] = getString("sounds.minecraft.create-orange-portal", "STEP_WOOL:0.3");
         soundNative[Sound.PORTAL_EXIT_BLUE.ordinal()] = getString("sounds.minecraft.exit-blue-portal", "ENDERMAN_TELEPORT");
         soundNative[Sound.PORTAL_EXIT_ORANGE.ordinal()] = getString("sounds.minecraft.exit-orange-portal", "ENDERMAN_TELEPORT");
-        soundNative[Sound.PORTAL_CANNOT_CREATE.ordinal()] = getString("sounds.minecraft.cannot-create-portal", "");
+        soundNative[Sound.PORTAL_CANNOT_CREATE.ordinal()] = getString("sounds.minecraft.cannot-create-portal", ""); //TODO: Find sound...
         soundNative[Sound.GRILL_EMANCIPATE.ordinal()] = getString("sounds.minecraft.grill-emancipate", "FIZZ");
         soundNative[Sound.FAITHPLATE_LAUNCH.ordinal()] = getString("sounds.minecraft.faith-plate-launch", "EXPLODE:0.5");
         soundNative[Sound.GEL_BLUE_BOUNCE.ordinal()] = getString("sounds.minecraft.blue-gel-bounce", "SLIME_WALK2");
@@ -189,13 +185,16 @@ public class Config {
         saveAll();
 		
         EntityAddEvent eae;
-		for(World w: plugin.getServer().getWorlds())
-		  for(Chunk c: w.getLoadedChunks())
-			for(Entity e: c.getEntities())
-			{
-			  eae = new EntityAddEvent(e);
-			  plugin.eL.spawn(eae);
-			}
+		for(World w: plugin.getServer().getWorlds()) {
+		    if(!DisabledWorlds.contains(w.getName())) {
+		        for(Chunk c: w.getLoadedChunks()) {
+		            for(Entity e: c.getEntities()) {
+		                eae = new EntityAddEvent(e);
+		                plugin.eL.spawn(eae);
+		            }
+		        }
+		    }
+		}
 	}
 	
 	private int getInt(String path, int def)
@@ -251,7 +250,7 @@ public class Config {
 			p.delete();
 		plugin.portalManager.portals.clear();
 		plugin.grillManager.deleteAll();
-		for(LibigotLocation loc: plugin.gelManager.gels.keySet())
+		for(V10Location loc: plugin.gelManager.gels.keySet())
 		  plugin.gelManager.stopGelTube(loc);
 	}
 	

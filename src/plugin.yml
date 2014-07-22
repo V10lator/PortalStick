@@ -1,8 +1,9 @@
 name: PortalStick
 main: de.V10lator.PortalStick.PortalStick
-version: 4.0
+version: 5.0-dev3
 authors: [matejdro, oliverw92, V10lator]
 softdepend: [WorldGuard]
+depend: [BKCommonLib]
 commands:
   portalstick:
     description: Aperture Science Portal Stick

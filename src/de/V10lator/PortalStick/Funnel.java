@@ -6,12 +6,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.libigot.LibigotLocation;
+
+import de.V10lator.PortalStick.util.V10Location;
 
 public class Funnel extends Bridge {
 	private boolean reversed = false;
 	
-	Funnel(PortalStick plugin, LibigotLocation CreationBlock, LibigotLocation startingBlock, BlockFace face, HashSet<LibigotLocation> machineBlocks) {
+	Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
 		super(plugin, CreationBlock, startingBlock, face, machineBlocks);
 	}
 	
@@ -23,14 +24,14 @@ public class Funnel extends Bridge {
 	
 	public BlockFace getDirection(Block block)
 	{
-		LibigotLocation vb = new LibigotLocation(block);
+		V10Location vb = new V10Location(block);
 		if (!bridgeBlocks.containsKey(vb)) return null;
 		
 		int curnum = bridgeBlocks.get(vb);
 		BlockFace face = null;
 		for (BlockFace check : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN})
 		{
-			vb = new LibigotLocation(block.getRelative(check));
+			vb = new V10Location(block.getRelative(check));
 			if (bridgeBlocks.containsKey(vb) && (curnum - bridgeBlocks.get(vb) == 1 || bridgeBlocks.get(vb) > curnum + 1) )			{
 				face = check;
 				break;
@@ -59,7 +60,7 @@ public class Funnel extends Bridge {
 		return face;
 	}
 	
-	public int getCounter(LibigotLocation block)
+	public int getCounter(V10Location block)
 	{
 		return bridgeBlocks.get(block);
 	}
@@ -71,7 +72,7 @@ public class Funnel extends Bridge {
 		deactivate();
 		
 		BlockFace face = facingSide;
-		LibigotLocation nextLibigotLocation = startBlock;
+		V10Location nextLibigotLocation = startBlock;
 		Block nextBlock = nextLibigotLocation.getHandle().getBlock();
 		int counter = reversed ? 1 : 8;
 		while (true)
@@ -95,7 +96,7 @@ public class Funnel extends Bridge {
 			{
 			  portal = plugin.portalManager.borderBlocks.get(nextLibigotLocation);
 			  if(portal.open)
-				nextLibigotLocation = new LibigotLocation(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+				nextLibigotLocation = new V10Location(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
 			  else
 				return;
 			}
@@ -132,14 +133,14 @@ public class Funnel extends Bridge {
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextLibigotLocation, this);
 			
 			nextBlock = nextBlock.getRelative(face);
-			nextLibigotLocation = new LibigotLocation(nextBlock);
+			nextLibigotLocation = new V10Location(nextBlock);
 		}
 	}
 	
 	@Override
 	public void deactivate()
 	{
-		for (LibigotLocation b : bridgeBlocks.keySet())
+		for (V10Location b : bridgeBlocks.keySet())
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.funnelBridgeManager.bridgeBlocks.remove(b);

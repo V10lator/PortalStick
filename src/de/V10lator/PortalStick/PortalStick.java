@@ -1,5 +1,8 @@
 package de.V10lator.PortalStick;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -17,6 +20,7 @@ import de.V10lator.PortalStick.commands.DeleteAllCommand;
 import de.V10lator.PortalStick.commands.DeleteCommand;
 import de.V10lator.PortalStick.commands.DeleteRegionCommand;
 import de.V10lator.PortalStick.commands.FlagCommand;
+import de.V10lator.PortalStick.commands.GetGunCommand;
 import de.V10lator.PortalStick.commands.HelpCommand;
 import de.V10lator.PortalStick.commands.LanguageCommand;
 import de.V10lator.PortalStick.commands.RegionInfoCommand;
@@ -59,6 +63,8 @@ public class PortalStick extends JavaPlugin {
 	
 	public void onDisable() {
 		//config.unLoad() handles cleanup, so let's call it
+	    for(StackTraceElement line: Thread.currentThread().getStackTrace())
+	        getLogger().info("DEBUG: " + line.toString());
 		config.unLoad();
 		getServer().getScheduler().cancelTasks(this);
 	}
@@ -97,6 +103,7 @@ public class PortalStick extends JavaPlugin {
 		tmpList.add(new FlagCommand(this));
 		tmpList.add(new RegionInfoCommand(this));
 		tmpList.add(new LanguageCommand(this));
+		tmpList.add(new GetGunCommand(this));
 		commands = tmpList.toArray(new BaseCommand[0]);
 	}
 	
@@ -136,6 +143,29 @@ public class PortalStick extends JavaPlugin {
 				return true;
 		}
 		return player.hasPermission("*");
+	}
+	
+	private boolean debug = true;
+	public void debug(String string) {
+	    if(!debug) {
+	        return;
+	    }
+	    File f = new File(getDataFolder(), "debug.txt");
+	    try {
+	        if(!f.exists()) {
+	            f.createNewFile();
+	        }
+	        BufferedWriter writer = new BufferedWriter(new FileWriter(f, true));
+	        writer.write(string+"\n");
+	        writer.flush();
+	        writer.close();
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	public void stopDebugging() {
+	    debug = false;
 	}
 }
 		    

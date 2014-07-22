@@ -2,7 +2,6 @@ package de.V10lator.PortalStick;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,33 +13,38 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.util.Vector;
-import org.libigot.LibigotLocation;
 
 
+
+
+
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+
+import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
 import de.V10lator.PortalStick.util.Config.Sound;
 
 public class EntityManager implements Runnable {
 	private final PortalStick plugin;
 	private final HashSet<Entity> blockedEntities = new HashSet<Entity>();
-	final HashMap<UUID, Location> oldLocations = new HashMap<UUID, Location>();
 
 	EntityManager(PortalStick instance)
 	{
 		plugin = instance;
 	}
 
-	public V10Teleport teleport(Entity entity, Location locFrom, Location oloc, LibigotLocation locTo, Vector vector, boolean really)
+	public V10Teleport teleport(Entity entity, Location locFrom, Location oloc, V10Location locTo, Vector vector, boolean really)
 	{
 		if (entity == null || entity.isDead() || blockedEntities.contains(entity))
 		  return null;
 
 		Region regionTo = plugin.regionManager.getRegion(locTo);
 		Portal portal = plugin.portalManager.insideBlocks.get(locTo);
-		LibigotLocation lTeleport;
+		V10Location lTeleport;
 		final Portal destination;
 		boolean ab = portal == null;
 		if(!ab)
@@ -260,7 +264,7 @@ public class EntityManager implements Runnable {
 		
 		if(really)
 		{
-		  if(!entity.teleport(teleport))
+		  if(!EntityUtil.teleport(entity, teleport))
 			return null;
 		  entity.setVelocity(outvector);
 		}
@@ -269,9 +273,9 @@ public class EntityManager implements Runnable {
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){public void run(){destination.disabled = false;}}, 10L);
 		
 		if (portal.orange)
-			plugin.util.playSound(Sound.PORTAL_EXIT_ORANGE, new LibigotLocation(teleport));
+			plugin.util.playSound(Sound.PORTAL_EXIT_ORANGE, new V10Location(teleport));
 		else
-			plugin.util.playSound(Sound.PORTAL_EXIT_BLUE, new LibigotLocation(teleport));
+			plugin.util.playSound(Sound.PORTAL_EXIT_BLUE, new V10Location(teleport));
 		
 		return new V10Teleport(teleport, outvector);
 	}
@@ -282,7 +286,7 @@ public class EntityManager implements Runnable {
 		faceCache.clear();
 	}
 	
-	HashMap<LibigotLocation, HashMap<BlockFace, Block>> faceCache = new HashMap<LibigotLocation, HashMap<BlockFace, Block>>();
+	HashMap<V10Location, HashMap<BlockFace, Block>> faceCache = new HashMap<V10Location, HashMap<BlockFace, Block>>();
 	
 	public Location onEntityMove(final Entity entity, Location locFrom, Location locTo, boolean tp)
 	{
@@ -296,9 +300,9 @@ public class EntityManager implements Runnable {
 		Vector vec2 = locTo.toVector();
 		Location oloc = locTo;
 		locTo = new Location(locTo.getWorld(), locTo.getBlockX(), locTo.getBlockY(), locTo.getBlockZ());
-		LibigotLocation vlocTo = new LibigotLocation(locTo);
+		V10Location vlocTo = new V10Location(locTo);
 		Vector vec1 = locFrom.toVector();
-		LibigotLocation vlocFrom = new LibigotLocation(locFrom.getWorld(), locFrom.getBlockX(), locFrom.getBlockY(), locFrom.getBlockZ());
+		V10Location vlocFrom = new V10Location(locFrom.getWorld(), locFrom.getBlockX(), locFrom.getBlockY(), locFrom.getBlockZ());
 		if(vlocTo.equals(vlocFrom))
 		  return null;
 		
@@ -376,21 +380,31 @@ public class EntityManager implements Runnable {
 						velocity.setZ(-velocity.getZ());
 					}
 					entity.setVelocity(velocity);
-					plugin.util.playSound(Sound.FAITHPLATE_LAUNCH, new LibigotLocation(blockStart.getLocation()));
+					plugin.util.playSound(Sound.FAITHPLATE_LAUNCH, new V10Location(blockStart.getLocation()));
 					return null;
 				}
 			}
 		
 		}
+		
+		boolean isPlayer = entity instanceof Player;
+		//Turrets
+/*        if(regionTo.getBoolean(RegionSetting.ENABLE_TURRETS) && (
+                isPlayer ||
+                (regionTo.getBoolean(RegionSetting.TURRETS_ATTACK_EVERYTHING) &&
+                        entity instanceof LivingEntity))) {
+            plugin.turretManager.check(entity, vlocTo);
+        }
+*/		
 		Location ret = null;
 		//Teleport
-		if (!(entity instanceof Player) || plugin.hasPermission((Player)entity, plugin.PERM_TELEPORT))
+		if (!isPlayer || plugin.hasPermission((Player)entity, plugin.PERM_TELEPORT))
 		{
 		  final V10Teleport to = teleport(entity, locFrom, oloc, vlocTo, vector, tp);
 		  if(to != null)
 		  {
 			ret = to.to;
-			vlocTo = new LibigotLocation(ret);
+			vlocTo = new V10Location(ret);
 			if(to.velocity != null) {
 			    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){public void run(){entity.setVelocity(to.velocity);}});
 			}

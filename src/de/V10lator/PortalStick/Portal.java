@@ -5,9 +5,9 @@ import java.util.HashSet;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.libigot.LibigotLocation;
-import org.libigot.block.BlockStorage;
 
+import de.V10lator.PortalStick.util.BlockStorage;
+import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
 
 public class Portal {
@@ -17,8 +17,8 @@ public class Portal {
 	public boolean open = false;
 	boolean disabled = false;
 	public boolean transmitter = false;
-	private final HashSet<LibigotLocation> awayBlocks;
-	final LibigotLocation[] awayBlocksY = new LibigotLocation[2];
+	private final HashSet<V10Location> awayBlocks;
+	final V10Location[] awayBlocksY = new V10Location[2];
 	private boolean placetorch = false;
 	public final PortalCoord coord;
 	
@@ -28,7 +28,7 @@ public class Portal {
 		this.orange = orange;
 		this.owner = owner;
 		if(coord.horizontal)
-		  awayBlocks = new HashSet<LibigotLocation>();
+		  awayBlocks = new HashSet<V10Location>();
 		else
 		  awayBlocks = null;
 		this.coord = coord;
@@ -37,7 +37,7 @@ public class Portal {
 	public void delete()
 	{
 		BlockStorage bh;
-		for (LibigotLocation loc: coord.border)
+		for (V10Location loc: coord.border)
 		{
 			if (plugin.portalManager.oldBlocks.containsKey(loc))
 			{
@@ -49,7 +49,7 @@ public class Portal {
 			}
 			plugin.portalManager.borderBlocks.remove(loc);
 		}
-		for (LibigotLocation loc: coord.inside)
+		for (V10Location loc: coord.inside)
 		{
 		  if(loc == null)
 			continue;
@@ -65,7 +65,7 @@ public class Portal {
 		}
 		if (plugin.config.FillPortalBack > -1)
 		{
-			for (LibigotLocation loc: coord.behind)
+			for (V10Location loc: coord.behind)
 			{
 				if (plugin.portalManager.oldBlocks.containsKey(loc))
 				{
@@ -80,7 +80,7 @@ public class Portal {
 		}
 		if(coord.horizontal)
 		{
-		  for(LibigotLocation l: awayBlocks)
+		  for(V10Location l: awayBlocks)
 			plugin.portalManager.awayBlocks.remove(l);
 		  plugin.portalManager.awayBlocksY.remove(awayBlocksY[0]);
 		  plugin.portalManager.awayBlocksY.remove(awayBlocksY[1]);
@@ -106,7 +106,7 @@ public class Portal {
 		
 		Block b;
 //		BlockStorage bh;
-		for (LibigotLocation loc: coord.inside)
+		for (V10Location loc: coord.inside)
     	{
 		  if(loc == null)
 			continue;
@@ -129,7 +129,7 @@ public class Portal {
 						 		transmitter = true;
 						 		if (destination.open)
 						 		{
-							 		for (LibigotLocation b2: destination.coord.inside)
+							 		for (V10Location b2: destination.coord.inside)
 							 		  if(b2 != null)
 							 			b2.getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
 						 		}
@@ -159,7 +159,7 @@ public class Portal {
 		else
 			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);
 		int w = Material.WOOL.getId();
-		for (LibigotLocation b: coord.inside)
+		for (V10Location b: coord.inside)
     	{
 		  if(b != null)
 		  {
@@ -179,16 +179,16 @@ public class Portal {
 		else
 			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);			
 		
-		for (LibigotLocation b: coord.border)
+		for (V10Location b: coord.border)
     		b.getHandle().getBlock().setData(color);
 
 		if (!open)
-			for (LibigotLocation b: coord.inside)
+			for (V10Location b: coord.inside)
 			  if(b != null)
 	    		b.getHandle().getBlock().setData(color);
 		
 		if (plugin.config.CompactPortal)
-			for (LibigotLocation b: coord.behind)
+			for (V10Location b: coord.behind)
 	    		b.getHandle().getBlock().setData(color);
 	}
 	
@@ -203,7 +203,7 @@ public class Portal {
 		Block rb;
 		BlockStorage bh;
 		int wool = Material.WOOL.getId();
-    	for (LibigotLocation loc: coord.border)
+    	for (V10Location loc: coord.border)
     	{
     		if (plugin.portalManager.insideBlocks.containsKey(loc))
     			plugin.portalManager.insideBlocks.get(loc).delete();
@@ -224,7 +224,7 @@ public class Portal {
     		rb.setTypeIdAndData(wool, color, false);
     		plugin.portalManager.borderBlocks.put(loc, this);
        	}
-    	for (LibigotLocation loc: coord.inside)
+    	for (V10Location loc: coord.inside)
     	{
     	  if(loc != null && !plugin.portalManager.oldBlocks.containsKey(loc))
     	  {
@@ -241,7 +241,7 @@ public class Portal {
     	byte data;
     	if (plugin.config.FillPortalBack > -1)
     	{
-    		for (LibigotLocation loc: coord.behind)
+    		for (V10Location loc: coord.behind)
         	{
         		if (plugin.portalManager.borderBlocks.containsKey(loc))
         			plugin.portalManager.borderBlocks.get(loc).delete();
@@ -285,8 +285,8 @@ public class Portal {
     	}
     	
     	
-    	LibigotLocation oloc;
-    	LibigotLocation loc;
+    	V10Location oloc;
+    	V10Location loc;
     	int i;
     	oloc = coord.inside[0].clone();
     	plugin.portalManager.insideBlocks.put(coord.inside[0], this);
@@ -299,7 +299,7 @@ public class Portal {
     	  {
     		if(y != 0)
     		{
-    		  loc = new LibigotLocation(oloc.getWorldName(), oloc.getX(), oloc.getY() + y, oloc.getZ());
+    		  loc = new V10Location(oloc.getWorldName(), oloc.getX(), oloc.getY() + y, oloc.getZ());
     		  plugin.portalManager.awayBlocksY.put(loc, this);
     		  if(y < 1)
     			i = 0;
@@ -311,7 +311,7 @@ public class Portal {
     		{
     		  for (int z = -1;z<2;z++)
     		  {
-    			loc = new LibigotLocation(oloc.getWorldName(), oloc.getX() + x, oloc.getY() + y, oloc.getZ() + z);
+    			loc = new V10Location(oloc.getWorldName(), oloc.getX() + x, oloc.getY() + y, oloc.getZ() + z);
     			plugin.portalManager.awayBlocks.put(loc, this);
     			awayBlocks.add(loc);
     		  }

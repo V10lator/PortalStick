@@ -1,7 +1,6 @@
 package de.V10lator.PortalStick;
 
 import java.util.HashSet;
-import java.util.UUID;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -10,42 +9,34 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.libigot.LibigotLocation;
+
+import de.V10lator.PortalStick.util.V10Location;
 
 public class User {
 	public Portal bluePortal;
 	public Portal orangePortal;
 	private ItemStack[] inventory;
 	private ItemStack[] armor;
-	public LibigotLocation pointOne;
-	public LibigotLocation pointTwo;
+	public V10Location pointOne;
+	public V10Location pointTwo;
 	public boolean usingTool = false;
 	public int colorPreset = 0;
 	public final String name;
-	public final UUID uuid;
 	public final boolean isPlayer;
 	public final HashSet<Item> droppedItems = new HashSet<Item>();
 	
-	public User(String name)
-	{
-	  this.name = name;
-	  uuid = null;
-	  isPlayer = false;
-	}
+	public User(String name) {
+	    this.name = name;
+	    isPlayer = false;
+    }
 	
-	public User(Entity entity)
-	{
-	  if(entity instanceof Player)
-	  {
-		name = ((Player)entity).getName();
-		isPlayer = true;
-	  }
-	  else
-	  {
-		name = null;
-		isPlayer = false;
-	  }
-	  uuid = entity.getUniqueId();
+	public User(Entity entity) {
+	    isPlayer = entity instanceof Player;
+	    if(isPlayer) {
+	        name = ((Player) entity).getName();
+	    } else {
+	        name = null;
+	    }
 	}
 	
 	public void recreatePortals()

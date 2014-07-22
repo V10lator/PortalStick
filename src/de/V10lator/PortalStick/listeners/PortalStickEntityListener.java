@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -17,22 +18,23 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.libigot.LibigotLocation;
-import org.libigot.block.BlockStorage;
-import org.libigot.event.entity.EntityAddEvent;
-import org.libigot.event.entity.EntityMoveEvent;
-import org.libigot.event.entity.EntityRemoveEvent;
 
+import com.bergerkiller.bukkit.common.events.EntityAddEvent;
+import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
+import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 
 import de.V10lator.PortalStick.Grill;
 import de.V10lator.PortalStick.Portal;
 import de.V10lator.PortalStick.PortalStick;
 import de.V10lator.PortalStick.Region;
 import de.V10lator.PortalStick.User;
+import de.V10lator.PortalStick.util.BlockStorage;
+import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
 
 public class PortalStickEntityListener implements Listener {
@@ -95,7 +97,7 @@ public class PortalStickEntityListener implements Listener {
 			if (!plugin.hasPermission(player, plugin.PERM_DAMAGE_BOOTS))
 			  return;
 			Location loc = player.getLocation();
-			Region region = plugin.regionManager.getRegion(new LibigotLocation(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
+			Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
 			ItemStack is = player.getInventory().getBoots();
 			if (event.getCause() == DamageCause.FALL && region.getBoolean(RegionSetting.ENABLE_FALL_DAMAGE_BOOTS))
 			{
@@ -116,15 +118,15 @@ public class PortalStickEntityListener implements Listener {
 		if(plugin.config.DisabledWorlds.contains(event.getLocation().getWorld().getName()))
 		  return;
 		Location bloc = event.getLocation();
-		Region region = plugin.regionManager.getRegion(new LibigotLocation(bloc.getWorld(), (int)bloc.getX(), (int)bloc.getY(), (int)bloc.getZ()));
+		Region region = plugin.regionManager.getRegion(new V10Location(bloc.getWorld(), (int)bloc.getX(), (int)bloc.getY(), (int)bloc.getZ()));
 		Iterator<Block> iter = event.blockList().iterator();
 		Block block;
-		LibigotLocation loc;
+		V10Location loc;
 		Portal portal;
 		while(iter.hasNext())
 		{
 			block = iter.next();
-			loc = new LibigotLocation(block.getLocation());
+			loc = new V10Location(block.getLocation());
 			if (block.getType() == Material.WOOL)
 			{
 				portal = plugin.portalManager.borderBlocks.get(loc);
@@ -164,11 +166,10 @@ public class PortalStickEntityListener implements Listener {
 		return;
 //	  System.out.print("Spawned: "+entity.getType());
 	  plugin.userManager.createUser(entity);
-	  User user = plugin.userManager.getUser(entity);
 	  Location loc = entity.getLocation();
-      Region region = plugin.regionManager.getRegion(new LibigotLocation(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
+      Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
 	  if(entity instanceof InventoryHolder && !region.name.equals("global") && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
-		user.saveInventory((InventoryHolder)entity);
+	      plugin.userManager.getUser(entity).saveInventory((InventoryHolder)entity);
 	}
 	
 	@EventHandler(ignoreCancelled = true)
@@ -189,10 +190,10 @@ public class PortalStickEntityListener implements Listener {
 	  //Remove flying gels from the map. We can't do this if they don't try to place themself in the event above...
 	  if(entity instanceof FallingBlock && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
 	  {
-		LibigotLocation from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
+		V10Location from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
 		plugin.gelManager.flyingGels.remove(entity.getUniqueId());
 		Location loc = entity.getLocation();
-		LibigotLocation vloc = new LibigotLocation(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
+		V10Location vloc = new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
 		ArrayList<BlockStorage> blocks;
 		if(plugin.gelManager.gels.containsKey(from))
 		  blocks = plugin.gelManager.gels.get(from);
@@ -224,7 +225,7 @@ public class PortalStickEntityListener implements Listener {
 			  }
 			if(bl)
 			  continue;
-			vloc = new LibigotLocation(b2);
+			vloc = new V10Location(b2);
 			if(plugin.portalManager.borderBlocks.containsKey(vloc) ||
 					plugin.portalManager.insideBlocks.containsKey(vloc) ||
 					plugin.portalManager.behindBlocks.containsKey(vloc) ||
@@ -236,7 +237,7 @@ public class PortalStickEntityListener implements Listener {
 			bh = new BlockStorage(b2);
 			boolean contains = false;
 			for(BlockStorage bs: blocks) {
-			    if(bh.getLocation().equals(bs)) {
+			    if(bh.getLocation().equals(bs.getLocation())) {
 			        contains = true;
 			        break;
 			    }
@@ -255,14 +256,15 @@ public class PortalStickEntityListener implements Listener {
 	  }
 	  
 	  User user = plugin.userManager.getUser(entity);
-	  if(user == null) //TODO: Workaround against BKCommonLib bugs.
-		return;
+	  // TODO: Check if fixed
+	  //if(user == null) //TODO: Workaround against BKCommonLib bugs.
+		//return;
 	  
 	  Location loc = entity.getLocation();
-      Region region = plugin.regionManager.getRegion(new LibigotLocation(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
+      Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
 	  if(entity instanceof InventoryHolder && region.name != "global" && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
 		user.revertInventory((InventoryHolder)entity);
-	  plugin.userManager.deleteUser(user);
+	  plugin.userManager.deleteUser(entity);
 	  if(entity instanceof Player) //TODO
 		plugin.gelManager.resetPlayer((Player)entity);
 	}
@@ -273,6 +275,25 @@ public class PortalStickEntityListener implements Listener {
 	  Entity entity = event.getEntity();
 	  if(entity instanceof Player || (entity instanceof Vehicle && !(entity instanceof Pig)))
 		return;
-	  plugin.entityManager.onEntityMove(entity, event.getFrom(), event.getTo(), true);
+	  plugin.entityManager.onEntityMove(entity, new Location(event.getWorld(), event.getFromX(), event.getFromY(), event.getFromZ()), new Location(event.getWorld(), event.getToX(), event.getToY(), event.getToZ()), true);
+	}
+	
+	@EventHandler
+	public void tp(EntityTeleportEvent event) {
+	    String oldWorld = event.getFrom().getWorld().getName();
+	    String newWorld = event.getTo().getWorld().getName();
+	    if(oldWorld.equals(newWorld)) {
+	        return;
+	    }
+	    boolean oldEnabled = plugin.config.DisabledWorlds.contains(oldWorld);
+	    boolean newEnabled = plugin.config.DisabledWorlds.contains(newWorld);
+	    if(oldEnabled == newEnabled) {
+	        return;
+	    }
+	    if(newEnabled) {
+	        plugin.userManager.createUser(event.getEntity());
+	    } else {
+	        plugin.userManager.deleteUser(event.getEntity());
+	    }
 	}
 }

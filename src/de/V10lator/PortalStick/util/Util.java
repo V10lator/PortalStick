@@ -1,12 +1,19 @@
 package de.V10lator.PortalStick.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.getspout.spoutapi.SpoutManager;
-import org.libigot.LibigotLocation;
+
+
+
+
 
 
 import de.V10lator.PortalStick.PortalStick;
@@ -71,7 +78,7 @@ public class Util {
     	return str;
     }
     
-    private void playNativeSound(Sound sound, LibigotLocation loc)
+    private void playNativeSound(Sound sound, V10Location loc)
     {
       boolean oldState = plugin.config.useSpoutSounds;
       plugin.config.useSpoutSounds = false;
@@ -79,7 +86,7 @@ public class Util {
       plugin.config.useSpoutSounds = oldState;
     }
     
-    public void playSound(Sound sound, LibigotLocation loc)
+    public void playSound(Sound sound, V10Location loc)
     {
       if (!plugin.regionManager.getRegion(loc).getBoolean(RegionSetting.ENABLE_SOUNDS))
     	return;
@@ -173,5 +180,25 @@ public class Util {
 
     	id = Integer.parseInt(split[0]);
     	return new ItemStack(id, num, data);
+    }
+    
+    public void setItemNameAndDesc(ItemStack item, String name, String desc) {
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        if(desc != null)
+            meta.setLore(Arrays.asList(desc.split("\n")));
+        item.setItemMeta(meta);
+    }
+    
+    public boolean isPortalGun(ItemStack item) {
+        return item != null && item.getTypeId() == plugin.config.PortalTool &&
+                item.getDurability() == plugin.config.portalToolData &&
+                item.getItemMeta().getDisplayName().equals(plugin.config.portalToolName);
+    }
+    
+    public ItemStack createPortalGun() {
+        ItemStack gun = new ItemStack(plugin.config.PortalTool, 1, plugin.config.portalToolData);
+        plugin.util.setItemNameAndDesc(gun, plugin.config.portalToolName, plugin.config.portalToolDesc);
+        return gun;
     }
 }

@@ -1,79 +1,62 @@
 package de.V10lator.PortalStick;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 public class UserManager implements Runnable {
 	private final PortalStick plugin;
-	private final HashMap<String, User> playerUsers = new HashMap<String, User>();
-	private final HashMap<UUID, User> entityUsers = new HashMap<UUID, User>();
 	
 	UserManager(PortalStick plugin)
 	{
 		this.plugin = plugin;
 	}
 	
-	public void createUser(Entity entity)
-	{
-	  if(entity instanceof Player)
-		playerUsers.put(((Player)entity).getName(), new User(entity));
-	  else
-	  {
-		UUID uuid = entity.getUniqueId();
-		entityUsers.put(uuid, new User(entity));
-		plugin.entityManager.oldLocations.put(uuid, entity.getLocation());
-	  }
+	public void createUser(Entity entity) {
+	    plugin.debug("Adding: "+entity.getEntityId()+" / "+entity.getType().getName()+" / "+entity.getUniqueId().toString());
+	    MetadataValue value = new FixedMetadataValue(plugin, new User(entity));
+	    entity.setMetadata("PortalStickUser", value);
 	}
 	
-	public User getUser(Entity entity)
-	{
-	  if(entity instanceof Player)
-		return getUser(((Player)entity).getName());
-	  else
-		return getUser(entity.getUniqueId());
+	public User getUser(Entity entity) {
+	    /* TODO
+	    if(!entity.hasMetadata("PortalStickUser")) {
+	        createUser(entity);
+	    }
+	    */
+	    plugin.debug("Getting: "+entity.getEntityId()+" / "+entity.getType().getName()+" / "+entity.getUniqueId().toString());
+	    try {
+	        return (User) entity.getMetadata("PortalStickUser").get(0).value();
+	    } catch(Throwable t) {
+	        for(StackTraceElement element: t.getStackTrace())
+	            plugin.debug(element.toString());
+            plugin.stopDebugging();
+            plugin.getPluginLoader().disablePlugin(plugin);
+	    }
+	    return null;
 	}
 	
-	public User getUser(UUID uuid)
-	{
-	  return entityUsers.get(uuid);
-	}
-	
-	public User getUser(String player)
-	{
-		return playerUsers.get(player);
+	public void deleteUser(Entity entity) {
+	    plugin.debug("Removing: "+entity.getEntityId()+" / "+entity.getType().getName()+" / "+entity.getUniqueId().toString());
+	    try {
+	        User user = getUser(entity);
+	        plugin.portalManager.deletePortals(user);
+	        deleteDroppedItems(user);
+	        entity.removeMetadata("PortalStickUser", plugin);
+	    } catch(Throwable e) {
+	        plugin.debug("Crashing!");
+	        plugin.stopDebugging();
+	        plugin.getPluginLoader().disablePlugin(plugin);
+	    }
 	}
 
-	public void deleteUser(Entity entity)
-	{
-	  deleteUser(getUser(entity));
-	}
-	
-	public void deleteUser(User user) {
-		plugin.portalManager.deletePortals(user);
-		deleteDroppedItems(user);
-		playerUsers.values().remove(user);
-		entityUsers.values().remove(user);
-		if(!user.isPlayer)
-		  plugin.entityManager.oldLocations.remove(user.uuid);
-	}
-
-	public List<User> getUsers()
-	{
-	  List<User> ret = new ArrayList<User>(playerUsers.values());
-	  for(User user: entityUsers.values())
-		ret.add(user);
-	  return ret;
-	}
-	
 	public void deleteDroppedItems(User user)
 	{
 	  Location loc;
@@ -91,15 +74,19 @@ public class UserManager implements Runnable {
 	{
 	  Iterator<Item> iter;
 	  Item item;
-	  for(User user: playerUsers.values())
-	  {
-		iter = user.droppedItems.iterator();
-		while(iter.hasNext())
-		{
-		  item = iter.next();
-		  if(!item.isValid() || item.isDead())
-			iter.remove();
-		}
+	  for(World world: Bukkit.getWorlds()) {
+	      for(Entity entity: world.getEntities()) {
+	          if(!entity.hasMetadata("PortalStickUser")) {
+	              continue;
+	          }
+	          iter = getUser(entity).droppedItems.iterator();
+	          while(iter.hasNext()) {
+	              item = iter.next();
+	              if(!item.isValid() || item.isDead()) {
+	                  iter.remove();
+	              }
+	          }
+	      }
 	  }
 	}
 }

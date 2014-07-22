@@ -7,19 +7,20 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.libigot.LibigotLocation;
+
+import de.V10lator.PortalStick.util.V10Location;
 
 public class Bridge {
 	final PortalStick plugin;
 	
-	public final LinkedHashMap<LibigotLocation, Integer> bridgeBlocks = new LinkedHashMap<LibigotLocation, Integer>();
+	public final LinkedHashMap<V10Location, Integer> bridgeBlocks = new LinkedHashMap<V10Location, Integer>();
 	public final HashSet<Portal> involvedPortals = new HashSet<Portal>();
-	HashSet<LibigotLocation> bridgeMachineBlocks = new HashSet<LibigotLocation>();
-	LibigotLocation startBlock;
-	public LibigotLocation creationBlock;
+	HashSet<V10Location> bridgeMachineBlocks = new HashSet<V10Location>();
+	V10Location startBlock;
+	public V10Location creationBlock;
 	BlockFace facingSide;
 
-	Bridge(PortalStick plugin, LibigotLocation creationBlock, LibigotLocation startingBlock, BlockFace face, HashSet<LibigotLocation> machineBlocks)
+	Bridge(PortalStick plugin, V10Location creationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks)
 	{
 		this.plugin = plugin;
 		startBlock = startingBlock;
@@ -39,7 +40,7 @@ public class Bridge {
 		deactivate();
 		
 		BlockFace face = facingSide;
-		LibigotLocation nextV10Location = startBlock;
+		V10Location nextV10Location = startBlock;
 		Block nextBlock = nextV10Location.getHandle().getBlock();
 		Portal portal;
 		while(true)
@@ -63,7 +64,7 @@ public class Bridge {
 			{
 			  portal = plugin.portalManager.borderBlocks.get(nextV10Location);
 			  if(portal.open)
-				nextV10Location = new LibigotLocation(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+				nextV10Location = new V10Location(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
 			  else
 				return;
 			}
@@ -88,13 +89,13 @@ public class Bridge {
 			  return;
 			
 			nextBlock = nextBlock.getRelative(face);
-			nextV10Location = new LibigotLocation(nextBlock);
+			nextV10Location = new V10Location(nextBlock);
 		}
 	}
 	
 	public void deactivate()
 	{
-		for (LibigotLocation b : bridgeBlocks.keySet())
+		for (V10Location b : bridgeBlocks.keySet())
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.funnelBridgeManager.bridgeBlocks.remove(b);
@@ -108,16 +109,16 @@ public class Bridge {
 	public void delete()
 	{
 		deactivate();
-		for (LibigotLocation b: bridgeMachineBlocks)
+		for (V10Location b: bridgeMachineBlocks)
 			plugin.funnelBridgeManager.bridgeMachineBlocks.remove(b);
 	}
 	
-	public boolean isBlockNextToBridge(LibigotLocation check)
+	public boolean isBlockNextToBridge(V10Location check)
 	{
 		BlockFace[] faces = new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
-		for (LibigotLocation b : bridgeBlocks.keySet())
+		for (V10Location b : bridgeBlocks.keySet())
 			for (BlockFace face : faces)
-				if (new LibigotLocation(b.getHandle().getBlock().getRelative(face)).equals(check)) return true;
+				if (new V10Location(b.getHandle().getBlock().getRelative(face)).equals(check)) return true;
 		return false;
 	}
 	

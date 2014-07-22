@@ -2,12 +2,13 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/run/media/taxi/disk/Minecraft/4eclipse/SpoutPlugin.jar">
+	<classpathentry kind="lib" path="/run/media/taxi/V10Disc/Minecraft/4eclipse/SpoutPlugin.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://jd.spout.org/plugin/recommended/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/run/media/taxi/disk/Minecraft/4eclipse/WorldGuard.jar"/>
-	<classpathentry kind="lib" path="/run/media/taxi/disk/Minecraft/4eclipse/libkit.jar"/>
+	<classpathentry kind="lib" path="/run/media/taxi/V10Disc/Minecraft/4eclipse/WorldGuard.jar"/>
+	<classpathentry kind="lib" path="/run/media/taxi/V10Disc/Minecraft/4eclipse/bukkit.jar"/>
+	<classpathentry kind="lib" path="/run/media/taxi/V10Disc/Minecraft/4eclipse/BKCommonLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -2,10 +2,10 @@ package de.V10lator.PortalStick.commands;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.libigot.LibigotLocation;
 
 import de.V10lator.PortalStick.PortalStick;
 import de.V10lator.PortalStick.Region;
+import de.V10lator.PortalStick.util.V10Location;
 
 public class RegionInfoCommand extends BaseCommand {
 
@@ -15,7 +15,7 @@ public class RegionInfoCommand extends BaseCommand {
 	
 	public boolean execute() {
 	    Location loc = player.getLocation();
-		Region region = plugin.regionManager.getRegion(new LibigotLocation(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+		Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 		plugin.util.sendMessage(sender, "&7- &c" + region.name + " &7- &c" + region.min.toString() + " &7-&c " + region.max.toString());
 		return true;
 	}

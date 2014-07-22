@@ -18,13 +18,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.libigot.LibigotLocation;
+
 
 
 import de.V10lator.PortalStick.Portal;
 import de.V10lator.PortalStick.PortalStick;
 import de.V10lator.PortalStick.Region;
 import de.V10lator.PortalStick.User;
+import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
 import de.V10lator.PortalStick.util.Config.Sound;
 
@@ -46,7 +47,7 @@ public class PortalStickPlayerListener implements Listener {
 		User user = plugin.userManager.getUser(player);
 	
 		//Portal tool
-		if (player.getItemInHand().getTypeId() == plugin.config.PortalTool && player.getItemInHand().getDurability() == plugin.config.portalToolData && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
+		if (plugin.util.isPortalGun(player.getItemInHand()) && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK))
 		{
 			if(event.getAction() == Action.RIGHT_CLICK_BLOCK)
 			{
@@ -59,7 +60,7 @@ public class PortalStickPlayerListener implements Listener {
 			
 			event.setCancelled(true);
 			Location bloc = player.getLocation();
-			Region region = plugin.regionManager.getRegion(new LibigotLocation(bloc.getWorld(), bloc.getBlockX(), bloc.getBlockY(), bloc.getBlockZ()));
+			Region region = plugin.regionManager.getRegion(new V10Location(bloc.getWorld(), bloc.getBlockX(), bloc.getBlockY(), bloc.getBlockZ()));
 			HashSet<Byte> tb = new HashSet<Byte>();
 			for (int i : region.getList(RegionSetting.TRANSPARENT_BLOCKS).toArray(new Integer[0]))
 				tb.add((byte) i);
@@ -83,12 +84,12 @@ public class PortalStickPlayerListener implements Listener {
 			if (targetBlocks.size() < 1)
 				return;
 			
-			LibigotLocation loc;
+			V10Location loc;
 			if (region.getBoolean(RegionSetting.PREVENT_PORTAL_THROUGH_PORTAL))
 			{
 				for (Block b : targetBlocks)
 				{
-					loc = new LibigotLocation(b);
+					loc = new V10Location(b);
 					for (Portal p : plugin.portalManager.portals)
 					{
 					  for(int i = 0; i < 2; i++)
@@ -121,13 +122,13 @@ public class PortalStickPlayerListener implements Listener {
 					if ((b.getType() == Material.IRON_DOOR_BLOCK || b.getType() == Material.WOODEN_DOOR) && ((b.getData() & 4) != 4) )
 					{
 						plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
-						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new LibigotLocation(b));
+						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new V10Location(b));
 						return;
 					}
 					else if (b.getType() == Material.TRAP_DOOR && (b.getData() & 4) == 0)
 					{
 						plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
-						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new LibigotLocation(b));
+						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new V10Location(b));
 						return;
 
 					}
@@ -137,26 +138,26 @@ public class PortalStickPlayerListener implements Listener {
 			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_AIR || tb.contains((byte) event.getClickedBlock().getTypeId()))
 			{
 				Block b = targetBlocks.get(targetBlocks.size() - 1);
-				loc = new LibigotLocation(b);
+				loc = new V10Location(b);
 		        if (targetBlocks.size() < 2)
 		        	plugin.portalManager.placePortal(loc, event.getPlayer(), orange);
 		        else
 		    	   plugin.portalManager.placePortal(loc, b.getFace(targetBlocks.get(targetBlocks.size() - 2)), event.getPlayer(), orange, true);
 			}
 			else
-				plugin.portalManager.placePortal(new LibigotLocation(event.getClickedBlock()), event.getBlockFace(), event.getPlayer(), orange, true);
+				plugin.portalManager.placePortal(new V10Location(event.getClickedBlock()), event.getBlockFace(), event.getPlayer(), orange, true);
 		}
 		//Region tool
 		else if (user.usingTool && player.getItemInHand().getTypeId() == plugin.config.RegionTool)
 		{
 			switch (event.getAction()) {
 				case RIGHT_CLICK_BLOCK:
-					user.pointTwo = new LibigotLocation(event.getClickedBlock());
+					user.pointTwo = new V10Location(event.getClickedBlock());
 					plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointTwoSet", player.getName()));
 					event.setCancelled(true);
 					break;
 				case LEFT_CLICK_BLOCK:
-					user.pointOne = new LibigotLocation(event.getClickedBlock());
+					user.pointOne = new V10Location(event.getClickedBlock());
 					plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointOneSet", player.getName()));
 					event.setCancelled(true);
 				default:
@@ -166,7 +167,7 @@ public class PortalStickPlayerListener implements Listener {
 		//Flint and steel
 		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
 		{
-			LibigotLocation loc = new LibigotLocation(event.getClickedBlock());
+			V10Location loc = new V10Location(event.getClickedBlock());
 			if (plugin.grillManager.createGrill(player, loc) || plugin.funnelBridgeManager.placeGlassBridge(player, loc)) 
 				event.setCancelled(true);
 		}
@@ -175,7 +176,7 @@ public class PortalStickPlayerListener implements Listener {
 		//Color changing
 		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getTypeId() == 0 && event.getClickedBlock().getType() == Material.WOOL)
 		{
-			LibigotLocation loc = new LibigotLocation(event.getClickedBlock());
+			V10Location loc = new V10Location(event.getClickedBlock());
 			Portal portal = plugin.portalManager.borderBlocks.get(loc);
 			if (portal == null) portal = plugin.portalManager.insideBlocks.get(loc);
 			if (portal == null && plugin.config.CompactPortal) portal = plugin.portalManager.behindBlocks.get(loc);
@@ -218,22 +219,20 @@ public class PortalStickPlayerListener implements Listener {
 	  if(plugin.config.DisabledWorlds.contains(item.getWorld().getName()))
 		return;
 	  Location loc = item.getLocation();
-	  LibigotLocation iloc = new LibigotLocation(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	  V10Location iloc = new V10Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	  Region region = plugin.regionManager.getRegion(iloc);
 	  Player player = event.getPlayer();
 	  User user = plugin.userManager.getUser(player);
 	  if(!region.getBoolean(RegionSetting.GRILLS_REMOVE_ITEMS) || user.usingTool)
 		return;
 	  ItemStack is = item.getItemStack();
-	  int id;
 	  for(Object iss: region.getList(RegionSetting.GRILL_REMOVE_EXCEPTIONS))
 	  {
-		id = (Integer)iss;
-		if(is.getTypeId() == id)
+		if(is.getTypeId() == (Integer)iss)
 		  return;
 	  }
 	  loc = player.getLocation();
-	  LibigotLocation ploc = new LibigotLocation(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+	  V10Location ploc = new V10Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	  int a, b;
 	  boolean x;
 	  if(ploc.getX() != iloc.getX())
@@ -259,9 +258,9 @@ public class PortalStickPlayerListener implements Listener {
 	  for(; a < b; a++)
 	  {
 		if(x)
-		  iloc = new LibigotLocation(iloc.getWorldName(), a, iloc.getY(), iloc.getZ());
+		  iloc = new V10Location(iloc.getWorldName(), a, iloc.getY(), iloc.getZ());
 		else
-		  iloc = new LibigotLocation(iloc.getWorldName(), iloc.getX(), iloc.getY(), a);
+		  iloc = new V10Location(iloc.getWorldName(), iloc.getX(), iloc.getY(), a);
 	    if(plugin.grillManager.insideBlocks.containsKey(iloc))
 	    {
 	      if(plugin.grillManager.insideBlocks.get(iloc).disabled)
@@ -286,7 +285,7 @@ public class PortalStickPlayerListener implements Listener {
 		return;
 	  Player player = event.getPlayer();
 	  Location loc = player.getLocation();
-	  Region region = plugin.regionManager.getRegion(new LibigotLocation(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+	  Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 	  
 	  if(!region.getBoolean(RegionSetting.GRILLS_CLEAR_ITEM_DROPS))
 		return;

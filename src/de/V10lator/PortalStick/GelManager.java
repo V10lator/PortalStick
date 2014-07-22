@@ -9,16 +9,18 @@ import java.util.UUID;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
-import org.libigot.LibigotLocation;
-import org.libigot.block.BlockStorage;
-import org.libigot.world.LibigotWorld;
 
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
+
+import de.V10lator.PortalStick.util.BlockStorage;
+import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
 import de.V10lator.PortalStick.util.Config.Sound;
 
@@ -27,18 +29,18 @@ public class GelManager {
 	final HashMap<String, Float> onRedGel = new HashMap<String, Float>();
 	private final HashSet<Entity> ignore = new HashSet<Entity>();
 	final HashMap<String, Integer> redTasks = new HashMap<String, Integer>();
-	public final HashMap<LibigotLocation, Integer> tubePids = new HashMap<LibigotLocation, Integer>();
-	public final HashSet<LibigotLocation> activeGelTubes = new HashSet<LibigotLocation>();
-	public final HashMap<UUID, LibigotLocation> flyingGels = new HashMap<UUID, LibigotLocation>();
-	public final HashMap<LibigotLocation, ArrayList<BlockStorage>> gels = new HashMap<LibigotLocation, ArrayList<BlockStorage>>();
-	public final HashMap<LibigotLocation, BlockStorage> gelMap = new HashMap<LibigotLocation, BlockStorage>();
+	public final HashMap<V10Location, Integer> tubePids = new HashMap<V10Location, Integer>();
+	public final HashSet<V10Location> activeGelTubes = new HashSet<V10Location>();
+	public final HashMap<UUID, V10Location> flyingGels = new HashMap<UUID, V10Location>();
+	public final HashMap<V10Location, ArrayList<BlockStorage>> gels = new HashMap<V10Location, ArrayList<BlockStorage>>();
+	public final HashMap<V10Location, BlockStorage> gelMap = new HashMap<V10Location, BlockStorage>();
 	
 	GelManager(PortalStick plugin)
 	{
 		this.plugin = plugin;
 	}
 	
-	public void useGel(Entity entity, LibigotLocation locTo, Vector vector, Block block, Block under, HashMap<BlockFace, Block> faceMap)
+	public void useGel(Entity entity, V10Location locTo, Vector vector, Block block, Block under, HashMap<BlockFace, Block> faceMap)
 	{
 		Region region = plugin.regionManager.getRegion(locTo);
 		
@@ -64,7 +66,7 @@ public class GelManager {
 			  }
 			  if(plugin.blockUtil.compareBlockToString(block2, bg))
 			  {
-				if(isPortal(new LibigotLocation(block2)))
+				if(isPortal(new V10Location(block2)))
 				  continue;
 				byte dir;
 				if(face == null)
@@ -88,12 +90,12 @@ public class GelManager {
 		}
 	}
 	
-	private boolean isPortal(LibigotLocation vl)
+	private boolean isPortal(V10Location vl)
 	{
-	  for(LibigotLocation loc: plugin.portalManager.borderBlocks.keySet())
+	  for(V10Location loc: plugin.portalManager.borderBlocks.keySet())
 		if(loc.equals(vl))
 		  return true;
-	  for(LibigotLocation loc: plugin.portalManager.insideBlocks.keySet())
+	  for(V10Location loc: plugin.portalManager.insideBlocks.keySet())
 		if(loc.equals(vl))
 		  return true;
 	  return false;
@@ -142,11 +144,11 @@ public class GelManager {
 		  else
 			vector.setZ(y);
 		  loc.setY(loc.getY()+0.01D);
-		  entity.teleport(loc);
+		  EntityUtil.teleport(entity, loc);
 		}
 		entity.setVelocity(vector);
 		
-		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new LibigotLocation(loc));
+		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new V10Location(loc));
 		
 		ignore.add(entity);
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 5L);
@@ -158,7 +160,7 @@ public class GelManager {
 		return false;
 	  
 	  final Player player = (Player)entity;
-	  if(isPortal(new LibigotLocation(under)))
+	  if(isPortal(new V10Location(under)))
 	  {
 		resetPlayer(player);
 		return false;
@@ -195,7 +197,7 @@ public class GelManager {
 	  redTasks.remove(pn);
 	}
 	
-	public void stopGelTube(LibigotLocation loc)
+	public void stopGelTube(V10Location loc)
 	{
 	  if(!tubePids.containsKey(loc))
 		return;
@@ -236,9 +238,9 @@ public class GelManager {
 		    }
 		}
 	  }
-	  LibigotWorld world = loc.getWorld();
+	  World world = loc.getHandle().getWorld();
 	  UUID uuid;
-	  for(Chunk c: world.getWorld().getLoadedChunks())
+	  for(Chunk c: world.getLoadedChunks())
 		for(Entity e: c.getEntities())
 		{
 		  uuid = e.getUniqueId();
