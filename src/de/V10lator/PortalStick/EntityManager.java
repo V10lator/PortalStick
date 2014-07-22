@@ -1,7 +1,6 @@
 package de.V10lator.PortalStick;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,7 +12,6 @@ import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.util.Vector;
@@ -30,8 +28,7 @@ import de.V10lator.PortalStick.util.Config.Sound;
 
 public class EntityManager implements Runnable {
 	private final PortalStick plugin;
-	private final HashSet<Entity> blockedEntities = new HashSet<Entity>();
-
+	
 	EntityManager(PortalStick instance)
 	{
 		plugin = instance;
@@ -39,7 +36,7 @@ public class EntityManager implements Runnable {
 
 	public V10Teleport teleport(Entity entity, Location locFrom, Location oloc, V10Location locTo, Vector vector, boolean really)
 	{
-		if (entity == null || entity.isDead() || blockedEntities.contains(entity))
+		if (entity == null || entity.isDead())
 		  return null;
 
 		Region regionTo = plugin.regionManager.getRegion(locTo);
@@ -290,9 +287,6 @@ public class EntityManager implements Runnable {
 	
 	public Location onEntityMove(final Entity entity, Location locFrom, Location locTo, boolean tp)
 	{
-		if (entity.isInsideVehicle())
-		  return null;
-		
 		double d = locTo.getBlockY();
 		if(d > locTo.getWorld().getMaxHeight() - 1 || d < 0)
 		  return null;
