@@ -20,41 +20,27 @@ public class UserManager implements Runnable {
 	}
 	
 	public void createUser(Entity entity) {
-	    plugin.debug("Adding: "+entity.getEntityId()+" / "+entity.getType().getName()+" / "+entity.getUniqueId().toString());
 	    MetadataValue value = new FixedMetadataValue(plugin, new User(entity));
 	    entity.setMetadata("PortalStickUser", value);
 	}
 	
 	public User getUser(Entity entity) {
-	    /* TODO
-	    if(!entity.hasMetadata("PortalStickUser")) {
+	    // TODO: BKCommonLib/Bukkit/MC/Whatever workaround
+	    if(!entity.hasMetadata("PortalStickUser"))
 	        createUser(entity);
-	    }
-	    */
-	    plugin.debug("Getting: "+entity.getEntityId()+" / "+entity.getType().getName()+" / "+entity.getUniqueId().toString());
-	    try {
-	        return (User) entity.getMetadata("PortalStickUser").get(0).value();
-	    } catch(Throwable t) {
-	        for(StackTraceElement element: t.getStackTrace())
-	            plugin.debug(element.toString());
-            plugin.stopDebugging();
-            plugin.getPluginLoader().disablePlugin(plugin);
-	    }
-	    return null;
+	    
+	    return (User) entity.getMetadata("PortalStickUser").get(0).value();
 	}
 	
 	public void deleteUser(Entity entity) {
-	    plugin.debug("Removing: "+entity.getEntityId()+" / "+entity.getType().getName()+" / "+entity.getUniqueId().toString());
-	    try {
-	        User user = getUser(entity);
-	        plugin.portalManager.deletePortals(user);
-	        deleteDroppedItems(user);
-	        entity.removeMetadata("PortalStickUser", plugin);
-	    } catch(Throwable e) {
-	        plugin.debug("Crashing!");
-	        plugin.stopDebugging();
-	        plugin.getPluginLoader().disablePlugin(plugin);
-	    }
+	    // TODO: BKCommonLib/Bukkit/MC/Whatever workaround
+        if(!entity.hasMetadata("PortalStickUser"))
+            return;
+        
+	    User user = getUser(entity);
+	    plugin.portalManager.deletePortals(user);
+	    deleteDroppedItems(user);
+	    entity.removeMetadata("PortalStickUser", plugin);
 	}
 
 	public void deleteDroppedItems(User user)

@@ -193,6 +193,7 @@ public class Util {
     public boolean isPortalGun(ItemStack item) {
         return item != null && item.getTypeId() == plugin.config.PortalTool &&
                 item.getDurability() == plugin.config.portalToolData &&
+                item.getItemMeta().getDisplayName() != null &&
                 item.getItemMeta().getDisplayName().equals(plugin.config.portalToolName);
     }
     

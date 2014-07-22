@@ -59,12 +59,8 @@ public class PortalStick extends JavaPlugin {
 	
 	public final Random rand = new Random();
 
-	//Tet
-	
 	public void onDisable() {
 		//config.unLoad() handles cleanup, so let's call it
-	    for(StackTraceElement line: Thread.currentThread().getStackTrace())
-	        getLogger().info("DEBUG: " + line.toString());
 		config.unLoad();
 		getServer().getScheduler().cancelTasks(this);
 	}
@@ -143,29 +139,6 @@ public class PortalStick extends JavaPlugin {
 				return true;
 		}
 		return player.hasPermission("*");
-	}
-	
-	private boolean debug = true;
-	public void debug(String string) {
-	    if(!debug) {
-	        return;
-	    }
-	    File f = new File(getDataFolder(), "debug.txt");
-	    try {
-	        if(!f.exists()) {
-	            f.createNewFile();
-	        }
-	        BufferedWriter writer = new BufferedWriter(new FileWriter(f, true));
-	        writer.write(string+"\n");
-	        writer.flush();
-	        writer.close();
-	    } catch(Exception e) {
-	        e.printStackTrace();
-	    }
-	}
-	
-	public void stopDebugging() {
-	    debug = false;
 	}
 }
 		    
