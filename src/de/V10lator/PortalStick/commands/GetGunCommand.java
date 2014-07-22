@@ -10,7 +10,7 @@ public class GetGunCommand extends BaseCommand {
 
     public GetGunCommand(PortalStick plugin)
     {
-      super(plugin, "gun", 0, "<- gives you the portal gun.", false);
+      super(plugin, "gun", 0, "<- gives you the portal gun.", true);
     }
     
     public boolean execute() {
