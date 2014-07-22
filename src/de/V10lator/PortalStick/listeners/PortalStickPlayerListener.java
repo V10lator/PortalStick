@@ -71,11 +71,7 @@ public class PortalStickPlayerListener implements Listener {
 			if (!plugin.hasPermission(player, plugin.PERM_PLACE_PORTAL))
 				return;
 			
-			boolean orange;
-			if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
-			  orange = true;
-			else
-			  orange = false;
+			boolean orange = event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK;
 			
 			if((orange && !region.getBoolean(RegionSetting.ENABLE_ORANGE_PORTALS)) || !orange && !region.getBoolean(RegionSetting.ENABLE_BLUE_PORTALS))
 			  return;

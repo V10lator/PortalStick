@@ -2,6 +2,7 @@ package de.V10lator.PortalStick;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -22,6 +23,7 @@ import de.V10lator.PortalStick.util.Config.Sound;
 
 public class PortalManager {
 	private final PortalStick plugin;
+	public final HashSet<V10Location> torches = new HashSet<V10Location>();
 	
 	PortalManager(PortalStick plugin)
 	{

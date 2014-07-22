@@ -49,7 +49,6 @@ public class PortalStickBlockListener implements Listener
 	private PortalStick plugin;
 	private HashSet<Block> blockedPistonBlocks = new HashSet<Block>();	
 	private boolean fakeBBE;
-	private final HashSet<V10Location> torches = new HashSet<V10Location>();
 	
 	public PortalStickBlockListener(PortalStick instance)
 	{
@@ -64,7 +63,7 @@ public class PortalStickBlockListener implements Listener
 	  if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
 		return;
 	  
-	  if(block.getType() == Material.REDSTONE_TORCH_ON && torches.contains(loc)) {
+	  if(block.getType() == Material.REDSTONE_TORCH_ON && plugin.portalManager.torches.contains(loc)) {
 	      event.setCancelled(true);
 	      return;
 	  }
@@ -255,7 +254,7 @@ public class PortalStickBlockListener implements Listener
 	    Block block = event.getBlock();
 	    if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 	        return;
-		if(torches.contains(new V10Location(block)) ||
+		if(plugin.portalManager.torches.contains(new V10Location(block)) ||
 		        (block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block))))
 		    event.setCancelled(true);
 	}
@@ -498,10 +497,11 @@ public class PortalStickBlockListener implements Listener
 			 Location l = block.getLocation();
 			 BlockFace face;
 			 Block block2;
+			 String worldName = l.getWorld().getName();
 			 for (int i = 0; i < 5; i++)
 			 {
 				 face = BlockFace.values()[i];
-				 loc = new V10Location(new Location(l.getWorld(), l.getX() + face.getModX(), l.getY() + face.getModY(), l.getZ() + face.getModZ()));
+				 loc = new V10Location(worldName, l.getBlockX() + face.getModX(), l.getBlockY() + face.getModY(), l.getBlockZ() + face.getModZ());
 				 if (plugin.portalManager.insideBlocks.containsKey(loc)) 
 					 {
 					 	Portal portal = plugin.portalManager.insideBlocks.get(loc);
@@ -510,39 +510,7 @@ public class PortalStickBlockListener implements Listener
 					 	Portal destination = portal.getDestination();
 					 	if (destination == null || destination.transmitter) continue;
 					 	
-					 	int mat1, mat2;
-					 	boolean create;
-					 	if (newC > 0)
-					 	{
-					 		portal.transmitter = true;
-					 		mat1 = Material.REDSTONE_TORCH_ON.getId();
-					 		mat2 = Material.AIR.getId();
-					 		create = true;
-					 	}
-					 	else
-					 	{
-					 		portal.transmitter = false;
-					 		mat1 = Material.AIR.getId();
-					 		mat2 = Material.REDSTONE_TORCH_ON.getId();
-					 		create = false;
-					 	}
-					 	for (V10Location b: destination.coord.inside)
-					 	{
-					 	  if(b != null)
-					 	  {
-					 		block2 = b.getHandle().getBlock();
-					 		if(block2.getTypeId() == mat2)
-					 		{
-					 		    if(create) {
-					 		        torches.add(b);
-					 		    }
-					 		    block2.setTypeIdAndData(mat1, (byte)0, false);
-					 		}
-					 		if(!create) {
-					 		    torches.remove(b);
-					 		}
-					 	  }
-					 	}
+					 	portal.switchRedstoneTransmitter(newC > 0);
 					 }
 			 }	 
 		 }

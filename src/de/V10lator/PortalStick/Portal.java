@@ -102,8 +102,6 @@ public class Portal {
 	
 	public void open()
 	{
-		Region region = plugin.regionManager.getRegion(coord.inside[0]);
-		
 		Block b;
 //		BlockStorage bh;
 		for (V10Location loc: coord.inside)
@@ -114,41 +112,66 @@ public class Portal {
 //			bh = new BlockStorage(b);
 //			if(plugin.gelManager.gelMap.containsKey(bh))
 //			  plugin.gelManager.removeGel(bh);
-			b.setType(Material.AIR); 
-			
-			if (region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER))
-			 {			 				 
-				 for (int i = 0; i < 4; i++)
-				 {
-					 BlockFace face = BlockFace.values()[i];
-					 if (b.getRelative(face).getBlockPower() > 0) 
-						 {						 
-						 	Portal destination = getDestination();
-						 	if (destination == null || destination.transmitter) continue;
-						 
-						 		transmitter = true;
-						 		if (destination.open)
-						 		{
-							 		for (V10Location b2: destination.coord.inside)
-							 		  if(b2 != null)
-							 			b2.getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
-						 		}
-						 		else
-						 			destination.placetorch = true;
-						 }
-				 }
-			 }
-
+			b.setType(Material.AIR);
     	}
 		
-		if (placetorch)
+		Portal destination = getDestination();
+		if (placetorch || (destination != null && destination.transmitter))
 		{
-		    coord.inside[0].getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
+		    for (V10Location b2: coord.inside)
+                if(b2 != null)
+                  b2.getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
 			placetorch = false;
 		}
 		
 		open = true;
 		plugin.funnelBridgeManager.reorientBridge(this);
+	}
+	
+	public void switchRedstoneTransmitter(boolean on) {
+	    Portal destination = getDestination();
+	    
+	    transmitter = on;
+	    if(destination == null)
+	        return;
+	    
+	    if(!destination.open) {
+	        destination.placetorch = on;
+	        return;
+	    }
+	    
+	    int mat1, mat2;
+	    boolean create;
+	    if (on)
+	    {
+	        mat1 = Material.REDSTONE_TORCH_ON.getId();
+	        mat2 = Material.AIR.getId();
+	        create = true;
+	    }
+	    else
+	    {
+	        mat1 = Material.AIR.getId();
+	        mat2 = Material.REDSTONE_TORCH_ON.getId();
+	        create = false;
+	    }
+	    Block block;
+	    for (V10Location b: destination.coord.inside)
+	    {
+	        if(b != null)
+	        {
+	            block = b.getHandle().getBlock();
+	            if(block.getTypeId() == mat2)
+	            {
+	                if(create) {
+	                    plugin.portalManager.torches.add(b);
+	                }
+	                block.setTypeIdAndData(mat1, (byte)0, false);
+	            }
+	            if(!create) {
+	                plugin.portalManager.torches.remove(b);
+	            }
+	        }
+	    }
 	}
 	
 	public void close()
@@ -194,11 +217,7 @@ public class Portal {
 	
 	public void create()
 	{
-		byte color;
-		if (orange)
-			color = (byte) plugin.util.getRightPortalColor(owner.colorPreset);
-		else
-			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);			
+		byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));
 
 		Block rb;
 		BlockStorage bh;
@@ -272,6 +291,21 @@ public class Portal {
         		rb.setTypeIdAndData(wool, data, false);
         		plugin.portalManager.behindBlocks.put(loc, this);
         	}
+    	}
+    	
+    	Region region = plugin.regionManager.getRegion(coord.inside[0]);
+    	
+    	if (region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER))
+    	{
+    	    for(int i = 0; i < 2; i++) {
+    	        if(coord.inside[i] == null)
+    	            continue;
+    	        
+    	        if (coord.inside[i].getHandle().getBlock().getBlockPower() > 0) {
+    	            switchRedstoneTransmitter(true);
+    	            break;
+    	        }
+    	    }
     	}
     	
     	Portal dest = getDestination();
