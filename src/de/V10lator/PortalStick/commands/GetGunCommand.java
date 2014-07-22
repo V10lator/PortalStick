@@ -21,6 +21,6 @@ public class GetGunCommand extends BaseCommand {
     }
     
     public boolean permission(Player player) {
-        return true;
+        return plugin.hasPermission(player, plugin.PERM_GET_GUN);
     }
 }

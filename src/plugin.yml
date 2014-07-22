@@ -28,6 +28,9 @@ permissions:
   portalstick.teleport:
     description: Use portals
     default: true
+  portalstick.gun:
+    description: Get the gun with /portalstick gun
+    default: op
   portalstick.admin.regions:
     description: Administrate regions
     default: op
