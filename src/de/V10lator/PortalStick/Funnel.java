@@ -11,6 +11,7 @@ import de.V10lator.PortalStick.util.V10Location;
 
 public class Funnel extends Bridge {
 	private boolean reversed = false;
+	public boolean activated = true;
 	
 	Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
 		super(plugin, CreationBlock, startingBlock, face, machineBlocks);
@@ -68,6 +69,7 @@ public class Funnel extends Bridge {
 	@Override
 	public void activate()
 	{
+		activated = true;
 		//deactivate first for cleanup
 		deactivate();
 		
@@ -115,7 +117,9 @@ public class Funnel extends Bridge {
 			  break;
 			
 			if (!nextBlock.getWorld().isChunkLoaded(nextBlock.getChunk())) return;
-			
+			nextBlock.setType(Material.WATER);
+			nextBlock.setData((byte)0);
+			/*
 			if (counter < 0) counter = 8;
 			if (counter > 0)
 			{
@@ -125,10 +129,10 @@ public class Funnel extends Bridge {
 				  data = (byte)(counter - 1);
 				else
 				  data = (byte)(8 - counter);
-				if (face != BlockFace.UP && face != BlockFace.DOWN) nextBlock.setData(data);
+				if (face != BlockFace.UP && face != BlockFace.DOWN) nextBlock.setData((byte)0);
 			}
 			counter--;
-				
+			*/	
 			bridgeBlocks.put(nextLibigotLocation, counter);
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextLibigotLocation, this);
 			
@@ -140,6 +144,7 @@ public class Funnel extends Bridge {
 	@Override
 	public void deactivate()
 	{
+		activated = false;
 		for (V10Location b : bridgeBlocks.keySet())
 		{
 			b.getHandle().getBlock().setType(Material.AIR);
@@ -148,8 +153,8 @@ public class Funnel extends Bridge {
 		bridgeBlocks.clear();
 		for (Portal p: involvedPortals)
 			plugin.funnelBridgeManager.involvedPortals.remove(p);
-//		for (Entity e : plugin.funnelBridgeManager.glassBlocks.keySet())
-//			plugin.funnelBridgeManager.EntityExitsFunnel(e);
+		for (Entity e : plugin.funnelBridgeManager.glassBlocks.keySet())
+			plugin.funnelBridgeManager.EntityExitsFunnel(e);
 		
 		involvedPortals.clear();
 	}

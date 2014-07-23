@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 
 import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
@@ -25,7 +29,8 @@ public class FunnelBridgeManager {
 	public HashMap<Portal, Bridge> involvedPortals = new HashMap<Portal, Bridge>();
 	public HashMap<V10Location, Bridge> bridgeBlocks = new HashMap<V10Location, Bridge>();
 	public HashMap<V10Location, Bridge> bridgeMachineBlocks = new HashMap<V10Location, Bridge>();
-//	private HashSet<Entity> inFunnel = new HashSet<Entity>();
+	//private HashSet<Entity> inFunnel = new HashSet<Entity>();
+	private HashMap<Entity,Funnel> inFunnel = new HashMap<Entity,Funnel>();
 	HashMap<Entity, List<V10Location>> glassBlocks = new HashMap<Entity, List<V10Location>>();
 //	private HashMap<LibigotLocation, Entity> glassBlockOwners = new HashMap<LibigotLocation, Entity>();
 
@@ -160,7 +165,226 @@ public class FunnelBridgeManager {
 		for (Bridge bridge: bridges.toArray(new Bridge[0]))
 			bridge.deactivate();
 	}
+	public Funnel getFunnelInEntity(Entity entity)
+	{
+		Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
+		if (bridge == null )bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(BlockFace.UP)));
+		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(0,0,-1)));
+		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(0,0,1)));
+		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(-1,0,0)));
+		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(1,0,0)));
+		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(0,1,-1)));
+		if (bridge == null && ((entity.getLocation().getZ() - (double) entity.getLocation().getBlockZ()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(0,1,1)));
+		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) < 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(-1,1,0)));
+		if (bridge == null && ((entity.getLocation().getX() - (double) entity.getLocation().getBlockX()) > 0.5)) bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(1,1,0)));
+
+		
+		
+		if (bridge != null && bridge instanceof Funnel)
+			return (Funnel) bridge;
+		else
+			return null;
+	}
 	
+	public void EntityMoveCheck(Entity entity)
+	{
+		Funnel funnel = getFunnelInEntity(entity);
+		
+		if (funnel == null && inFunnel.containsKey(entity))
+		{
+			if (inFunnel.get(entity).activated) {
+			EntityExitsFunnel(entity);
+			}
+		}
+		else if (funnel != null)
+		{
+
+			if (!inFunnel.containsKey(entity)) EntityEntersFunnel(entity, funnel);
+			EntityMoveInFunnel(entity, funnel);
+		}
+	}
+	
+	private void EntityEntersFunnel(final Entity entity, final Funnel funnel)
+	{
+		
+		if (entity instanceof Player) {
+			Player p = (Player)entity;
+			p.setVelocity(p.getVelocity().multiply(-2));
+			p.setAllowFlight(true);
+			 p.setFlying(true);
+			//delay to give the player a split second of upwards momentum to cancel out falling
+				plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+				    public void run() {
+				    	inFunnel.put(entity,funnel);
+				    }
+				}, 1L);
+			 
+		}
+		if (entity instanceof FallingBlock) {
+			Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
+			if (bridge == null) return;
+			/*FlyingBlock fblock = new FlyingBlock(((FallingBlock) entity).getMaterial(),((FallingBlock) entity).getBlockData()) {
+				
+				@Override
+				public void onTick() {
+					final FlyingBlock fblock = this;
+					
+					Location l = this.getBukkitEntity().getLocation();
+					final Block b = l.getBlock().getRelative(BlockFace.DOWN, (int) this.getHeightOffset());
+					if (!funnel.activated) {
+						plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+						    @SuppressWarnings("deprecation")
+							public void run() {
+						    	if (!funnel.activated) {
+						    		FallingBlock fb = b.getWorld().spawnFallingBlock(b.getLocation(), fblock.getMaterial(), fblock.getMaterialData());
+						    		fb.setDropItem(false);
+						    		Block k = null;
+						    		for (Entry<Block, FlyingBlock> b : plugin.eventListener.FlyingBlocks.entrySet()) {
+										if (b.getValue() == fblock) {
+											plugin.eventListener.cubes.put(b.getKey(), fb);
+											k = b.getKey();
+										}
+									}
+									if (k != null) plugin.eventListener.FlyingBlocks.remove(k);
+						    		fblock.remove();
+						    		return;
+						    	}
+						    }
+						}, 1L);	
+					}
+					BlockFace face = null;
+					
+					if (funnel.getDirection(b) != null)
+						face = funnel.getDirection(b);
+							else {
+								face =funnel.facingSide;
+							}
+					V10Location nextV10Location = new V10Location(b.getRelative(face));
+					
+					V10Location nextV10Location2 = new V10Location(b.getRelative(face).getLocation().add(FaceUtil.faceToVector(face).multiply(2.1)));
+					if (nextV10Location2.getHandle().getBlockX() == funnel.startBlock.getHandle().getBlockX() &&nextV10Location2.getHandle().getBlockY() == funnel.startBlock.getHandle().getBlockY()  &&nextV10Location2.getHandle().getBlockZ() == funnel.startBlock.getHandle().getBlockZ() ) {
+						this.setVelocity(new Vector(0,0,0).zero());
+						return;
+					}
+					if ((b.getRelative(face).getType() != Material.WATER && b.getRelative(face).getType() != Material.STATIONARY_WATER)) {
+						Portal portal = null;
+						if(plugin.portalManager.insideBlocks.containsKey(nextV10Location))
+						{
+						  portal = plugin.portalManager.insideBlocks.get(nextV10Location);
+						  if(portal.open)
+						  {
+							Portal destP = portal.getDestination();
+							if (destP.horizontal) {
+								nextV10Location = destP.teleport[1];
+							} else 
+								nextV10Location = new V10Location(destP.teleport[1].getHandle().add(0,-2,0));
+						  }
+						  else
+							return;
+						}
+						else if(plugin.portalManager.borderBlocks.containsKey(nextV10Location))
+						{
+						  portal = plugin.portalManager.borderBlocks.get(nextV10Location);
+						  if(portal.open)
+							nextV10Location = new V10Location(portal.getDestination().teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+						  else
+							return;
+						}
+						
+						if(portal != null && portal.open)
+						{
+						  
+						  face = portal.getDestination().teleportFace.getOppositeFace();
+						  final BlockFace face2 = portal.getDestination().teleportFace.getOppositeFace();
+						  final FlyingBlock fb = this;
+						  final Location pr = nextV10Location.getHandle();
+						  plugin.getServer().getScheduler()
+							.scheduleSyncDelayedTask(plugin, new Runnable() {
+								public void run() {
+									
+									fb.setBlockLocation(new Location (pr.getWorld(),pr.getBlockX()+0.5,pr.getBlockY()+0.5,pr.getBlockZ()+0.5));
+										fb.setVelocity(FaceUtil.faceToVector(face2).multiply(0.1));
+									
+								}
+							});
+						}
+						else {
+						this.setVelocity(new Vector(0,0,0).zero());
+						}
+					} else {
+						this.setVelocity(FaceUtil.faceToVector(face).multiply(0.1));
+						}
+				}
+				
+				
+			};
+			
+			
+
+
+
+
+
+			// spawn block
+			fblock.spawn(new Location (entity.getLocation().getWorld(),entity.getLocation().getBlockX()+0.5,entity.getLocation().getBlockY()+0.5,entity.getLocation().getBlockZ()+0.5));
+			fblock.setVelocity(FaceUtil.faceToVector(funnel.facingSide).multiply(0.1));
+			Block k = null;
+			for (Entry<Block, FallingBlock> b : plugin.eventListener.cubes.entrySet()) {
+				if (b.getValue() == (FallingBlock) entity) {
+					plugin.eventListener.FlyingBlocks.put(b.getKey(), fblock);
+					k = b.getKey();
+				}
+			}
+			if (k != null) plugin.eventListener.cubes.remove(k);
+			*/
+			((FallingBlock) entity).remove();
+			
+		}
+		
+	}
+	
+	public void EntityExitsFunnel(Entity entity)
+	{
+		if (entity instanceof Player) {
+			Player p = (Player)entity;
+			if (p.getGameMode() != GameMode.CREATIVE)
+			p.setAllowFlight(false);
+			p.setFlying(false);
+		}
+		inFunnel.remove(entity);
+	}
+
+	private void EntityMoveInFunnel(Entity entity, Funnel funnel)
+	{
+		
+	}
+
+	public void bridgeCheck() {
+		for (Entity entity: inFunnel.keySet()) {
+			Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
+			if (bridge != null && bridge instanceof Funnel) {
+				if (((Funnel)bridge).getDirection(entity.getLocation().getBlock()) != null)
+			entity.setVelocity(FaceUtil.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock())).multiply(0.1));
+				else {
+					entity.setVelocity(FaceUtil.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
+				}
+			} else {
+				if (bridge == null )bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(BlockFace.UP)));
+				if (bridge != null && bridge instanceof Funnel) {
+					if (((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP)) != null)
+				entity.setVelocity(FaceUtil.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP))).multiply(0.1).setY(0.1));
+					else {
+						entity.setVelocity(FaceUtil.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
+					}
+				}
+				
+			}
+		}
+		
+	}
+
 /*	public Funnel getFunnelInEntity(Entity entity)
 	{
 		Bridge bridge = bridgeBlocks.get(new LibigotLocation(entity.getLocation()));

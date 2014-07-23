@@ -281,6 +281,7 @@ public class EntityManager implements Runnable {
 	public void run()
 	{
 		faceCache.clear();
+		plugin.funnelBridgeManager.bridgeCheck();
 	}
 	
 	HashMap<V10Location, HashMap<BlockFace, Block>> faceCache = new HashMap<V10Location, HashMap<BlockFace, Block>>();
@@ -410,7 +411,7 @@ public class EntityManager implements Runnable {
 		  plugin.gelManager.useGel(entity, vlocTo, vector, blockIn, blockUnder, faceMap);
 		
 		//Funnel
-//		plugin.funnelBridgeManager.EntityMoveCheck(entity);
+ 		plugin.funnelBridgeManager.EntityMoveCheck(entity);
 		
 		return ret;
 	}

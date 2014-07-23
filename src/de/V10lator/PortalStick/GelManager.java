@@ -18,6 +18,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.sanjay900.fallingblocks.FrozenSand;
 
 import de.V10lator.PortalStick.util.BlockStorage;
 import de.V10lator.PortalStick.util.V10Location;
@@ -31,6 +32,7 @@ public class GelManager {
 	final HashMap<String, Integer> redTasks = new HashMap<String, Integer>();
 	public final HashMap<V10Location, Integer> tubePids = new HashMap<V10Location, Integer>();
 	public final HashSet<V10Location> activeGelTubes = new HashSet<V10Location>();
+	public final HashSet<FrozenSand> ignoreCube = new HashSet<FrozenSand>();
 	public final HashMap<UUID, V10Location> flyingGels = new HashMap<UUID, V10Location>();
 	public final HashMap<V10Location, ArrayList<BlockStorage>> gels = new HashMap<V10Location, ArrayList<BlockStorage>>();
 	public final HashMap<V10Location, BlockStorage> gelMap = new HashMap<V10Location, BlockStorage>();
@@ -153,7 +155,59 @@ public class GelManager {
 		ignore.add(entity);
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 5L);
 	}
-	
+	public boolean blueGelCube(final FrozenSand entity, Region region /*byte dir,*/)
+	{	
+		if (ignoreCube.contains(entity)) return false;
+		double min = region.getDouble(RegionSetting.BLUE_GEL_MIN_VELOCITY);
+		byte dir = 0;
+		Vector vector = entity.getVelocity(); //We need a self-calculated vector from the player move event as this has 0.0 everywhere.
+		Location loc = entity.getLocation();
+		double y = vector.getY();
+		if(dir == 0)
+		{
+		  y = -y;
+		  if(y < 0.1D)
+			return false;
+		  if(y < min)
+			y = min;
+		  vector.setY(y);
+		}
+		else
+		{
+		  if(y < min/3.0D)
+			vector.setY(min / 3.0D);
+		  boolean m;
+		  if(dir == 1)
+			y = vector.getX();
+		  else
+			y = vector.getZ();
+		  if(y == 0)
+			return false;
+		  if(y < 0)
+		  {
+			m = true;
+			y = -y;
+		  }
+		  else
+			m = false;
+		  if(y < min)
+			y = min;
+		  if(!m)
+			y = -y;
+		  if(dir == 1)
+			vector.setX(y);
+		  else
+			vector.setZ(y);
+		  loc.setY(loc.getY()+0.01D);
+		}
+		entity.setVelocity(vector);
+		
+		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new V10Location(loc));
+		
+		ignoreCube.add(entity);
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignoreCube.remove(entity); }}, 5L);
+		return true;
+	}
 	private boolean redGel(Entity entity, Block under, Region region)
 	{
 	  if(!(entity instanceof Player)) // TODO
