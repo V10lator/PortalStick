@@ -13,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.sanjay900.PortalStick.EventListener;
+import com.sanjay900.fallingblocks.FlyingBlocksAPI;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 import de.V10lator.PortalStick.commands.BaseCommand;
@@ -49,7 +51,7 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
-
+	public EventListener eventListener;
 	public WorldGuardPlugin worldGuard = null;
 	
 	public final Util util = new Util(this);
@@ -67,10 +69,12 @@ public class PortalStick extends JavaPlugin {
 	
 	public void onEnable() {
 		config = new Config(this);
+		eventListener = new EventListener(this);
 		
 		//Register events
 		Server s = getServer();
 		PluginManager pm = s.getPluginManager();
+		pm.registerEvents(new FlyingBlocksAPI(this), this);
 		pm.registerEvents(new PortalStickPlayerListener(this), this);
 		pm.registerEvents(new PortalStickBlockListener(this), this);
 		pm.registerEvents(new PortalStickVehicleListener(this), this);
@@ -121,11 +125,11 @@ public class PortalStick extends JavaPlugin {
 	public final String PERM_ADMIN_REGIONS	= "portalstick.admin.regions";
 	public final String PERM_DELETE_BRIDGE	= "portalstick.deletebridge";
 	public final String PERM_DELETE_GRILL	= "portalstick.deletegrill";
+    public final String PERM_GET_GUN        = "portalstick.gun";
 	public final String PERM_DAMAGE_BOOTS	= "portalstick.damageboots";
 	public final String PERM_TELEPORT 		= "portalstick.teleport";
 	public final String PERM_LANGUAGE		= "portalstick.admin.language";
 	public final String PERM_DEBUG			= "portalstick.admin.debug";
-	public final String PERM_GET_GUN        = "portalstick.gun";
     
 	public boolean hasPermission(Player player, String node) {
 		if(player.hasPermission(node))
