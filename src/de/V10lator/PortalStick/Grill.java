@@ -1,11 +1,15 @@
 package de.V10lator.PortalStick;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+import com.sanjay900.fallingblocks.FrozenSand;
+import com.sanjay900.fallingblocks.FrozenSandFactory;
+
+import de.V10lator.PortalStick.util.RegionSetting;
 import de.V10lator.PortalStick.util.V10Location;
 
 public class Grill {
@@ -13,6 +17,7 @@ public class Grill {
 	
 	final HashSet<V10Location> border;
 	private final HashSet<V10Location> inside;
+	public ArrayList<FrozenSand> blocks = new ArrayList<>();
 	final V10Location firstBlock;
 	public boolean disabled;
 	
@@ -40,17 +45,26 @@ public class Grill {
 	{
 		for (V10Location b: inside)
 		{
-			b.getHandle().getBlock().setType(Material.AIR);
 			plugin.grillManager.insideBlocks.remove(b);
 		}
+		for (FrozenSand b: blocks)
+		{
+			
+			b.clearAllPlayerViews();
+		}
+
 	}
 	
 	public void disable()
 	{
 		for (V10Location b: inside)
 		{
-			b.getHandle().getBlock().setType(Material.AIR);
 			disabled = true;
+		}
+		for (FrozenSand b: blocks)
+		{
+			
+			b.clearAllPlayerViews();
 		}
 	}
 	
@@ -58,9 +72,15 @@ public class Grill {
 	{
 		for (V10Location b: inside)
 		{
-			b.getHandle().getBlock().setType(Material.SUGAR_CANE_BLOCK);
-			disabled = false;
+			Region region = plugin.regionManager.getRegion(b);
+			FrozenSand hologram = new FrozenSandFactory(plugin)    // Replace "myPlugin" with your plugin instance
+		    .withLocation(new Location(b.getHandle().getWorld(),b.getHandle().getBlockX(),b.getHandle().getBlockY(),b.getHandle().getBlockZ()))
+		    .withText(region.getString(RegionSetting.GRILL_MATERIAL))
+		    .build();
+		blocks.add(hologram);
+		disabled = false;
 		}
+		
 	}
 		
 	public boolean create()
@@ -71,10 +91,12 @@ public class Grill {
     	{
 			rb = b.getHandle().getBlock();
 			plugin.grillManager.insideBlocks.put(b, this);
-			if (rb.getType() != Material.SUGAR_CANE_BLOCK) {
-				rb.setType(Material.SUGAR_CANE_BLOCK);
-				complete = false;
-			}
+			Region region = plugin.regionManager.getRegion(b);
+			FrozenSand hologram = new FrozenSandFactory(plugin)    // Replace "myPlugin" with your plugin instance
+		    .withLocation(new Location(b.getHandle().getWorld(),b.getHandle().getBlockX(),b.getHandle().getBlockY(),b.getHandle().getBlockZ()))
+		    .withText(region.getString(RegionSetting.GRILL_MATERIAL_INSIDE))
+		    .build();
+		blocks.add(hologram);
 			
     	}
 		for (V10Location b : border)
