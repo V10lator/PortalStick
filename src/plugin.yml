@@ -3,7 +3,7 @@ main: de.V10lator.PortalStick.PortalStick
 version: 5.0-dev4
 authors: [matejdro, oliverw92, V10lator]
 softdepend: [WorldGuard]
-depend: [BKCommonLib]
+depend: [BKCommonLib, ProtocolLib]
 commands:
   portalstick:
     description: Aperture Science Portal Stick
