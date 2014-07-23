@@ -1,5 +1,6 @@
 package com.sanjay900.PortalStick;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -8,8 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -27,9 +30,17 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Directional;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.events.EntityMoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.sanjay900.PortalStick.Util.Util;
 import com.sanjay900.fallingblocks.FrozenSand;
 import com.sanjay900.fallingblocks.FrozenSandFactory;
@@ -48,6 +59,7 @@ public class EventListener implements Listener {
 	public HashMap<Block, Block> cubesFallen = new HashMap<Block, Block>();
 	public HashMap<Block, ItemStack> cubesPlayerItem = new HashMap<Block, ItemStack>();
 	public PortalStick plugin;
+	private ArrayList<FallingBlock> blockMap = new ArrayList<FallingBlock>();
 	public HashMap<Block, Block> cubesign = new HashMap<>();
 	public HashMap<BukkitTask, Block> hatches = new HashMap<>();
 	public HashMap<Block, FrozenSand> FlyingBlocks = new HashMap<>();
@@ -61,7 +73,20 @@ public class EventListener implements Listener {
 		.registerEvents(this, portalStick);
 		plugin = portalStick;
 	}
+	@EventHandler
+	public void entityMoveEvent(final EntityMoveEvent event) {
+		final Location from = new Location(event.getWorld(), event.getFromX(),
+				event.getFromY(), event.getFromZ());
+		final Location to = new Location(event.getWorld(), event.getToX(),
+				event.getToY(), event.getToZ());
+		if (from.getBlockX() == to.getBlockX()
+				&& from.getBlockY() == to.getBlockY()
+				&& from.getBlockZ() == to.getBlockZ()) {
+			return;
+		}
 
+		checkPiston(to, event.getEntity());
+	}
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onEntityDeath(final EntityRemoveEvent event) {
@@ -160,7 +185,7 @@ public class EventListener implements Listener {
 		} else {
 			Block middle = Util.chkBtn(to);
 			if (middle == null) {
-				
+
 				Block middle2 = buttonsToPlayer.get(p);
 
 				Util.changeBtn(middle2, !buttons.containsKey(middle2));
@@ -168,6 +193,14 @@ public class EventListener implements Listener {
 				buttons.remove(middle2);
 			}
 		}
+		final Location from =e.getFrom();
+		if (from.getBlockX() == to.getBlockX()
+				&& from.getBlockY() == to.getBlockY()
+				&& from.getBlockZ() == to.getBlockZ()) {
+			return;
+		}
+
+		checkPiston(to, p);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -432,7 +465,268 @@ public class EventListener implements Listener {
 		}
 
 	}
+	@SuppressWarnings("deprecation")
+	public boolean checkPiston(Location to, final Entity entity) {
 
+		BlockFace pistonBlockFace = BlockFace.DOWN;
+
+		final Entity p = entity;
+		Block orig = to.getBlock();
+		Block pistonBlock = to.getBlock().getRelative(BlockFace.DOWN);
+		BlockFace[] BlockFaces = new BlockFace[] { BlockFace.UP,
+				BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST,
+				BlockFace.SOUTH, BlockFace.WEST };
+		for (BlockFace bf : BlockFaces) {
+			if (orig.getRelative(bf).getType() == Material.PISTON_BASE
+					|| orig.getRelative(bf).getType() == Material.PISTON_STICKY_BASE) {
+
+				pistonBlock = to.getBlock().getRelative(bf);
+				pistonBlockFace = bf;
+			}
+		}
+		if (!(pistonBlock.getType().equals(Material.PISTON_BASE) || pistonBlock
+				.getType().equals(Material.PISTON_STICKY_BASE))) {
+			return false;
+		}
+		((Directional) pistonBlock.getState()
+				.getData()).getFacing();
+		BlockFace pistondir = ((Directional) pistonBlock.getState().getData())
+				.getFacing();
+		switch (pistondir) {
+		case NORTH:
+			pistondir = BlockFace.SOUTH;
+			break;
+		case EAST:
+			pistondir = BlockFace.WEST;
+			break;
+		case SOUTH:
+			pistondir = BlockFace.NORTH;
+			break;
+		case WEST:
+			pistondir = BlockFace.EAST;
+			break;
+		case UP:
+			pistondir = BlockFace.DOWN;
+			break;
+		case DOWN:
+			pistondir = BlockFace.UP;
+			break;
+		default:
+			break;
+
+		}
+		if ((pistonBlock.getRelative(pistondir).getType()
+				.equals(Material.WALL_SIGN) || (pistonBlock.getRelative(
+						pistondir).getType().equals(Material.SIGN_POST)))
+						&& pistondir == pistonBlockFace) {
+			final Sign s = (Sign) pistonBlock.getRelative(pistondir).getState();
+
+			double speedt = 0.0D;
+			double x2 = 0.0D;
+			double y2 = 0.0D;
+			double z2 = 0.0D;
+			boolean pos = true;
+			boolean ok = true;
+			if (s.getLine(0).contains("direction")) {
+				pos = false;
+				y2 = p.getLocation().getDirection().getY();
+				if (s.getLine(0).contains(",")) {
+
+					String[] text = s.getLine(0).split(",");	
+					try {
+						if (y2 < Double.parseDouble(text[1]))
+						{
+							y2 = Double.parseDouble(text[1]);
+						}
+					} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+						y2 = p.getLocation().getDirection().getY();
+					}
+				}
+			} else {
+				String[] text = s.getLine(0).split(",");
+				try {
+					x2 = Double.parseDouble(text[0]);
+				} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+					ok = false;
+				}
+
+				try {
+					y2 = Double.parseDouble(text[1]);
+				} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+					ok = false;
+				}
+				try {
+					z2 = Double.parseDouble(text[2]);
+				} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+					ok = false;
+				}
+			}
+			try {
+				speedt = Double.parseDouble(s.getLine(1));
+			} catch (NumberFormatException nfe) {
+				ok = false;
+			}
+
+			final double speed = speedt;
+			final double x = x2;
+			final double y = y2;
+			final double z = z2;
+
+			final boolean pos2 = pos;
+			final BlockState signLoc = s;
+			if (ok) {
+
+				if (p instanceof Player) {
+						s.getBlock().setType(Material.REDSTONE_BLOCK);
+					if (entity.isInsideVehicle()) {
+						entity.getVehicle().eject();
+					}
+					Location playerloc = p.getLocation()
+							.getBlock().getLocation();
+					Vector vector = new Vector(0, 0, 0);
+					Location dest = null;
+					if (pos2) {
+
+						dest = new Location(playerloc
+								.getWorld(), x, y, z);
+
+							vector = dest.toVector().subtract(
+									playerloc.toVector());
+
+						
+					} else {
+						vector = p.getLocation().getDirection();
+					}
+
+						FallingBlock f = p.getWorld()
+								.spawnFallingBlock(playerloc, Material.GLASS, (byte)0);
+						blockMap.add(f);
+						f.setDropItem(false);
+						f.setPassenger(p);
+						
+						Vector v =vector.normalize()
+								.multiply(speed);
+						if (!pos2) {
+							v.setY(y);
+						} else {
+							v.setY(vector.getY());
+						}
+						f.setVelocity(v);
+						ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+						 PacketContainer metadata = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+					        WrappedDataWatcher dw = new WrappedDataWatcher();
+					        dw.setObject(0, Byte.valueOf((byte) 0x20));
+
+					        metadata.getIntegers().write(0, f.getEntityId());
+					        metadata.getWatchableCollectionModifier().write(0, dw.getWatchableObjects());
+					        for (Player pl : Bukkit.getOnlinePlayers()) {
+					        try {
+								pm.sendServerPacket(pl, metadata);
+							} catch (InvocationTargetException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							} 
+
+
+
+
+					}
+						Bukkit.getScheduler().scheduleSyncDelayedTask(
+								plugin, new Runnable() {
+									@Override
+									public void run() {
+										signLoc.getBlock().setType(
+												signLoc.getType());
+										Sign newSign = (Sign) signLoc.getBlock()
+												.getState();
+										Sign oldsign = (Sign) signLoc;
+										for (int i = 0; i < 4; i++) {
+											newSign.setLine(i, oldsign.getLine(i));
+										}
+										newSign.update();
+
+									}
+								}, 2L);
+
+					if (entity.isInsideVehicle()) {
+						entity.getVehicle().eject();
+					}
+					Location playerloc = p.getLocation().getBlock()
+							.getLocation();
+					Vector vector = new Vector(0, 0, 0);
+					if (pos2) {
+						final Location dest = new Location(
+								playerloc.getWorld(), x, y, z);
+
+							vector = dest.toVector().subtract(
+									playerloc.toVector());
+						
+					} else {
+						vector = p.getLocation().getDirection();
+					}
+
+						FallingBlock f = p.getWorld().spawnFallingBlock(
+								playerloc, Material.GLASS, (byte)0);
+						blockMap.add(f);
+						f.setDropItem(false);
+						f.setPassenger(p);
+						f.setVelocity(vector.normalize().multiply(speed));
+						ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+						 PacketContainer metadata = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+					        WrappedDataWatcher dw = new WrappedDataWatcher();
+					        dw.setObject(0, Byte.valueOf((byte) 0x20));
+
+					        metadata.getIntegers().write(0, f.getEntityId());
+					        metadata.getWatchableCollectionModifier().write(0, dw.getWatchableObjects());
+					        for (Player pl : Bukkit.getOnlinePlayers()) {
+					        try {
+								pm.sendServerPacket(pl, metadata);
+							} catch (InvocationTargetException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							} 
+						Bukkit.getScheduler().scheduleSyncDelayedTask(
+								plugin, new Runnable() {
+									@Override
+									public void run() {
+										s.getBlock().setType(
+												Material.REDSTONE_BLOCK);
+										Bukkit.getScheduler()
+										.scheduleSyncDelayedTask(
+												plugin,
+												new Runnable() {
+													@Override
+													public void run() {
+														signLoc.getBlock()
+														.setType(
+																signLoc.getType());
+														Sign newSign = (Sign) signLoc
+																.getBlock()
+																.getState();
+														Sign oldsign = (Sign) signLoc;
+														for (int i = 0; i < 4; i++) {
+															newSign.setLine(
+																	i,
+																	oldsign.getLine(i));
+														}
+														newSign.update();
+													}
+												}, 2L);
+									}
+								}, 2L);
+
+					
+				}
+		
+				return true;
+		}
+			
+
+		
+		return false;
+	}
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void blockPlace(BlockPlaceEvent event) {
@@ -733,7 +1027,7 @@ public class EventListener implements Listener {
 							return;
 						}
 
-					
+
 					}
 				}
 			}
@@ -745,8 +1039,13 @@ public class EventListener implements Listener {
 	@EventHandler
 	public void onEntityChangeBlock(final EntityChangeBlockEvent event) {
 		if ((event.getEntity().getType().equals(EntityType.FALLING_BLOCK))
+				&& blockMap.contains((FallingBlock) event.getEntity())) {
+			event.setCancelled(true);
+			blockMap.remove((FallingBlock) event.getEntity());
+
+		} else if ((event.getEntity().getType().equals(EntityType.FALLING_BLOCK))
 				&& cubes.containsValue((FallingBlock) event.getEntity())) {
-			
+
 			if (event.getBlock().getRelative(BlockFace.UP).getType() == Material.LAVA
 					|| event.getBlock().getRelative(BlockFace.UP).getType() == Material.STATIONARY_LAVA) {
 				if (cubes.containsValue((FallingBlock) event.getEntity())) {
@@ -818,19 +1117,21 @@ public class EventListener implements Listener {
 				}
 
 			} else {
-			
-						for (Entry<Block, FallingBlock> entry : cubes.entrySet()) {
-							if (((FallingBlock) event.getEntity()).equals(entry
-									.getValue())) {
-								cubesFallen.put(entry.getKey(), event.getBlock());
-								cubes.remove(entry.getKey());
-								event.getEntity().remove();
-								return;
-							}
-						}
-					
+
+				for (Entry<Block, FallingBlock> entry : cubes.entrySet()) {
+					if (((FallingBlock) event.getEntity()).equals(entry
+							.getValue())) {
+						cubesFallen.put(entry.getKey(), event.getBlock());
+						cubes.remove(entry.getKey());
+						event.getEntity().remove();
+						return;
+					}
+				}
+
 
 			}
+		}else {
+			checkPiston(event.getBlock().getLocation(), event.getEntity());
 		}
 
 
