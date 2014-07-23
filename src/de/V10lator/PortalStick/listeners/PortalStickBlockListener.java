@@ -15,7 +15,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
@@ -24,7 +23,6 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
-import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -138,6 +136,28 @@ public class PortalStickBlockListener implements Listener
 	  
 	  Material type = block.getType();
 	  Region region = plugin.regionManager.getRegion(loc);
+	  
+	  
+	  //TODO: Workaround for https://bukkit.atlassian.net/browse/BUKKIT-5710
+      if(block.getBlockPower() > 0) {
+          if (region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER)) {
+              boolean stop = false;
+              for(Portal port: plugin.portalManager.portals) {
+                  if(!port.transmitter)
+                      continue;
+                  for(V10Location ploc: port.coord.teleport)
+                      if(loc.equals(ploc)) {
+                          port.switchRedstoneTransmitter(false);
+                          stop = true;
+                          break;
+                      }
+                  if(stop)
+                      break;
+              }
+          }
+      }
+	  
+	  
 	  if(type == Material.REDSTONE_WIRE && region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER))
 	  {
 		Location l = block.getLocation();
@@ -163,6 +183,7 @@ public class PortalStickBlockListener implements Listener
 		  }
 		}
 	  }
+	  
 	}
 	
 	@EventHandler(ignoreCancelled = true)
@@ -255,8 +276,10 @@ public class PortalStickBlockListener implements Listener
 	    if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 	        return;
 		if(plugin.portalManager.torches.contains(new V10Location(block)) ||
-		        (block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block))))
+		        (block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block)))) {
 		    event.setCancelled(true);
+		    return;
+		}
 	}
 	
 	@EventHandler(ignoreCancelled = true)
