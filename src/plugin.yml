@@ -1,7 +1,7 @@
 name: PortalStick
 main: de.V10lator.PortalStick.PortalStick
 version: 5.0-dev5
-authors: [matejdro, oliverw92, V10lator]
+authors: [matejdro, oliverw92, V10lator, sanjay900]
 softdepend: [WorldGuard]
 depend: [BKCommonLib, ProtocolLib]
 commands:
