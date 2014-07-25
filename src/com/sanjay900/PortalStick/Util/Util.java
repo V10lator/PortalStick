@@ -155,9 +155,17 @@ public class Util {
 	public void changeBtn(Block middle, boolean on) {
 		Block under = middle.getRelative(BlockFace.DOWN);
 		Block block;
-		Material mat = on ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
+		byte data;
+		Material mat;
+		if(on) {
+		    data = 5;
+		    mat = Material.EMERALD_BLOCK;
+		} else {
+		    data = 14;
+		    mat = Material.REDSTONE_BLOCK;
+		}
 		for (BlockFace f : blockfaces)
-		    middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), (byte)(on ? 5 : 14), true);
+		    middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), data, true);
 		
 		under.getRelative(BlockFace.EAST, 2).setType(mat);
 		under.getRelative(BlockFace.WEST, 2).setType(mat);
