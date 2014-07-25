@@ -111,7 +111,7 @@ public class FrozenSand {
 
 				String[] datas = message.split(":");
 				int blockID = Integer.parseInt(datas[0]);
-				byte data = Byte.valueOf(datas[1]);
+				byte data = datas.length > 1 ? Byte.valueOf(datas[1]) : 0;
 				modifier.write(10, blockID | (data << 0x10));
 				modifier = attach2.getIntegers();
 				modifier.write(0, 0);
