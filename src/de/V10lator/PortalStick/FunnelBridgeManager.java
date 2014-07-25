@@ -235,7 +235,7 @@ public class FunnelBridgeManager {
 					if (!funnel.activated) {
 						plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
-						    @SuppressWarnings("deprecation")
+						    
 							public void run() {
 						    	if (!funnel.activated) {
 						    		FallingBlock fb = b.getWorld().spawnFallingBlock(b.getLocation(), fblock.getMaterial(), fblock.getMaterialData());

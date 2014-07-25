@@ -8,13 +8,15 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import de.V10lator.PortalStick.util.V10Location;
+
 public class AnimateHatch extends BukkitRunnable {
-	private Block blk;
+	private V10Location blk;
 	private boolean on;
 	private EventListener el;
 
 	public AnimateHatch(Block blk, boolean on, EventListener el) {
-		this.blk = blk;
+		this.blk = new V10Location(blk.getLocation());
 		this.on = on;
 		this.el = el;
 	}
@@ -22,10 +24,10 @@ public class AnimateHatch extends BukkitRunnable {
 	public void run() {
 		// What you want to schedule goes here
 		if (on) {
-			this.blk.setType(Material.GLASS);
+			this.blk.getHandle().getBlock().setType(Material.GLASS);
 			el.hatches.remove(this);
 		} else {
-			this.blk.setType(Material.AIR);
+			this.blk.getHandle().getBlock().setType(Material.AIR);
 			el.hatches.remove(this);
 		}
 

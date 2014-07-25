@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +29,7 @@ import de.V10lator.PortalStick.util.Config.Sound;
 public class GelManager {
 	private final PortalStick plugin;
 	final HashMap<String, Float> onRedGel = new HashMap<String, Float>();
-	private final HashSet<Entity> ignore = new HashSet<Entity>();
+	public final HashSet<Entity> ignore = new HashSet<Entity>();
 	final HashMap<String, Integer> redTasks = new HashMap<String, Integer>();
 	public final HashMap<V10Location, Integer> tubePids = new HashMap<V10Location, Integer>();
 	public final HashSet<V10Location> activeGelTubes = new HashSet<V10Location>();
@@ -91,7 +92,53 @@ public class GelManager {
 			}
 		}
 	}
-	
+	public byte useGelCube(FrozenSand entity, V10Location locTo, Vector vector, Block under)
+	{
+		
+		Region region = plugin.regionManager.getRegion(locTo);
+
+		if (region.getBoolean(RegionSetting.ENABLE_BLUE_GEL_BLOCKS))
+		{
+			if(ignoreCube.contains(entity))
+			  return -1;
+			String bg = region.getString(RegionSetting.BLUE_GEL_BLOCK);
+			Block block2;
+			Block block = locTo.getHandle().getBlock();
+			for(BlockFace face: new BlockFace[] {null, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST})
+			{
+				
+			  if(face == null)
+				block2 = under;
+			  else
+			  {
+				block2 = block.getRelative(face);
+			  }
+			  if(plugin.blockUtil.compareBlockToString(block2, bg))
+			  {
+				  
+				if(isPortal(new V10Location(block2)))
+				  continue;
+				byte dir;
+				if(face == null)
+				  dir = 0;
+				else
+				{
+				  switch(face)
+				  {
+				  	case EAST:
+				  	case WEST:
+				  	  dir = 1;
+				  	  break;
+				  	default:
+				  	  dir = 2;
+				  }
+				}
+				return blueGelCube(entity,locTo.getHandle(), region, dir);
+			  }
+			}
+		}
+		return -1;
+	}
 	private boolean isPortal(V10Location vl)
 	{
 	  for(V10Location loc: plugin.portalManager.borderBlocks.keySet())
@@ -105,7 +152,7 @@ public class GelManager {
 	
 	private void blueGel(final Entity entity, Region region, byte dir, Vector vector, double min)
 	{
-//		Vector vector = player.getVelocity(); //We need a self-calculated vector from the player move event as this has 0.0 everywhere.
+		
 		Location loc = entity.getLocation();
 		double y = vector.getY();
 		if(dir == 0)
@@ -155,34 +202,28 @@ public class GelManager {
 		ignore.add(entity);
 		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 5L);
 	}
-	public boolean blueGelCube(final FrozenSand entity, Region region /*byte dir,*/)
+	public byte blueGelCube(final FrozenSand entity, Location loc, Region region, byte dir)
 	{	
-		if (ignoreCube.contains(entity)) return false;
+		if (ignoreCube.contains(entity)) return -1;
 		double min = region.getDouble(RegionSetting.BLUE_GEL_MIN_VELOCITY);
-		byte dir = 0;
-		Vector vector = entity.getVelocity(); //We need a self-calculated vector from the player move event as this has 0.0 everywhere.
-		Location loc = entity.getLocation();
+		final Vector vector = entity.getVelocity();
 		double y = vector.getY();
 		if(dir == 0)
 		{
 		  y = -y;
-		  if(y < 0.1D)
-			return false;
 		  if(y < min)
 			y = min;
 		  vector.setY(y);
 		}
 		else
 		{
-		  if(y < min/3.0D)
-			vector.setY(min / 3.0D);
 		  boolean m;
 		  if(dir == 1)
 			y = vector.getX();
 		  else
 			y = vector.getZ();
 		  if(y == 0)
-			return false;
+			return -1;
 		  if(y < 0)
 		  {
 			m = true;
@@ -198,15 +239,14 @@ public class GelManager {
 			vector.setX(y);
 		  else
 			vector.setZ(y);
-		  loc.setY(loc.getY()+0.01D);
 		}
-		entity.setVelocity(vector);
+		
 		
 		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new V10Location(loc));
 		
 		ignoreCube.add(entity);
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignoreCube.remove(entity); }}, 5L);
-		return true;
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { entity.setVelocity(vector);ignoreCube.remove(entity); }}, 5L);
+		return dir;
 	}
 	private boolean redGel(Entity entity, Block under, Region region)
 	{

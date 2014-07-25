@@ -13,6 +13,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import com.sanjay900.PortalStick.EventListener;
 import com.sanjay900.fallingblocks.FlyingBlocksAPI;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
@@ -105,6 +111,15 @@ public class PortalStick extends JavaPlugin {
 		tmpList.add(new LanguageCommand(this));
 		tmpList.add(new GetGunCommand(this));
 		commands = tmpList.toArray(new BaseCommand[0]);
+		/*ProtocolLibrary.getProtocolManager().addPacketListener(
+				new PacketAdapter(this, ListenerPriority.NORMAL,
+						PacketType.Play.Server.ENTITY_METADATA) {
+					@Override
+					public void onPacketSending(final PacketEvent event) {
+						PacketContainer packet = event.getPacket();
+						
+					}
+				});*/
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String args[])

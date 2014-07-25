@@ -26,7 +26,7 @@ public class CheckWireTask extends BukkitRunnable {
 		this.on = on;
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public void run() {
 		// What you want to schedule goes here
 		Block lastblock = blk;

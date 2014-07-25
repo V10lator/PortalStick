@@ -20,7 +20,9 @@ import org.bukkit.util.Vector;
 
 
 
+
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.sanjay900.PortalStick.LocationIterator;
 
 import de.V10lator.PortalStick.util.V10Location;
 import de.V10lator.PortalStick.util.RegionSetting;
@@ -42,7 +44,7 @@ public class EntityManager implements Runnable {
 		Region regionTo = plugin.regionManager.getRegion(locTo);
 		Portal portal = plugin.portalManager.insideBlocks.get(locTo);
 		V10Location lTeleport;
-		final Portal destination;
+		Portal destination;
 		boolean ab = portal == null;
 		if(!ab)
 		{
@@ -56,6 +58,30 @@ public class EntityManager implements Runnable {
 		}
 		else
 		{
+			boolean foundportal = false;
+			LocationIterator blocksToAdd = new LocationIterator(locTo
+					.getHandle().getWorld(), locTo.getHandle().toVector()
+					.subtract(vector), vector, 0, (int) Math.floor(vector
+					.length()));
+			Location blockToAdd;
+			while (blocksToAdd.hasNext()) {
+				blockToAdd = blocksToAdd.next();
+				portal = plugin.portalManager.insideBlocks.get(new V10Location(
+						blockToAdd));
+				ab = portal == null;
+				if (!ab)
+					if (portal.open) {
+						foundportal = true;
+						break;
+					}
+			}
+			if (foundportal) {
+				destination = portal.getDestination();
+				if(destination.coord.horizontal || portal.coord.inside[0].equals(locTo))
+					lTeleport = destination.coord.teleport[0];
+				  else
+					lTeleport = destination.coord.teleport[1];
+			}
 		  if((entity instanceof FallingBlock || entity instanceof TNTPrimed) && vector.getX() == 0.0D && vector.getZ() == 0.0D)
 		  {
 			portal = plugin.portalManager.awayBlocksY.get(locTo);
@@ -267,7 +293,8 @@ public class EntityManager implements Runnable {
 		}
 		
 		destination.disabled = true;
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){public void run(){destination.disabled = false;}}, 10L);
+		final Portal destination2 = destination;
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){public void run(){destination2.disabled = false;}}, 10L);
 		
 		if (portal.orange)
 			plugin.util.playSound(Sound.PORTAL_EXIT_ORANGE, new V10Location(teleport));

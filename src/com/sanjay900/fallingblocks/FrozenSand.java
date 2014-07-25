@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -17,6 +15,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.sanjay900.PortalStick.MoveEvent;
 
 
 public class FrozenSand {
@@ -165,13 +164,16 @@ public class FrozenSand {
         }
     }
     public void clearAllPlayerViews() {
+    	 if (velocitytask!=null)velocitytask.cancel();
        for (Player p : Bukkit.getOnlinePlayers()) {
     	   if (p != null) {
                this.clearTags(p, this.getAllEntityIds());
            } 
        }
-       FlyingBlocksAPI.fakeBlocks.remove(id);
-       if (velocitytask!=null)velocitytask.cancel();
+       if ( FlyingBlocksAPI.fakeBlocks.contains(this)) {
+       FlyingBlocksAPI.fakeBlocks.remove(this);
+       }
+      
         
     }
     public int[] getAllEntityIds() {
@@ -230,7 +232,6 @@ public class FrozenSand {
 				try {
 					pm.sendServerPacket(observer, attach);
 				} catch (InvocationTargetException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -272,23 +273,21 @@ public class FrozenSand {
 			 return entityId+2;
 		 }
 		public void setVelocity(final Vector velocity) {
+			final FrozenSand sand = this;
+			motion = velocity;
 			velocitytask = Bukkit.getScheduler().runTaskTimer(Bukkit.getPluginManager().getPlugin("PortalStick"), new Runnable(){
 				
 				@Override
 				public void run() {
-					motion = velocity;
-						move(getLocation().add(velocity));
-						Block under = getLocation().getBlock().getRelative(BlockFace.DOWN);
-						if (under.getType() == Material.WOOL && under.getData() == 1) {
-						velocity.multiply(0.9);
-						} else if (under.getType() == Material.WOOL && under.getData() == 3){
-							
-						} else {
-							velocity.multiply(0.2);
-						}
-						if (velocity.length() < 0.00001) {
-							velocitytask.cancel();
-						}
+					MoveEvent event = new MoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
+					Bukkit.getServer().getPluginManager().callEvent(event);
+					if (!event.isCancelled()) {
+						move(getLocation().add(motion));
+						motion = event.getVelocity();
+					} else {
+						velocitytask.cancel();
+					}
+						
 					
 				}},1l,1l);
 			
@@ -325,6 +324,12 @@ public class FrozenSand {
 		}
 		public Vector getVelocity() {
 			return motion;
+		}
+		public Material getMaterial() {
+			return Material.getMaterial(Integer.parseInt(id.split(":")[0]));
+		}
+		public byte getData() {
+			return Byte.parseByte(id.split(":")[1]);
 		}
 
 	}

@@ -23,7 +23,7 @@ public class SetFallLater extends BukkitRunnable {
 		this.vector = vector;
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public void run() {
 		// What you want to schedule goes here
 		this.blk.setType(Material.AIR);

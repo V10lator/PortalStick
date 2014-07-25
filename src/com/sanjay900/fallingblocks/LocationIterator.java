@@ -11,7 +11,6 @@ import org.bukkit.util.Vector;
  
 public class LocationIterator implements Iterator<Location>{
     private final World world;
-    @SuppressWarnings("unused")
     private final int maxDistance;
    
     private static final int gridSize = 1 << 24;

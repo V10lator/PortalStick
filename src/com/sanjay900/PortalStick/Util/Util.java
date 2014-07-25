@@ -1,6 +1,7 @@
 package com.sanjay900.PortalStick.Util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BlockIterator;
 
+import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.sanjay900.fallingblocks.FrozenSand;
 
 import de.V10lator.PortalStick.PortalStick;
@@ -27,7 +29,12 @@ public class Util {
 		BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
 		BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
 		BlockFace.SOUTH_EAST };
+	public static boolean compareLocation(Location l, Location l2) {
+		return (l.getX() == l2.getX())
+				&& (l.getY() == l2.getY())
+				&& (l.getZ() == l2.getZ());
 
+	}
 	public static Entity getTarget(final Player player) {
 
 		BlockIterator iterator = new BlockIterator(player.getWorld(), player
@@ -53,7 +60,7 @@ public class Util {
 
 		BlockIterator iterator = new BlockIterator(player.getWorld(), player
 				.getLocation().toVector(), player.getEyeLocation()
-				.getDirection(), 0, 100);
+				.getDirection(), 0, 2);
 		while (iterator.hasNext()) {
 			Block item = iterator.next();
 			for (Entry<Block, FrozenSand> fb : plugin.eventListener.FlyingBlocks.entrySet()) {
@@ -83,7 +90,7 @@ public class Util {
 	 * @param damage
 	 *            The data value or -1 if this does not matter.
 	 */
-	@SuppressWarnings("deprecation")
+	
 	public static void remove(Inventory inv, Material type, int amount,
 			short damage) {
 		ItemStack[] items = inv.getContents();
@@ -139,7 +146,7 @@ public class Util {
 		}
 		return searchAmount - amount;
 	}
-	@SuppressWarnings("deprecation")
+	
 	public static void changeBtn(Block middle, boolean on) {
 		Block under = middle.getRelative(BlockFace.DOWN);
 		if (on) {
@@ -172,7 +179,7 @@ public class Util {
 			.setType(Material.REDSTONE_BLOCK);
 		}
 	}
-	@SuppressWarnings("deprecation")
+	
 	public static void changeBtnInner(Block middle, boolean on) {
 		if (on) {
 			for (BlockFace f : blockfaces) {
@@ -206,51 +213,34 @@ public class Util {
 	}
 	public static void doInventoryUpdate(final Player player, Plugin plugin) {
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-			@SuppressWarnings("deprecation")
+			
 			@Override
 			public void run() {
 				player.updateInventory();
 			}
 		}, 1L);
 	}
-	@SuppressWarnings("deprecation")
+	
 	public static void clear(Block hatchMiddle, boolean respawn, PortalStick plugin, int id, int data, Block sign) {
 		if (plugin.eventListener.cubes.containsKey(hatchMiddle)) {
-			plugin.eventListener.cubes.get(hatchMiddle).remove();
+			if (EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)) != null)
+				EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)).remove();
 			plugin.eventListener.cubes.remove(hatchMiddle);
 		} else if (plugin.eventListener.FlyingBlocks.containsKey(hatchMiddle)) {
-			plugin.eventListener.FlyingBlocks.get(hatchMiddle).clearAllPlayerViews();
-			plugin.eventListener.FlyingBlocks.remove(hatchMiddle);
-
-		} else if (plugin.eventListener.cubesFallen.containsKey(hatchMiddle)) {
-
-			plugin.eventListener.cubesFallen.get(hatchMiddle).setType(
-					Material.AIR);
-
-			Block blockUnder = plugin.eventListener.cubesFallen.get(hatchMiddle)
-					.getRelative(BlockFace.DOWN);
-
-			if (blockUnder.getType() == Material.WOOL) {
-				Block middle = chkBtn(plugin.eventListener.cubesFallen.get(hatchMiddle).getLocation());
-
-				if (!(middle == null)
-						&& plugin.eventListener.buttons.containsKey(middle)) {
-
-					for (BlockFace f2 : blockfaces) {
-						middle.getRelative(f2).setType(
-								Material.WOOL);
-						middle.getRelative(f2).setData(
-								(byte) 14);
-
+			if (plugin.eventListener.buttons.containsValue(plugin.eventListener.FlyingBlocks.get(hatchMiddle))) {
+				Iterator<Entry<Block, FrozenSand>> it = plugin.eventListener.buttons.entrySet().iterator();
+				while (it.hasNext()) {
+					Entry<Block, FrozenSand> e = it.next();
+					if (e.getValue() == plugin.eventListener.FlyingBlocks.get(hatchMiddle)) {
+						Block middle = e.getKey();
+						Util.changeBtn(middle, !plugin.eventListener.buttons.containsKey(middle));
+						it.remove();
 					}
-					Block under = middle
-							.getRelative(BlockFace.DOWN);
-					changeBtn(under,
-							!plugin.eventListener.buttons.containsKey(middle));
-					plugin.eventListener.buttons.remove(middle);
 				}
 			}
-			plugin.eventListener.cubesFallen.remove(hatchMiddle);
+			plugin.eventListener.FlyingBlocks.get(hatchMiddle).clearAllPlayerViews();
+			plugin.eventListener.FlyingBlocks.remove(hatchMiddle);
+			
 
 		} else if (plugin.eventListener.cubesPlayer.containsKey(hatchMiddle)) {
 
@@ -276,11 +266,11 @@ public class Util {
 							hatchMiddle.getLocation(), id,
 							(byte) data);
 			f.setDropItem(false);
-			plugin.eventListener.cubes.put(hatchMiddle, f);
+			plugin.eventListener.cubes.put(hatchMiddle, f.getUniqueId());
 			plugin.eventListener.cubesign.put(hatchMiddle, sign);
 		}
 	}
-	@SuppressWarnings("deprecation")
+	
 	public static Block chkBtn (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;
@@ -350,7 +340,7 @@ public class Util {
 		return Blocks;
 	}
 
-	@SuppressWarnings("deprecation")
+	
 	public static Block chkBtnInner (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;
