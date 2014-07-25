@@ -25,17 +25,17 @@ import de.V10lator.PortalStick.PortalStick;
 
 public class Util {
 
-	static BlockFace[] blockfaces = new BlockFace[] { BlockFace.WEST,
+	BlockFace[] blockfaces = new BlockFace[] { BlockFace.WEST,
 		BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
 		BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
 		BlockFace.SOUTH_EAST };
-	public static boolean compareLocation(Location l, Location l2) {
+	public boolean compareLocation(Location l, Location l2) {
 		return (l.getX() == l2.getX())
 				&& (l.getY() == l2.getY())
 				&& (l.getZ() == l2.getZ());
 
 	}
-	public static Entity getTarget(final Player player) {
+	public Entity getTarget(final Player player) {
 
 		BlockIterator iterator = new BlockIterator(player.getWorld(), player
 				.getLocation().toVector(), player.getEyeLocation()
@@ -56,7 +56,7 @@ public class Util {
 		}
 		return target;
 	}
-	public static Entry<Block, FrozenSand> getTargetFlying(final Player player, PortalStick plugin) {
+	public Entry<Block, FrozenSand> getTargetFlying(final Player player, PortalStick plugin) {
 
 		BlockIterator iterator = new BlockIterator(player.getWorld(), player
 				.getLocation().toVector(), player.getEyeLocation()
@@ -91,7 +91,7 @@ public class Util {
 	 *            The data value or -1 if this does not matter.
 	 */
 	
-	public static void remove(Inventory inv, Material type, int amount,
+	public void remove(Inventory inv, Material type, int amount,
 			short damage) {
 		ItemStack[] items = inv.getContents();
 		for (int i = 0; i < items.length; i++) {
@@ -128,7 +128,7 @@ public class Util {
 	 * @return The amount of items the player has not. If this return 0 then the
 	 *         check was successfull.
 	 */
-	public static int contains(Inventory inventory, Material mat, int amount,
+	public int contains(Inventory inventory, Material mat, int amount,
 			short damage) {
 		ItemStack[] contents = inventory.getContents();
 		int searchAmount = 0;
@@ -147,7 +147,7 @@ public class Util {
 		return searchAmount - amount;
 	}
 	
-	public static void changeBtn(Block middle, boolean on) {
+	public void changeBtn(Block middle, boolean on) {
 		Block under = middle.getRelative(BlockFace.DOWN);
 		if (on) {
 			for (BlockFace f : blockfaces) {
@@ -180,7 +180,7 @@ public class Util {
 		}
 	}
 	
-	public static void changeBtnInner(Block middle, boolean on) {
+	public void changeBtnInner(Block middle, boolean on) {
 		if (on) {
 			for (BlockFace f : blockfaces) {
 				middle.getRelative(f).setType(Material.WOOL);
@@ -211,7 +211,7 @@ public class Util {
 			.setType(Material.REDSTONE_BLOCK);
 		}
 	}
-	public static void doInventoryUpdate(final Player player, Plugin plugin) {
+	public void doInventoryUpdate(final Player player, Plugin plugin) {
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
 			
 			@Override
@@ -221,7 +221,7 @@ public class Util {
 		}, 1L);
 	}
 	
-	public static void clear(Block hatchMiddle, boolean respawn, PortalStick plugin, int id, int data, Block sign) {
+	public void clear(Block hatchMiddle, boolean respawn, PortalStick plugin, int id, int data, Block sign) {
 		if (plugin.eventListener.cubes.containsKey(hatchMiddle)) {
 			if (EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)) != null)
 				EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)).remove();
@@ -233,7 +233,7 @@ public class Util {
 					Entry<Block, FrozenSand> e = it.next();
 					if (e.getValue() == plugin.eventListener.FlyingBlocks.get(hatchMiddle)) {
 						Block middle = e.getKey();
-						Util.changeBtn(middle, !plugin.eventListener.buttons.containsKey(middle));
+						changeBtn(middle, !plugin.eventListener.buttons.containsKey(middle));
 						it.remove();
 					}
 				}
@@ -271,7 +271,7 @@ public class Util {
 		}
 	}
 	
-	public static Block chkBtn (Location l) {
+	public Block chkBtn (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;
 		Block middle = blockUnder;
@@ -320,7 +320,7 @@ public class Util {
 		if (!error) return middle;
 		return null;
 	}
-	public static List<Block> getNearbyBlocks(Location location, int Radius) {
+	public List<Block> getNearbyBlocks(Location location, int Radius) {
 		List<Block> Blocks = new ArrayList<Block>();
 
 		for (int X = location.getBlockX() - Radius; X <= location.getBlockX()
@@ -341,7 +341,7 @@ public class Util {
 	}
 
 	
-	public static Block chkBtnInner (Location l) {
+	public Block chkBtnInner (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;
 		Block middle = l.getBlock();

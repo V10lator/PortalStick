@@ -21,6 +21,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.sanjay900.PortalStick.EventListener;
 import com.sanjay900.fallingblocks.FlyingBlocksAPI;
+import com.sanjay900.fallingblocks.TagIdGenerator;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 import de.V10lator.PortalStick.commands.BaseCommand;
@@ -66,6 +67,10 @@ public class PortalStick extends JavaPlugin {
 	public final PortalStickEntityListener eL = new PortalStickEntityListener(this);
 	
 	public final Random rand = new Random();
+	
+	public final FlyingBlocksAPI flyingBlocksAPI = new FlyingBlocksAPI(this);
+	public final TagIdGenerator tagIdGenerator = new TagIdGenerator();
+	public final com.sanjay900.PortalStick.Util.Util util2 = new com.sanjay900.PortalStick.Util.Util();
 
 	public void onDisable() {
 		//config.unLoad() handles cleanup, so let's call it
@@ -80,7 +85,7 @@ public class PortalStick extends JavaPlugin {
 		//Register events
 		Server s = getServer();
 		PluginManager pm = s.getPluginManager();
-		pm.registerEvents(new FlyingBlocksAPI(this), this);
+		pm.registerEvents(flyingBlocksAPI, this);
 		pm.registerEvents(new PortalStickPlayerListener(this), this);
 		pm.registerEvents(new PortalStickBlockListener(this), this);
 		pm.registerEvents(new PortalStickVehicleListener(this), this);

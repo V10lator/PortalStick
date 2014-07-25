@@ -8,12 +8,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 public class getConnectedBlocks{
-	static List<Block>
+	List<Block>
 	unchecked = new LinkedList<Block>(),
 	checked = new LinkedList<Block>(),
 	confirmed = new LinkedList<Block>();
 
-	public static List<Block> getConnectedBlocks(Block block){
+	public List<Block> getConnectedBlocks(Block block){
 		BlockFace bf = null;
 
 		unchecked.clear();
@@ -52,7 +52,7 @@ public class getConnectedBlocks{
 		return confirmed;
 	}
 
-	public static boolean isChecked(Block block){
+	public boolean isChecked(Block block){
 		for(int i = 0; i < checked.size(); i++){
 			if(checked.get(i) != null && checked.get(i).equals(block)){
 				return true;

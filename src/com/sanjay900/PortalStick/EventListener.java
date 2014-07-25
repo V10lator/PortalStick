@@ -157,11 +157,11 @@ public class EventListener implements Listener {
 						|| under.getData() == (byte) 14 || under
 						.getData() == (byte) 5)) {
 
-					Block middle = Util.chkBtn(to.getLocation());
+					Block middle = plugin.util2.chkBtn(to.getLocation());
 					if (!(middle == null)
 							&& !plugin.eventListener.buttons.containsKey(middle)) {
 
-						Util.changeBtn(middle,
+						plugin.util2.changeBtn(middle,
 								!plugin.eventListener.buttons.containsKey(middle));
 						plugin.eventListener.buttons.put(middle, event.getEntity());
 
@@ -239,7 +239,7 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onPlayerAnimation(PlayerAnimationEvent event) {
-		Entry<Block, FrozenSand> fb = Util.getTargetFlying(event.getPlayer(),
+		Entry<Block, FrozenSand> fb = plugin.util2.getTargetFlying(event.getPlayer(),
 				plugin);
 		if (!(fb == null)) {
 			FlyingBlocks.remove(fb.getKey());
@@ -248,7 +248,7 @@ public class EventListener implements Listener {
 			cubesPlayerItem.put(fb.getKey(), item);
 
 			event.getPlayer().getInventory().addItem(item);
-			Util.doInventoryUpdate(event.getPlayer(), plugin);
+			plugin.util2.doInventoryUpdate(event.getPlayer(), plugin);
 			fb.getValue().clearAllPlayerViews();
 			if (buttons.containsValue(fb.getValue())) {
 				Iterator<Entry<Block, FrozenSand>> iter = buttons.entrySet().iterator();
@@ -256,7 +256,7 @@ public class EventListener implements Listener {
 					Entry<Block, FrozenSand> e = iter.next();
 					if (e.getValue() == fb.getValue()) {
 						Block middle = e.getKey();
-						Util.changeBtn(middle, !buttons.containsKey(middle));
+						plugin.util2.changeBtn(middle, !buttons.containsKey(middle));
 						iter.remove();
 					}
 				}
@@ -265,7 +265,7 @@ public class EventListener implements Listener {
 		}
 
 
-		Entity en = Util.getTarget(event.getPlayer());
+		Entity en = plugin.util2.getTarget(event.getPlayer());
 		if (en == null) return;
 		for (Entry<Block, UUID> entry : cubes.entrySet()) {
 			if (en.getUniqueId().compareTo(entry.getValue())==0) {
@@ -277,7 +277,7 @@ public class EventListener implements Listener {
 				cubesPlayerItem.put(entry.getKey(), item);
 
 				event.getPlayer().getInventory().addItem(item);
-				Util.doInventoryUpdate(event.getPlayer(), plugin);
+				plugin.util2.doInventoryUpdate(event.getPlayer(), plugin);
 				en.remove();
 
 				break;
@@ -295,20 +295,20 @@ public class EventListener implements Listener {
 		Player p = e.getPlayer();
 		Location to = e.getTo();
 		if (!buttonsToPlayer.containsKey(p)) {
-			Block middle = Util.chkBtn(to);
+			Block middle = plugin.util2.chkBtn(to);
 			if (!(middle == null) && !buttonsToPlayer.containsValue(middle)
 					&& !buttons.containsKey(middle)) {
 				buttonsToPlayer.put(p, middle);
-				Util.changeBtn(middle, !buttons.containsKey(middle));
+				plugin.util2.changeBtn(middle, !buttons.containsKey(middle));
 				buttons.put(middle, null);
 			}
 		} else {
-			Block middle = Util.chkBtn(to);
+			Block middle = plugin.util2.chkBtn(to);
 			if (middle == null) {
 
 				Block middle2 = buttonsToPlayer.get(p);
 
-				Util.changeBtn(middle2, !buttons.containsKey(middle2));
+				plugin.util2.changeBtn(middle2, !buttons.containsKey(middle2));
 				buttonsToPlayer.remove(p);
 				buttons.remove(middle2);
 			}
@@ -316,7 +316,7 @@ public class EventListener implements Listener {
 		
 		final Location from =e.getFrom();
 		for (FrozenSand s : FlyingBlocks.values()) {
-			if (Util.compareLocation(e.getTo().getBlock().getLocation(), s.getLocation().getBlock().getLocation())) {
+			if (plugin.util2.compareLocation(e.getTo().getBlock().getLocation(), s.getLocation().getBlock().getLocation())) {
 				
 				s.setVelocity(FaceUtil.faceToVector(FaceUtil.getDirection(to.toVector().subtract(from.toVector()))));
 			}
@@ -467,17 +467,17 @@ public class EventListener implements Listener {
 			}
 
 		}
-		Block middle = Util.chkBtn(event.getClickedBlock().getLocation());
+		Block middle = plugin.util2.chkBtn(event.getClickedBlock().getLocation());
 
 		if (!(middle == null) && buttons.containsKey(middle)) {
 
-			Util.changeBtn(middle, !buttons.containsKey(middle));
+		    plugin.util2.changeBtn(middle, !buttons.containsKey(middle));
 			buttons.remove(middle);
 		} else {
-			middle = Util.chkBtnInner(event.getClickedBlock().getLocation());
+			middle = plugin.util2.chkBtnInner(event.getClickedBlock().getLocation());
 			if (!(middle == null) && buttons.containsKey(middle)) {
 
-				Util.changeBtnInner(middle, !buttons.containsKey(middle));
+			    plugin.util2.changeBtnInner(middle, !buttons.containsKey(middle));
 
 			}
 		}
@@ -934,7 +934,7 @@ public class EventListener implements Listener {
 		if (event.getBlock().getWorld().getName().toLowerCase()
 				.contains("portal")||event.getBlock().getWorld().getName().toLowerCase()
 				.contains("lobby")) {
-			for (final Block blk : Util.getNearbyBlocks(event.getBlock()
+			for (final Block blk : plugin.util2.getNearbyBlocks(event.getBlock()
 					.getLocation(), 1)) {
 
 				if (blk.getType() == Material.STAINED_CLAY
@@ -1038,7 +1038,7 @@ public class EventListener implements Listener {
 							boolean powered = blk.isBlockPowered()
 									|| blk.isBlockIndirectlyPowered();
 
-							Util.clear(hatchMiddle, powered, plugin, id, data,
+							plugin.util2.clear(hatchMiddle, powered, plugin, id, data,
 									blk);
 
 						} catch (Exception e) {
@@ -1105,7 +1105,7 @@ public class EventListener implements Listener {
 					String id = String.valueOf(((FallingBlock) event.getEntity())
 							.getMaterial().getId())+":"+String.valueOf(((FallingBlock) event.getEntity())
 									.getBlockData());
-					fblock = new FrozenSandFactory().withLocation(event.getEntity().getLocation()).withText(id).build();
+					fblock = new FrozenSandFactory(plugin).withLocation(event.getEntity().getLocation()).withText(id).build();
 
 					FlyingBlocks.put(entry.getKey(), fblock);
 					event.getEntity().remove();
@@ -1120,11 +1120,11 @@ public class EventListener implements Listener {
 					|| blockUnder.getData() == (byte) 14 || blockUnder
 					.getData() == (byte) 5)) {
 
-				Block middle = Util.chkBtn(event.getBlock().getLocation());
+				Block middle = plugin.util2.chkBtn(event.getBlock().getLocation());
 
 				if (!(middle == null) && !buttons.containsKey(middle)) {
 
-					Util.changeBtn(middle, true);
+				    plugin.util2.changeBtn(middle, true);
 					buttons.put(middle, fblock);
 				}
 			} else if (blockUnder.getType() == Material.WOOL

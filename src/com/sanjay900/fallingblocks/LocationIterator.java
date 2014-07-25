@@ -13,7 +13,7 @@ public class LocationIterator implements Iterator<Location>{
     private final World world;
     private final int maxDistance;
    
-    private static final int gridSize = 1 << 24;
+    private final int gridSize = 1 << 24;
    
     private boolean end = false;
    

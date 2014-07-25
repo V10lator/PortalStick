@@ -5,7 +5,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
+import de.V10lator.PortalStick.PortalStick;
+
 public class FrozenSandFactory {
+        private final PortalStick plugin;
 	    private String worldName;
 	    private double locX;
 	    private double locY;
@@ -14,6 +17,11 @@ public class FrozenSandFactory {
 	    private Player ridePlayer = null;
 	    private Player attachPlayer = null;
 		private String tag;
+		
+		public FrozenSandFactory(PortalStick plugin) {
+		    this.plugin = plugin;
+		}
+		
 	    private FrozenSandFactory withCoords(double x, double y, double z) {
 	        this.locX = x;
 	        this.locY = y;
@@ -51,9 +59,9 @@ public class FrozenSandFactory {
 	            Bukkit.getLogger().warning("Could not find valid world (" + this.worldName + ") for Hologram of ID " + this.saveId + ". Maybe the world isn't loaded yet?");
 	            return null;
 	        }
-	        Integer id = FlyingBlocksAPI.getNextId();
-	        FrozenSand hologram = new FrozenSand(id,this.worldName, this.locX, this.locY, this.locZ, this.attachPlayer,this.ridePlayer, tag);
-	        FlyingBlocksAPI.fakeBlocks.add(hologram);
+	        Integer id = plugin.flyingBlocksAPI.getNextId();
+	        FrozenSand hologram = new FrozenSand(plugin, id,this.worldName, this.locX, this.locY, this.locZ, this.attachPlayer,this.ridePlayer, tag);
+	        plugin.flyingBlocksAPI.fakeBlocks.add(hologram);
 	        for (Player e : hologram.getLocation().getWorld().getPlayers()) {
 	                hologram.show(e);
 	        }

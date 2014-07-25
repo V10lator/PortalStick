@@ -17,9 +17,12 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.sanjay900.PortalStick.MoveEvent;
 
+import de.V10lator.PortalStick.PortalStick;
+
 
 public class FrozenSand {
 
+    private final PortalStick plugin;
 	private Player attachPlayer;
 	private Player ridePlayer;
 	public String id = "";
@@ -32,8 +35,9 @@ public class FrozenSand {
 	ProtocolManager pm;
 	private Vector motion;
 	private BukkitTask velocitytask = null;
-	protected FrozenSand(Integer id2, String worldName, double x, double y, double z, Player attachPlayer, Player ridePlayer, String id) {
-		entityId = TagIdGenerator.nextId(1);
+	protected FrozenSand(PortalStick plugin, Integer id2, String worldName, double x, double y, double z, Player attachPlayer, Player ridePlayer, String id) {
+	    this.plugin = plugin;
+		entityId = plugin.tagIdGenerator.nextId(1);
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -170,8 +174,8 @@ public class FrozenSand {
                this.clearTags(p, this.getAllEntityIds());
            } 
        }
-       if ( FlyingBlocksAPI.fakeBlocks.contains(this)) {
-       FlyingBlocksAPI.fakeBlocks.remove(this);
+       if ( plugin.flyingBlocksAPI.fakeBlocks.contains(this)) {
+       plugin.flyingBlocksAPI.fakeBlocks.remove(this);
        }
       
         
