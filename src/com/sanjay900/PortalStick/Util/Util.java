@@ -157,7 +157,7 @@ public class Util {
 		Block block;
 		Material mat = on ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
 		for (BlockFace f : blockfaces)
-		    middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), (byte)5, true);
+		    middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), (byte)(on ? 5 : 14), true);
 		
 		under.getRelative(BlockFace.EAST, 2).setType(mat);
 		under.getRelative(BlockFace.WEST, 2).setType(mat);
