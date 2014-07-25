@@ -19,7 +19,7 @@ public enum RegionSetting {
 	GRILL_REMOVE_EXCEPTIONS("grill-remove-exceptions", Arrays.asList(new Integer[]{280,313}), false),
 	GRILL_ONE_EXCEPTION("grill-one-exception", true, true),
 	GRILL_MATERIAL("emancipation-grill-material", 48, true),
-	GRILL_MATERIAL_INSIDE("emancipation-grill-inside-material", "95:11", true),
+	GRILL_MATERIAL_INSIDE("emancipation-grill-inside-material", "30", true),
 	GRILLS_CLEAR_ITEM_DROPS("grills-clear-item-drops", true, true),
 	ENABLE_GRILL_REDSTONE_DISABLING("enable-disabling-grill-with-redstone", true, true),
 	ENABLE_HARD_GLASS_BRIDGES("enable-hard-glass-bridges", true, true),
