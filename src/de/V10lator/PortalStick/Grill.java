@@ -73,7 +73,7 @@ public class Grill {
 		for (V10Location b: inside)
 		{
 			Region region = plugin.regionManager.getRegion(b);
-			FrozenSand hologram = new FrozenSandFactory(plugin)
+			FrozenSand hologram = new FrozenSandFactory()
 		    .withLocation(new Location(b.getHandle().getWorld(),b.getHandle().getBlockX(),b.getHandle().getBlockY(),b.getHandle().getBlockZ()))
 		    .withText(region.getString(RegionSetting.GRILL_MATERIAL_INSIDE))
 		    .build();
@@ -92,7 +92,7 @@ public class Grill {
 			rb = b.getHandle().getBlock();
 			plugin.grillManager.insideBlocks.put(b, this);
 			Region region = plugin.regionManager.getRegion(b);
-			FrozenSand hologram = new FrozenSandFactory(plugin)
+			FrozenSand hologram = new FrozenSandFactory()
 		    .withLocation(new Location(b.getHandle().getWorld(),b.getHandle().getBlockX(),b.getHandle().getBlockY(),b.getHandle().getBlockZ()))
 		    .withText(region.getString(RegionSetting.GRILL_MATERIAL_INSIDE))
 		    .build();

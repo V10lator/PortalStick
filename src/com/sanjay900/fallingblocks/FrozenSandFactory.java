@@ -14,10 +14,6 @@ public class FrozenSandFactory {
 	    private Player ridePlayer = null;
 	    private Player attachPlayer = null;
 		private String tag;
-	    public FrozenSandFactory(Plugin owningPlugin) {
-	    }
-
-
 	    private FrozenSandFactory withCoords(double x, double y, double z) {
 	        this.locX = x;
 	        this.locY = y;

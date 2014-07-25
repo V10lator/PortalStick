@@ -1106,7 +1106,7 @@ public class EventListener implements Listener {
 					String id = String.valueOf(((FallingBlock) event.getEntity())
 							.getMaterial().getId())+":"+String.valueOf(((FallingBlock) event.getEntity())
 									.getBlockData());
-					fblock = new FrozenSandFactory(plugin).withLocation(event.getEntity().getLocation()).withText(id).build();
+					fblock = new FrozenSandFactory().withLocation(event.getEntity().getLocation()).withText(id).build();
 
 					FlyingBlocks.put(entry.getKey(), fblock);
 					event.getEntity().remove();
