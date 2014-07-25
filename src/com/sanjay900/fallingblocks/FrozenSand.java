@@ -14,6 +14,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.sanjay900.PortalStick.MoveEvent;
 
@@ -65,11 +66,12 @@ public class FrozenSand {
 			PacketContainer attach = pm.createPacket(PacketType.Play.Server.ATTACH_ENTITY);
 			PacketContainer attach2 = pm.createPacket(PacketType.Play.Server.ATTACH_ENTITY);
 			PacketContainer horse = pm.createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
-			horse.getIntegers().write(0,this.getHorseIndex());
-			horse.getIntegers().write(1,(int)EntityType.HORSE.getTypeId());
-			horse.getIntegers().write(2, (int) Math.floor((y +(ridePlayer == null? diffY + 41:0)) * 32.0D));
-			horse.getIntegers().write(3, (int)Math.floor((y + diffY+ 41)* 32.0D));
-			horse.getIntegers().write(4, (int)Math.floor(z* 32.0D));
+			StructureModifier<Integer> modifier = horse.getIntegers();
+			modifier.write(0,this.getHorseIndex());
+			modifier.write(1,(int)EntityType.HORSE.getTypeId());
+			modifier.write(2, (int) Math.floor((y +(ridePlayer == null? diffY + 41:0)) * 32.0D));
+			modifier.write(3, (int)Math.floor((y + diffY+ 41)* 32.0D));
+			modifier.write(4, (int)Math.floor(z* 32.0D));
 
 			WrappedDataWatcher dw = new WrappedDataWatcher();
 			dw.setObject(0, Byte.valueOf((byte) 0x20));
@@ -89,39 +91,38 @@ public class FrozenSand {
 			horse.getDataWatcherModifier().write(0,dw);
 			
 			PacketContainer skull = pm.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
-			skull.getIntegers().write(0, this.getSkullIndex());
-			skull.getIntegers().write(1, (int) Math.floor(x * 32.0D));
-			skull.getIntegers().write(2, (int) Math.floor((y +(ridePlayer == null? diffY + 41:0)) * 32.0D));
-			skull.getIntegers().write(3, (int) Math.floor(z * 32.0D));
-			skull.getIntegers().write(9, 66);
+			modifier = skull.getIntegers();
+			modifier.write(0, this.getSkullIndex());
+			modifier.write(1, (int) Math.floor(x * 32.0D));
+			modifier.write(2, (int) Math.floor((y +(ridePlayer == null? diffY + 41:0)) * 32.0D));
+			modifier.write(3, (int) Math.floor(z * 32.0D));
+			modifier.write(9, 66);
 			
 
 			PacketContainer item = pm.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 
 			if (!message.equals("none")) {
-				item.getIntegers().write(0, this.getTouchSlimeIndex());
-				item.getIntegers().write(1, (int) Math.floor(x * 32.0D));
-				item.getIntegers().write(2, (int) Math.floor((y +(ridePlayer == null? diffY + 41:0)) * 32.0D));
-				item.getIntegers().write(3, (int) Math.floor(z * 32.0D));
-				item.getIntegers().write(9, 70);
+			    modifier = item.getIntegers();
+			    modifier.write(0, this.getTouchSlimeIndex());
+			    modifier.write(1, (int) Math.floor(x * 32.0D));
+			    modifier.write(2, (int) Math.floor((y +(ridePlayer == null? diffY + 41:0)) * 32.0D));
+			    modifier.write(3, (int) Math.floor(z * 32.0D));
+			    modifier.write(9, 70);
 
 				String[] datas = message.split(":");
 				int blockID = Integer.parseInt(datas[0]);
 				byte data = Byte.valueOf(datas[1]);
-				item.getIntegers().write(10, blockID | (data << 0x10));
-				attach2.getIntegers().write(0, 0);
-				attach2.getIntegers().write(1, item.getIntegers().read(0));
+				modifier.write(10, blockID | (data << 0x10));
+				modifier = attach2.getIntegers();
+				modifier.write(0, 0);
+				modifier.write(1, item.getIntegers().read(0));
 				attach2.getIntegers().write(2, horse.getIntegers().read(0));
 			}
 			
-			attach.getIntegers().write(0, 0);
-			attach.getIntegers().write(1, horse.getIntegers().read(0));
-			if (ridePlayer == null) {
-			attach.getIntegers().write(2, skull.getIntegers().read(0));
-			} else {
-				
-				attach.getIntegers().write(2, ridePlayer.getEntityId());
-			}
+			modifier = attach.getIntegers();
+			modifier.write(0, 0);
+			modifier.write(1, horse.getIntegers().read(0));
+			modifier.write(2, ridePlayer == null ? skull.getIntegers().read(0) : ridePlayer.getEntityId());
 			
 			pm.sendServerPacket(observer, horse);
 			if (ridePlayer == null) {
@@ -136,22 +137,22 @@ public class FrozenSand {
 			}
 			if (attachPlayer != null) {
 				PacketContainer attach3 = pm.createPacket(PacketType.Play.Server.ATTACH_ENTITY);
-				attach3.getIntegers().write(0, 0);
-				attach3.getIntegers().write(1, attachPlayer.getEntityId());
+				modifier = attach3.getIntegers();
+				modifier.write(0, 0);
+				modifier.write(1, attachPlayer.getEntityId());
 
-				if (!message.equals("none")) {
-					attach3.getIntegers().write(2, item.getIntegers().read(0));
-				} else {
-					attach3.getIntegers().write(2, horse.getIntegers().read(0));
-				}
+				modifier.write(2, message.equals("none") ? horse.getIntegers().read(0) : item.getIntegers().read(0));
+				
 				pm.sendServerPacket(observer, attach3);
 
 			}
 			pm.sendServerPacket(observer, attach);
 		} 
 		catch (Exception ex) {
-			Bukkit.getLogger().warning("Hologram of ID "+String.valueOf(id)+" is invalid"+ex.getMessage());
-			ex.printStackTrace();
+		    if(plugin.config.debug) {
+		        plugin.getLogger().warning("Hologram of ID "+String.valueOf(id)+" is invalid"+ex.getMessage());
+		        ex.printStackTrace();
+		    }
 		}
 	}
 	protected void clearTags(Player observer, int... entityIds) {
@@ -169,9 +170,10 @@ public class FrozenSand {
     }
     public void clearAllPlayerViews() {
     	 if (velocitytask!=null)velocitytask.cancel();
+    	 int[] entityIDs = this.getAllEntityIds();
        for (Player p : Bukkit.getOnlinePlayers()) {
     	   if (p != null) {
-               this.clearTags(p, this.getAllEntityIds());
+               this.clearTags(p, entityIDs);
            } 
        }
        if ( plugin.flyingBlocksAPI.fakeBlocks.contains(this)) {
@@ -181,19 +183,12 @@ public class FrozenSand {
         
     }
     public int[] getAllEntityIds() {
-        ArrayList<Integer> entityIdList = new ArrayList<Integer>();
+        int[] entityIdList = new int[2];
             for (int i = 0; i < 2; i++) {
-                entityIdList.add(this.getHorseIndex() + i);
+                entityIdList[i] = this.getHorseIndex() + i;
             }
-        
-
-        int[] ids = new int[entityIdList.size()];
-
-        for (int i = 0; i < ids.length; i++) {
-            ids[i] = entityIdList.get(i);
-        }
-
-        return ids;
+            
+        return entityIdList;
     }
 		protected void updateNametag(Player observer, String message) {
 			y = Math.floor(y);
@@ -203,19 +198,19 @@ public class FrozenSand {
 			PacketContainer item = pm.createPacket(PacketType.Play.Server.SPAWN_ENTITY);
 
 			if (!message.equals("none")) {
-				item.getIntegers().write(0, this.getTouchSlimeIndex());
-				item.getIntegers().write(1, (int) Math.floor(x * 32.0D));
-				item.getIntegers().write(2, (int) (Math.floor(y + 41) * 32.0D));
-				item.getIntegers().write(3, (int) Math.floor(z * 32.0D));
-				item.getIntegers().write(9, 70);
+			    StructureModifier<Integer> modifier = item.getIntegers();
+			    modifier.write(0, this.getTouchSlimeIndex());
+			    modifier.write(1, (int) Math.floor(x * 32.0D));
+			    modifier.write(2, (int) (Math.floor(y + 41) * 32.0D));
+			    modifier.write(3, (int) Math.floor(z * 32.0D));
+			    modifier.write(9, 70);
 
 				String[] datas = message.split(":");
-				int blockID = Integer.parseInt(datas[0]);
-				byte data = Byte.valueOf(datas[1]);
-				item.getIntegers().write(10, blockID | (data << 0x10));
-				attach2.getIntegers().write(0, 0);
-				attach2.getIntegers().write(1, item.getIntegers().read(0));
-				attach2.getIntegers().write(2, this.getHorseIndex());
+				modifier.write(10, Integer.parseInt(datas[0])| (Byte.valueOf(datas[1]) << 0x10));
+				modifier = attach2.getIntegers();
+				modifier.write(0, 0);
+				modifier.write(1, item.getIntegers().read(0));
+				modifier.write(2, this.getHorseIndex());
 				try {
 					pm.sendServerPacket(observer, item);
 					pm.sendServerPacket(observer, attach2);
@@ -230,9 +225,10 @@ public class FrozenSand {
 			if (!(ridePlayer == null)) {
 			
 				PacketContainer attach = pm.createPacket(PacketType.Play.Server.ATTACH_ENTITY);
-				attach.getIntegers().write(0, 0);
-				attach.getIntegers().write(1, this.getHorseIndex());
-				attach.getIntegers().write(2, ridePlayer.getEntityId());
+				StructureModifier<Integer> modifier = attach.getIntegers();
+				modifier.write(0, 0);
+				modifier.write(1, this.getHorseIndex());
+				modifier.write(2, ridePlayer.getEntityId());
 				try {
 					pm.sendServerPacket(observer, attach);
 				} catch (InvocationTargetException e) {
@@ -245,10 +241,11 @@ public class FrozenSand {
 		protected void moveTag(Player observer) {
 
 	        PacketContainer teleportSkull = pm.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
-	        teleportSkull.getIntegers().write(0, getSkullIndex());
-	        teleportSkull.getIntegers().write(1, (int) Math.floor( x* 32.0D));
-	        teleportSkull.getIntegers().write(2, (int) Math.floor((y+41)* 32.0D));
-	        teleportSkull.getIntegers().write(3,(int) Math.floor( z * 32.0D));
+	        StructureModifier<Integer> modifier = teleportSkull.getIntegers();
+	        modifier.write(0, getSkullIndex());
+	        modifier.write(1, (int) Math.floor( x* 32.0D));
+	        modifier.write(2, (int) Math.floor((y+41)* 32.0D));
+	        modifier.write(3,(int) Math.floor( z * 32.0D));
 	        
 	       
 	        PacketContainer metadata = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
@@ -333,7 +330,10 @@ public class FrozenSand {
 			return Material.getMaterial(Integer.parseInt(id.split(":")[0]));
 		}
 		public byte getData() {
-			return Byte.parseByte(id.split(":")[1]);
+		    String[] split = id.split(":");
+            if (split.length < 2)
+                return 0;
+            return Byte.parseByte(split[1]);
 		}
 
 	}

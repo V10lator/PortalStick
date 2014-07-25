@@ -14,47 +14,35 @@ public class getConnectedBlocks{
 	confirmed = new LinkedList<Block>();
 
 	public List<Block> getConnectedBlocks(Block block){
-		BlockFace bf = null;
 
 		unchecked.clear();
 		checked.clear();
 		confirmed.clear();
 		unchecked.add(block);
+		BlockFace[] faces = new BlockFace[] {BlockFace.DOWN, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.UP, BlockFace.DOWN};
+		Block block1, block2;
 		while(unchecked.size() > 0){
-			if(!isChecked(unchecked.get(0))){
-				for(int i = 0; i < 6; i++){
-					if(i == 0){
-						bf = BlockFace.DOWN;
-					}else if(i == 1){
-						bf = BlockFace.EAST;
-					}else if(i == 2){
-						bf = BlockFace.NORTH;
-					}else if(i == 3){
-						bf = BlockFace.SOUTH;
-					}else if(i == 4){
-						bf = BlockFace.UP;
-					}else if(i == 5){
-						bf = BlockFace.WEST;
-					}
-					if(unchecked.get(0).getRelative(bf).getType().equals(block.getType()) &&unchecked.get(0).getRelative(bf).getData() == block.getData()  && !isChecked(unchecked.get(0).getRelative(bf))){
-						unchecked.add(unchecked.get(0).getRelative(bf));
+		    block1 = unchecked.get(0);
+			if(!isChecked(block1)){
+				for(BlockFace bf: faces){
+				    block2 = block1.getRelative(bf);
+					if(block2.getType().equals(block.getType()) &&block2.getData() == block.getData()  && !isChecked(block2)){
+						unchecked.add(block2);
 					}
 				}
-				checked.add(unchecked.get(0));
+				checked.add(block1);
 			}
 			unchecked.remove(0);
 		}
-		for(int i = 0; i < checked.size(); i++){
-			if(checked.get(i).getType().equals(block.getType()) && checked.get(i).getData() == block.getData()){
-				confirmed.add(checked.get(i));
-			}
-		}
+		for(Block block3: checked)
+			if(block3.getType().equals(block.getType()) && block3.getData() == block.getData())
+				confirmed.add(block3);
 		return confirmed;
 	}
 
 	public boolean isChecked(Block block){
-		for(int i = 0; i < checked.size(); i++){
-			if(checked.get(i) != null && checked.get(i).equals(block)){
+		for(Block block1: checked){
+			if(block1 != null && block1.equals(block)){
 				return true;
 			}
 		}

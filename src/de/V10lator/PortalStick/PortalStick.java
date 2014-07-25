@@ -58,7 +58,7 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
-	public EventListener eventListener;
+	public EventListener eventListener = new EventListener(this);
 	public WorldGuardPlugin worldGuard = null;
 	
 	public final Util util = new Util(this);
@@ -80,7 +80,6 @@ public class PortalStick extends JavaPlugin {
 	
 	public void onEnable() {
 		config = new Config(this);
-		eventListener = new EventListener(this);
 		
 		//Register events
 		Server s = getServer();
@@ -90,6 +89,7 @@ public class PortalStick extends JavaPlugin {
 		pm.registerEvents(new PortalStickBlockListener(this), this);
 		pm.registerEvents(new PortalStickVehicleListener(this), this);
 		pm.registerEvents(eL, this);
+		pm.registerEvents(eventListener, this);
 		
 		worldGuard = (WorldGuardPlugin) pm.getPlugin("WorldGuard");
 		

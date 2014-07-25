@@ -15,12 +15,16 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import de.V10lator.PortalStick.PortalStick;
+
 public class CheckWireTask extends BukkitRunnable {
+    private final PortalStick plugin;
 	private Block lblk;
 	private Block blk;
 	private boolean on;
 
-	public CheckWireTask(Block blk, Block lblk, boolean on) {
+	public CheckWireTask(PortalStick plugin, Block blk, Block lblk, boolean on) {
+	    this.plugin = plugin;
 		this.blk = blk;
 		this.lblk = lblk;
 		this.on = on;
@@ -31,6 +35,20 @@ public class CheckWireTask extends BukkitRunnable {
 		// What you want to schedule goes here
 		Block lastblock = blk;
 
+		byte data, data1, data2, data3, data4;
+		if(on) {
+		    data1 = DyeColor.PINK.getData();
+		    data2 = DyeColor.LIME.getData();
+		    data3 = DyeColor.RED.getData();
+		    data4 = DyeColor.GREEN.getData();
+		} else {
+		    data1 = DyeColor.LIME.getData();
+		    data2 = DyeColor.PINK.getData();
+		    data3 = DyeColor.GREEN.getData();
+		    data4 = DyeColor.RED.getData();
+		}
+		
+		Material mat;
 		for (BlockFace f : new BlockFace[] { BlockFace.NORTH, BlockFace.SOUTH,
 				BlockFace.WEST, BlockFace.EAST, BlockFace.UP, BlockFace.DOWN }) {
 			lastblock = blk.getRelative(f);
@@ -41,61 +59,38 @@ public class CheckWireTask extends BukkitRunnable {
 
 				continue;
 			}
-			if (lastblock.getType() == Material.STAINED_CLAY) {
+			mat = lastblock.getType();
+			if (mat == Material.STAINED_CLAY) {
 
-				if (on) {
+				if (lastblock.getData() == data1) {
+					lastblock.setData(data2);
+					new CheckWireTask(plugin, lastblock, blk, on)
+							.runTaskLater(plugin, 0);
 
-					if (lastblock.getState().getData().getData() == DyeColor.PINK
-							.getData()) {
-						lastblock.setData(DyeColor.LIME.getData());
-						new CheckWireTask(lastblock, blk, on)
-								.runTaskLater(Bukkit.getPluginManager()
-										.getPlugin("PortalStick"), 0);
+					
+				} else if (lastblock.getData() == data3) {
+					lastblock.setData(data4);
+					new CheckWireTask(plugin, lastblock, blk, on)
+							.runTaskLater(plugin, 0);
 
-						
-					} else if (lastblock.getState().getData().getData() == DyeColor.RED
-							.getData()) {
-						lastblock.setData(DyeColor.GREEN.getData());
-						new CheckWireTask(lastblock, blk, on)
-								.runTaskLater(Bukkit.getPluginManager()
-										.getPlugin("PortalStick"), 0);
-
-						
-					}
-				} else {
-					if (lastblock.getState().getData().getData() == DyeColor.LIME
-							.getData()) {
-						lastblock.setData(DyeColor.PINK.getData());
-						new CheckWireTask(lastblock, blk, on)
-								.runTaskLater(Bukkit.getPluginManager()
-										.getPlugin("PortalStick"), 0);
-						
-					} else if (lastblock.getState().getData().getData() == DyeColor.GREEN
-							.getData()) {
-						lastblock.setData(DyeColor.RED.getData());
-						new CheckWireTask(lastblock, blk, on)
-								.runTaskLater(Bukkit.getPluginManager()
-										.getPlugin("PortalStick"), 0);
-						
-					}
+					
 				}
 
-			} else if (lastblock.getType() == Material.WOOL && lastblock.getData() == (byte)4 && on) {
-				lastblock.setData((byte)13);
-				new CheckWireTask(lastblock, blk, on)
-				.runTaskLater(Bukkit.getPluginManager()
-						.getPlugin("PortalStick"), 0);
-
-			} else if (lastblock.getType() == Material.WOOL && lastblock.getData() == (byte)13 && !on) {
-				lastblock.setData((byte)4);
-				new CheckWireTask(lastblock, blk, on)
-				.runTaskLater(Bukkit.getPluginManager()
-						.getPlugin("PortalStick"), 0);
-
-			}else if (lastblock.getType() == Material.EMERALD_BLOCK && on) {
+			} else if (mat == Material.WOOL) {
+			    data = lastblock.getData();
+			    if(data == (byte)4 && on) {
+			        lastblock.setData((byte)13);
+	                new CheckWireTask(plugin, lastblock, blk, on)
+	                .runTaskLater(plugin, 0);
+			    } else if(data == (byte)13 && !on) {
+			        lastblock.setData((byte)4);
+	                new CheckWireTask(plugin, lastblock, blk, on)
+	                .runTaskLater(plugin, 0);
+			    }
+			}else if (mat == Material.EMERALD_BLOCK && on) {
 				lastblock.setType(Material.REDSTONE_BLOCK);
 
-			} else if (lastblock.getType() == Material.REDSTONE_BLOCK && !on) {
+			} else if (mat == Material.REDSTONE_BLOCK && !on) {
 				lastblock.setType(Material.EMERALD_BLOCK);
 				
 

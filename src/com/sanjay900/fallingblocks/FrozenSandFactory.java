@@ -1,8 +1,8 @@
 package com.sanjay900.fallingblocks;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import de.V10lator.PortalStick.PortalStick;
@@ -55,14 +55,16 @@ public class FrozenSandFactory {
 	        return this;
 	    }
 	    public FrozenSand build() {
-	        if (Bukkit.getWorld(this.worldName) == null) {
-	            Bukkit.getLogger().warning("Could not find valid world (" + this.worldName + ") for Hologram of ID " + this.saveId + ". Maybe the world isn't loaded yet?");
+	        World world = Bukkit.getWorld(this.worldName);
+	        if (world == null) {
+	            if(plugin.config.debug)
+	                plugin.getLogger().warning("Could not find valid world (" + this.worldName + ") for Hologram of ID " + this.saveId + ". Maybe the world isn't loaded yet?");
 	            return null;
 	        }
-	        Integer id = plugin.flyingBlocksAPI.getNextId();
+	        int id = plugin.flyingBlocksAPI.getNextId();
 	        FrozenSand hologram = new FrozenSand(plugin, id,this.worldName, this.locX, this.locY, this.locZ, this.attachPlayer,this.ridePlayer, tag);
 	        plugin.flyingBlocksAPI.fakeBlocks.add(hologram);
-	        for (Player e : hologram.getLocation().getWorld().getPlayers()) {
+	        for (Player e : world.getPlayers()) {
 	                hologram.show(e);
 	        }
 	        return hologram;

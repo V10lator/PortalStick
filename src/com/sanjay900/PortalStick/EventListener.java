@@ -56,28 +56,25 @@ import de.V10lator.PortalStick.util.V10Location;
 
 public class EventListener implements Listener {
 
-	public ArrayList<Block> wire = new ArrayList<Block>();
-	public HashMap<Player, Block> buttonsToPlayer = new HashMap<Player, Block>();
-	public HashMap<Block, FrozenSand> buttons = new HashMap<Block, FrozenSand>();
-	public HashMap<Block, Block> panels = new HashMap<Block, Block>();
-	public HashMap<BukkitTask, Block> paneltasks = new HashMap<BukkitTask, Block>();
-	public HashMap<Block, UUID> cubes = new HashMap<Block, UUID>();
-	public HashMap<Block, Player> cubesPlayer = new HashMap<Block, Player>();
-	public HashMap<Block, Block> cubesFallen = new HashMap<Block, Block>();
-	public HashMap<Block, ItemStack> cubesPlayerItem = new HashMap<Block, ItemStack>();
-	public PortalStick plugin;
-	private ArrayList<FallingBlock> blockMap = new ArrayList<FallingBlock>();
-	public HashMap<Block, Block> cubesign = new HashMap<Block, Block>();
-	public HashMap<BukkitTask, Block> hatches = new HashMap<BukkitTask, Block>();
-	public HashMap<Block, FrozenSand> FlyingBlocks = new HashMap<Block, FrozenSand>();
-	BlockFace[] blockfaces = new BlockFace[] { BlockFace.WEST,
+	public final ArrayList<Block> wire = new ArrayList<Block>();
+	public final HashMap<Player, Block> buttonsToPlayer = new HashMap<Player, Block>();
+	public final HashMap<Block, FrozenSand> buttons = new HashMap<Block, FrozenSand>();
+	public final HashMap<Block, Block> panels = new HashMap<Block, Block>();
+	public final HashMap<BukkitTask, Block> paneltasks = new HashMap<BukkitTask, Block>();
+	public final HashMap<Block, UUID> cubes = new HashMap<Block, UUID>();
+	public final HashMap<Block, Player> cubesPlayer = new HashMap<Block, Player>();
+	public final HashMap<Block, Block> cubesFallen = new HashMap<Block, Block>();
+	public final HashMap<Block, ItemStack> cubesPlayerItem = new HashMap<Block, ItemStack>();
+	private final PortalStick plugin;
+	private final ArrayList<FallingBlock> blockMap = new ArrayList<FallingBlock>();
+	public final HashMap<Block, Block> cubesign = new HashMap<Block, Block>();
+	public final HashMap<BukkitTask, Block> hatches = new HashMap<BukkitTask, Block>();
+	public final HashMap<Block, FrozenSand> FlyingBlocks = new HashMap<Block, FrozenSand>();
+	final BlockFace[] blockfaces = new BlockFace[] { BlockFace.WEST,
 			BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
 			BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
 			BlockFace.SOUTH_EAST };
 	public EventListener(PortalStick portalStick) {
-
-		portalStick.getServer().getPluginManager()
-		.registerEvents(this, portalStick);
 		plugin = portalStick;
 	}
 	@EventHandler 
@@ -910,13 +907,13 @@ public class EventListener implements Listener {
 						if (blk.getState().getData().getData() == DyeColor.LIME
 								.getData()) {
 							blk.setData(DyeColor.PINK.getData());
-							new CheckWireTask(blk, blk, false).runTaskLater(
+							new CheckWireTask(plugin, blk, blk, false).runTaskLater(
 									plugin, 1L);
 							return;
 						} else if (blk.getState().getData().getData() == DyeColor.GREEN
 								.getData()) {
 							blk.setData(DyeColor.RED.getData());
-							new CheckWireTask(blk, blk, false).runTaskLater(
+							new CheckWireTask(plugin, blk, blk, false).runTaskLater(
 									plugin, 1L);
 							return;
 						}
@@ -944,14 +941,14 @@ public class EventListener implements Listener {
 					if (blk.getState().getData().getData() == DyeColor.PINK
 							.getData()) {
 						blk.setData(DyeColor.LIME.getData());
-						new CheckWireTask(blk, blk, true).runTaskLater(plugin,
+						new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
 								1L);
 						wire.add(blk);
 						return;
 					} else if (blk.getState().getData().getData() == DyeColor.RED
 							.getData()) {
 						blk.setData(DyeColor.GREEN.getData());
-						new CheckWireTask(blk, blk, true).runTaskLater(plugin,
+						new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
 								1L);
 						wire.add(blk);
 						return;

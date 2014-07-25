@@ -20,8 +20,7 @@ public class FlyingBlocksAPI implements Listener {
 	}
 
 	public int getNextId() {
-		lastId ++;
-		return lastId;
+		return ++lastId;
 	}
 	
 	@EventHandler
@@ -37,8 +36,6 @@ public class FlyingBlocksAPI implements Listener {
 		
 	}
 	
-	
-
 	@EventHandler
 	public void onTeleport(final PlayerTeleportEvent event) {
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
@@ -51,6 +48,7 @@ public class FlyingBlocksAPI implements Listener {
 			}},10L);
 		
 	}
+	
 	@EventHandler
 	public void worldMove (final PlayerChangedWorldEvent event) {
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
@@ -63,10 +61,4 @@ public class FlyingBlocksAPI implements Listener {
 			}},10L);
 		
 	}
-
-	
-
-	
-
-
 }

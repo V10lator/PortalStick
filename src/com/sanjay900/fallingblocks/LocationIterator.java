@@ -113,16 +113,16 @@ public class LocationIterator implements Iterator<Location>{
        
         Location lastLocation;
        
-        lastLocation = getRelativeLocation(startLocation, reverseFace(mainFace));
+        lastLocation = getRelativeLocation(startLocation, mainFace.getOppositeFace());
  
         if(secondError < 0) {
             secondError += gridSize;
-            lastLocation = getRelativeLocation(lastLocation, reverseFace(secondFace));
+            lastLocation = getRelativeLocation(lastLocation, secondFace.getOppositeFace());
         }
  
         if(thirdError < 0) {
             thirdError += gridSize;
-            lastLocation = getRelativeLocation(lastLocation, reverseFace(thirdFace));
+            lastLocation = getRelativeLocation(lastLocation, thirdFace.getOppositeFace());
         }
  
         // This means that when the variables are positive, it means that the coord=1 boundary has been crossed
@@ -155,31 +155,6 @@ public class LocationIterator implements Iterator<Location>{
  
     private boolean locationEquals(Location a, Location b) {
         return a.getBlockX() == b.getBlockX() && a.getBlockY() == b.getBlockY() && a.getBlockZ() == b.getBlockZ();
-    }
- 
-    private BlockFace reverseFace(BlockFace face) {
-        switch(face) {
-        case UP:
-            return BlockFace.DOWN;
- 
-        case DOWN:
-            return BlockFace.UP;
- 
-        case NORTH:
-            return BlockFace.SOUTH;
- 
-        case SOUTH:
-            return BlockFace.NORTH;
- 
-        case EAST:
-            return BlockFace.WEST;
- 
-        case WEST:
-            return BlockFace.EAST;
- 
-        default:
-            return null;
-        }
     }
  
     private BlockFace getXFace(Vector direction) {

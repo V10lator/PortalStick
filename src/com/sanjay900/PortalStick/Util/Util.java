@@ -30,7 +30,8 @@ public class Util {
 		BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
 		BlockFace.SOUTH_EAST };
 	public boolean compareLocation(Location l, Location l2) {
-		return (l.getX() == l2.getX())
+		return (l.getWorld().equals(l2.getWorld())
+		        && l.getX() == l2.getX())
 				&& (l.getY() == l2.getY())
 				&& (l.getZ() == l2.getZ());
 
@@ -41,9 +42,13 @@ public class Util {
 				.getLocation().toVector(), player.getEyeLocation()
 				.getDirection(), 0, 100);
 		Entity target = null;
+		Block item;
+		List<Entity> entityList = null;
+		if(iterator.hasNext())
+		    entityList = player.getNearbyEntities(100, 100, 100);
 		while (iterator.hasNext()) {
-			Block item = iterator.next();
-			for (Entity entity : player.getNearbyEntities(100, 100, 100)) {
+			item = iterator.next();
+			for (Entity entity : entityList) {
 				int acc = 1;
 				for (int x = -acc; x < acc; x++)
 					for (int z = -acc; z < acc; z++)
@@ -61,8 +66,9 @@ public class Util {
 		BlockIterator iterator = new BlockIterator(player.getWorld(), player
 				.getLocation().toVector(), player.getEyeLocation()
 				.getDirection(), 0, 2);
+		Block item;
 		while (iterator.hasNext()) {
-			Block item = iterator.next();
+			item = iterator.next();
 			for (Entry<Block, FrozenSand> fb : plugin.eventListener.FlyingBlocks.entrySet()) {
 				int acc = 2;
 				for (int x = -acc; x < acc; x++)
@@ -103,7 +109,7 @@ public class Util {
 					is.setAmount(newamount);
 					break;
 				} else {
-					items[i] = new ItemStack(Material.AIR);
+					items[i] = null;
 					amount = -newamount;
 					if (amount == 0)
 						break;
@@ -130,9 +136,8 @@ public class Util {
 	 */
 	public int contains(Inventory inventory, Material mat, int amount,
 			short damage) {
-		ItemStack[] contents = inventory.getContents();
 		int searchAmount = 0;
-		for (ItemStack item : contents) {
+		for (ItemStack item : inventory.getContents()) {
 
 			if (item == null || !item.getType().equals(mat)) {
 				continue;
@@ -149,67 +154,41 @@ public class Util {
 	
 	public void changeBtn(Block middle, boolean on) {
 		Block under = middle.getRelative(BlockFace.DOWN);
-		if (on) {
-			for (BlockFace f : blockfaces) {
-				middle.getRelative(f).setType(Material.WOOL);
-				middle.getRelative(f).setData((byte) 5);
-
-			}
-			under.getRelative(BlockFace.EAST).getRelative(BlockFace.EAST)
-			.setType(Material.EMERALD_BLOCK);
-			under.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST)
-			.setType(Material.EMERALD_BLOCK);
-			under.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-			.setType(Material.EMERALD_BLOCK);
-			under.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH)
-			.setType(Material.EMERALD_BLOCK);
-		} else {
-			for (BlockFace f : blockfaces) {
-				middle.getRelative(f).setType(Material.WOOL);
-				middle.getRelative(f).setData((byte) 14);
-
-			}
-			under.getRelative(BlockFace.EAST).getRelative(BlockFace.EAST)
-			.setType(Material.REDSTONE_BLOCK);
-			under.getRelative(BlockFace.WEST).getRelative(BlockFace.WEST)
-			.setType(Material.REDSTONE_BLOCK);
-			under.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-			.setType(Material.REDSTONE_BLOCK);
-			under.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH)
-			.setType(Material.REDSTONE_BLOCK);
-		}
+		Block block;
+		Material mat = on ? Material.EMERALD_BLOCK : Material.REDSTONE_BLOCK;
+		for (BlockFace f : blockfaces)
+		    middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), (byte)5, true);
+		
+		under.getRelative(BlockFace.EAST, 2).setType(mat);
+		under.getRelative(BlockFace.WEST, 2).setType(mat);
+		under.getRelative(BlockFace.NORTH, 2).setType(mat);
+		under.getRelative(BlockFace.SOUTH, 2).setType(mat);
 	}
 	
 	public void changeBtnInner(Block middle, boolean on) {
+	    Material mat;
+	    byte data;
 		if (on) {
-			for (BlockFace f : blockfaces) {
-				middle.getRelative(f).setType(Material.WOOL);
-				middle.getRelative(f).setData((byte) 5);
-
-			}
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getRelative(BlockFace.EAST)
-			.setType(Material.EMERALD_BLOCK);
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST)
-			.setType(Material.EMERALD_BLOCK);
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-			.setType(Material.EMERALD_BLOCK);
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH)
-			.setType(Material.EMERALD_BLOCK);
+		    mat = Material.EMERALD_BLOCK;
+		    data = 5;
 		} else {
-			for (BlockFace f : blockfaces) {
-				middle.getRelative(f).setType(Material.WOOL);
-				middle.getRelative(f).setData((byte) 14);
-
-			}
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getRelative(BlockFace.EAST)
-			.setType(Material.REDSTONE_BLOCK);
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST).getRelative(BlockFace.WEST)
-			.setType(Material.REDSTONE_BLOCK);
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-			.setType(Material.REDSTONE_BLOCK);
-			middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH)
-			.setType(Material.REDSTONE_BLOCK);
+		    mat = Material.REDSTONE_BLOCK;
+		    data = 14;
 		}
+		    
+		for (BlockFace f : blockfaces) {
+			middle.getRelative(f).setType(Material.WOOL);
+			middle.getRelative(f).setData(data);
+
+		}
+		middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST, 2)
+		.setType(mat);
+		middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.WEST, 2)
+		.setType(mat);
+		middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH, 2)
+		.setType(mat);
+		middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH, 2)
+		.setType(mat);
 	}
 	public void doInventoryUpdate(final Player player, Plugin plugin) {
 		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
@@ -229,10 +208,12 @@ public class Util {
 		} else if (plugin.eventListener.FlyingBlocks.containsKey(hatchMiddle)) {
 			if (plugin.eventListener.buttons.containsValue(plugin.eventListener.FlyingBlocks.get(hatchMiddle))) {
 				Iterator<Entry<Block, FrozenSand>> it = plugin.eventListener.buttons.entrySet().iterator();
+				Entry<Block, FrozenSand> e;
+				Block middle;
 				while (it.hasNext()) {
-					Entry<Block, FrozenSand> e = it.next();
+					e = it.next();
 					if (e.getValue() == plugin.eventListener.FlyingBlocks.get(hatchMiddle)) {
-						Block middle = e.getKey();
+						middle = e.getKey();
 						changeBtn(middle, !plugin.eventListener.buttons.containsKey(middle));
 						it.remove();
 					}
@@ -308,17 +289,18 @@ public class Util {
 				error = true;
 			}
 
-		for (BlockFace f : blockfaces) {
-			Block rel = middle.getRelative(f);
-			if (rel.getType() == Material.WOOL
-					&& (rel.getData() == (byte) 14 || rel.getData() == (byte) 5)) {
+		if(!error)
+		    for (BlockFace f : blockfaces) {
+		        Block rel = middle.getRelative(f);
+		        if (rel.getType() == Material.WOOL
+		                && (rel.getData() == (byte) 14 || rel.getData() == (byte) 5)) {
 
-			} else {
-				error = true;
-			}
-		}	
-		if (!error) return middle;
-		return null;
+		        } else {
+		            error = true;
+		            break;
+		        }
+		    }
+		return error ? null : middle;
 	}
 	public List<Block> getNearbyBlocks(Location location, int Radius) {
 		List<Block> Blocks = new ArrayList<Block>();
@@ -355,16 +337,19 @@ public class Util {
 
 		} else {error = true;}
 
-		for (BlockFace f : blockfaces) {
-			Block rel = middle.getRelative(f);
-			if (rel.getType() == Material.WOOL
-					&& (rel.getData() == (byte) 14 || rel.getData() == (byte) 5)) {
+		if(!error) {
+		    Block rel;
+		    for (BlockFace f : blockfaces) {
+		        rel = middle.getRelative(f);
+		        if (rel.getType() == Material.WOOL
+		                && (rel.getData() == (byte) 14 || rel.getData() == (byte) 5)) {
 
-			} else {
-				error = true;
-			}
-		}	
-		if (!error) return middle;
-		return null;
+		        } else {
+		            error = true;
+		            break;
+		        }
+		    }	
+		}
+		return error ? null : middle;
 	}
 }

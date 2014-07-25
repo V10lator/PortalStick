@@ -16,20 +16,15 @@ public class AnimateHatch extends BukkitRunnable {
 	private EventListener el;
 
 	public AnimateHatch(Block blk, boolean on, EventListener el) {
-		this.blk = new V10Location(blk.getLocation());
+		this.blk = new V10Location(blk);
 		this.on = on;
 		this.el = el;
 	}
 
 	public void run() {
 		// What you want to schedule goes here
-		if (on) {
-			this.blk.getHandle().getBlock().setType(Material.GLASS);
-			el.hatches.remove(this);
-		} else {
-			this.blk.getHandle().getBlock().setType(Material.AIR);
-			el.hatches.remove(this);
-		}
+	    this.blk.getHandle().getBlock().setType(on ? Material.GLASS : Material.AIR);
+	    cancel();
 
 	}
 	
