@@ -23,6 +23,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BlockIterator;
 import org.getspout.spoutapi.SpoutManager;
 
@@ -437,6 +438,43 @@ public class Util {
             plugin.eventListener.cubesPlayerItem.remove(hatchMiddle);
 
         }
+        BlockFace[] blockfaces = new BlockFace[] {
+                BlockFace.NORTH_EAST, BlockFace.EAST,
+                BlockFace.SOUTH_EAST, BlockFace.SOUTH,
+                BlockFace.SOUTH_WEST, BlockFace.WEST,
+                BlockFace.NORTH_WEST, BlockFace.NORTH,
+                BlockFace.SELF};
+        Block blk = hatchMiddle.getRelative(BlockFace.DOWN,3);
+        for (Entry<BukkitTask, Block> t : plugin.eventListener.hatches.entrySet()) {
+            if (t.getValue() == blk) {
+                t.getKey().cancel();
+                plugin.eventListener.hatches.remove(t.getKey());
+                }
+            }
+        /*if (respawn) {
+
+    for (int i = 0; i < blockfaces.length; i++) {
+
+    plugin.eventListener.hatches.put(
+    new AnimateHatch(blk
+    .getRelative(blockfaces[i]),
+    false, plugin.eventListener).runTaskLater(
+    plugin, 3L * i), blk);
+
+    }
+
+    } else {
+
+    for (int i = 0; i < blockfaces.length; i++) {
+
+    plugin.eventListener.hatches.put(
+    new AnimateHatch(blk
+    .getRelative(blockfaces[i]),
+    true, plugin.eventListener).runTaskLater(
+    plugin, 3L * i), blk);
+    }
+
+    }*/
         if (respawn) {
             FallingBlock f = hatchMiddle.getWorld()
                     .spawnFallingBlock(

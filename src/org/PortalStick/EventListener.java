@@ -196,8 +196,7 @@ public class EventListener implements Listener {
 					new Runnable() {
 				@Override
 				public void run() {
-					if (cubes.containsValue((FallingBlock) event
-							.getEntity())) {
+					if (cubes.containsValue(fb.getUniqueId())) {
 						for (Entry<Block, UUID> entry : cubes
 								.entrySet()) {
 
@@ -951,61 +950,7 @@ public class EventListener implements Listener {
 					}
 				} else if (blk.getType() == Material.WALL_SIGN) {
 					final Sign s = (Sign) blk.getState();
-					if (s.getLine(0).equals("hatch")) {
-
-						org.bukkit.material.Sign sm = (org.bukkit.material.Sign) blk
-								.getState().getData();
-						Block attachedBlock = blk.getRelative(sm
-								.getAttachedFace());
-						Block hatchMiddle = null;
-						try {
-							hatchMiddle = attachedBlock.getRelative(
-									BlockFace.DOWN,
-									Integer.parseInt(s.getLine(2)) + 3);
-						} catch (Exception e) {
-							e.printStackTrace();
-							return;
-						}
-						BlockFace[] blockfaces = new BlockFace[] {
-								BlockFace.NORTH_EAST, BlockFace.EAST,
-								BlockFace.SOUTH_EAST, BlockFace.SOUTH,
-								BlockFace.SOUTH_WEST, BlockFace.WEST,
-								BlockFace.NORTH_WEST, BlockFace.NORTH,
-								BlockFace.SELF
-
-						};
-						for (Entry<BukkitTask, Block> t : hatches.entrySet()) {
-							if (t.getValue() == blk) {
-								t.getKey().cancel();
-								hatches.remove(t.getKey());
-							}
-						}
-						if (blk.isBlockPowered()
-								|| blk.isBlockIndirectlyPowered()) {
-
-							for (int i = 0; i < blockfaces.length; i++) {
-
-								hatches.put(
-										new AnimateHatch(hatchMiddle
-												.getRelative(blockfaces[i]),
-												false, this).runTaskLater(
-														plugin, 3L * i), blk);
-
-							}
-
-						} else {
-
-							for (int i = 0; i < blockfaces.length; i++) {
-
-								hatches.put(
-										new AnimateHatch(hatchMiddle
-												.getRelative(blockfaces[i]),
-												true, this).runTaskLater(
-														plugin, 3L * i), blk);
-							}
-
-						}
-					} else if (s.getLine(0).equals("block")) {
+					if (s.getLine(0).equals("cube")) {
 
 						org.bukkit.material.Sign sm = (org.bukkit.material.Sign) blk
 								.getState().getData();
