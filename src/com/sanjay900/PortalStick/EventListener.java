@@ -57,19 +57,19 @@ import de.V10lator.PortalStick.util.V10Location;
 public class EventListener implements Listener {
 
 	public ArrayList<Block> wire = new ArrayList<Block>();
-	public HashMap<Player, Block> buttonsToPlayer = new HashMap<>();
-	public HashMap<Block, FrozenSand> buttons = new HashMap<>();
-	public HashMap<Block, Block> panels = new HashMap<>();
-	public HashMap<BukkitTask, Block> paneltasks = new HashMap<>();
+	public HashMap<Player, Block> buttonsToPlayer = new HashMap<Player, Block>();
+	public HashMap<Block, FrozenSand> buttons = new HashMap<Block, FrozenSand>();
+	public HashMap<Block, Block> panels = new HashMap<Block, Block>();
+	public HashMap<BukkitTask, Block> paneltasks = new HashMap<BukkitTask, Block>();
 	public HashMap<Block, UUID> cubes = new HashMap<Block, UUID>();
 	public HashMap<Block, Player> cubesPlayer = new HashMap<Block, Player>();
 	public HashMap<Block, Block> cubesFallen = new HashMap<Block, Block>();
 	public HashMap<Block, ItemStack> cubesPlayerItem = new HashMap<Block, ItemStack>();
 	public PortalStick plugin;
 	private ArrayList<FallingBlock> blockMap = new ArrayList<FallingBlock>();
-	public HashMap<Block, Block> cubesign = new HashMap<>();
-	public HashMap<BukkitTask, Block> hatches = new HashMap<>();
-	public HashMap<Block, FrozenSand> FlyingBlocks = new HashMap<>();
+	public HashMap<Block, Block> cubesign = new HashMap<Block, Block>();
+	public HashMap<BukkitTask, Block> hatches = new HashMap<BukkitTask, Block>();
+	public HashMap<Block, FrozenSand> FlyingBlocks = new HashMap<Block, FrozenSand>();
 	BlockFace[] blockfaces = new BlockFace[] { BlockFace.WEST,
 			BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
 			BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
@@ -352,7 +352,7 @@ public class EventListener implements Listener {
 										.get(entry.getKey()).getData()
 										.getData());
 						f.setDropItem(false);
-						ArrayList<ItemStack> remove = new ArrayList<>();
+						ArrayList<ItemStack> remove = new ArrayList<ItemStack>();
 						for (ItemStack drop : event.getDrops()) {
 							if (drop.getType() == cubesPlayerItem.get(
 									entry.getKey()).getType()
@@ -556,7 +556,7 @@ public class EventListener implements Listener {
 						{
 							y2 = Double.parseDouble(text[1]);
 						}
-					} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+					} catch (Exception nfe) {
 						y2 = p.getLocation().getDirection().getY();
 					}
 				}
@@ -564,18 +564,18 @@ public class EventListener implements Listener {
 				String[] text = s.getLine(0).split(",");
 				try {
 					x2 = Double.parseDouble(text[0]);
-				} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+				} catch (Exception nfe) {
 					ok = false;
 				}
 
 				try {
 					y2 = Double.parseDouble(text[1]);
-				} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+				} catch (Exception nfe) {
 					ok = false;
 				}
 				try {
 					z2 = Double.parseDouble(text[2]);
-				} catch (NumberFormatException | IndexOutOfBoundsException nfe) {
+				} catch (Exception nfe) {
 					ok = false;
 				}
 			}
@@ -903,7 +903,7 @@ public class EventListener implements Listener {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {
-				ArrayList<Block> BlockToRemove = new ArrayList<>();
+				ArrayList<Block> BlockToRemove = new ArrayList<Block>();
 				for (Block blk : wire) {
 					if (!(blk.isBlockPowered() || blk
 							.isBlockIndirectlyPowered())) {
@@ -1031,8 +1031,7 @@ public class EventListener implements Listener {
 											":")[0]);
 									data = Integer.parseInt(s.getLine(1).split(
 											":")[1]);
-								} catch (NumberFormatException
-										| IndexOutOfBoundsException nfe) {
+								} catch (Exception nfe) {
 									return;
 								}
 							}

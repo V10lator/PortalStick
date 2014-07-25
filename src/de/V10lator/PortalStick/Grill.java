@@ -17,7 +17,7 @@ public class Grill {
 	
 	final HashSet<V10Location> border;
 	private final HashSet<V10Location> inside;
-	public ArrayList<FrozenSand> blocks = new ArrayList<>();
+	public ArrayList<FrozenSand> blocks = new ArrayList<FrozenSand>();
 	final V10Location firstBlock;
 	public boolean disabled;
 	

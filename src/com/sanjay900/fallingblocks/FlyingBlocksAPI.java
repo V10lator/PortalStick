@@ -13,7 +13,7 @@ import de.V10lator.PortalStick.PortalStick;
 
 public class FlyingBlocksAPI implements Listener {
 	public PortalStick plugin;
-	public static ArrayList<FrozenSand> fakeBlocks = new ArrayList<>();
+	public static ArrayList<FrozenSand> fakeBlocks = new ArrayList<FrozenSand>();
 	public static int lastId = 0;
 	public FlyingBlocksAPI(PortalStick portalStick) {
 		this.plugin = portalStick;

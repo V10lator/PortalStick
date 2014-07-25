@@ -177,7 +177,7 @@ public class FrozenSand {
         
     }
     public int[] getAllEntityIds() {
-        ArrayList<Integer> entityIdList = new ArrayList<>();
+        ArrayList<Integer> entityIdList = new ArrayList<Integer>();
             for (int i = 0; i < 2; i++) {
                 entityIdList.add(this.getHorseIndex() + i);
             }
