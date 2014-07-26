@@ -838,8 +838,7 @@ public class PortalStickEventListener implements Listener {
 		    UUID uuid = fb.getUniqueId();
 		    if(cubes.containsValue(uuid)) {
 		        Block up = event.getBlock().getRelative(BlockFace.UP);
-		        if (up.getType() == Material.LAVA
-		                || up.getType() == Material.STATIONARY_LAVA) {
+		        if (up.getType().name().contains("LAVA")) {
 		            Location loc;
 		            Block tmp;
 		            for (Entry<V10Location, UUID> entry: cubes.entrySet()) {
@@ -860,11 +859,10 @@ public class PortalStickEventListener implements Listener {
 								cubes.put(entry.getKey(), f.getUniqueId());
 								event.setCancelled(true);
 								return;
-							}
+		                    }
 						}
 					}
-
-				}
+		        }
 			}
 			FrozenSand fblock = null;
 			for (Entry<V10Location, UUID> entry : cubes.entrySet()) {
