@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.PortalStick.CheckWireTask;
+import org.PortalStick.Grill;
 import org.PortalStick.PortalStick;
 import org.PortalStick.Region;
 import org.PortalStick.fallingblocks.FrozenSand;
@@ -738,6 +739,13 @@ public class PortalStickEventListener implements Listener {
 	@EventHandler
 	public void onBlockPhysics(BlockPhysicsEvent event) {
 
+	    V10Location v10loc = new V10Location(event.getBlock());
+	    for(Grill grill: plugin.grillManager.grills) {
+	        if(v10loc.equals(grill.redstoneExit)) {
+	            event.setCancelled(true);
+	            return;
+	        }
+	    }
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {
