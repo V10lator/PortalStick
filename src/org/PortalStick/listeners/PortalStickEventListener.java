@@ -956,17 +956,17 @@ public class PortalStickEventListener implements Listener {
 					final Sign s = (Sign) blk.getState();
 					if (s.getLine(0).equals("cube")) {
 
-						org.bukkit.material.Sign sm = (org.bukkit.material.Sign) blk
+						final org.bukkit.material.Sign sm = (org.bukkit.material.Sign) blk
 								.getState().getData();
 						Block attachedBlock = blk.getRelative(sm
 								.getAttachedFace());
-						Block hatchMiddle = null;
+						
 						try {
-							hatchMiddle = attachedBlock.getRelative(
+							final Block hatchMiddle = attachedBlock.getRelative(
 									BlockFace.DOWN, 2);
 
-							int id = 0;
-							int data = 0;
+							final int id;
+							final int data;
 							if (!s.getLine(1).isEmpty()) {
 								try {
 									id = Integer.parseInt(s.getLine(1).split(
@@ -976,12 +976,28 @@ public class PortalStickEventListener implements Listener {
 								} catch (Exception nfe) {
 									return;
 								}
+							} else {
+								id = 0;
+								data = 0;
 							}
-							boolean powered = blk.isBlockPowered()
-									|| blk.isBlockIndirectlyPowered();
+							Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
 
-							plugin.util.clear(hatchMiddle, powered, plugin, id, data,
-									blk);
+								@Override
+								public void run() {
+									boolean powered = blk.isBlockPowered()
+											|| blk.isBlockIndirectlyPowered();
+									if (powered) {
+										if (blk.getRelative(sm.getFacing()).isBlockPowered()|| blk.getRelative(sm.getFacing()).isBlockIndirectlyPowered()) {
+									plugin.util.clear(hatchMiddle, true, plugin, id, data,
+											blk);
+										} else {
+											plugin.util.clear(hatchMiddle, false, plugin, id, data,
+													blk);
+										}
+										
+									} 
+								}}, 1l);
+							
 
 						} catch (Exception e) {
 							e.printStackTrace();

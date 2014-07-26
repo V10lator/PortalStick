@@ -15,6 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -22,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Lever;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BlockIterator;
@@ -37,7 +39,9 @@ public class Util {
 	        BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
 	        BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
 	        BlockFace.SOUTH_EAST };
-	
+	BlockFace[] blockfacesn = new BlockFace[] { BlockFace.WEST,
+	        BlockFace.NORTH, 
+	        BlockFace.EAST, BlockFace.SOUTH};
 	public Util(PortalStick plugin)
 	{
 		this.plugin = plugin;
@@ -343,23 +347,69 @@ public class Util {
     
     public void changeBtn(Block middle, boolean on) {
         Block under = middle.getRelative(BlockFace.DOWN);
-        Block block;
         byte data;
-        Material mat;
+        byte ldata;
         if(on) {
             data = 5;
-            mat = Material.EMERALD_BLOCK;
+            ldata = 8;
         } else {
             data = 14;
-            mat = Material.REDSTONE_BLOCK;
+            ldata = 0;
         }
         for (BlockFace f : blockfaces)
             middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), data, true);
-        
-        under.getRelative(BlockFace.EAST, 2).setType(mat);
-        under.getRelative(BlockFace.WEST, 2).setType(mat);
-        under.getRelative(BlockFace.NORTH, 2).setType(mat);
-        under.getRelative(BlockFace.SOUTH, 2).setType(mat);
+        for (BlockFace f : blockfacesn) {
+        	Block block = under.getRelative(f,2);
+        	Lever lever;
+        	BlockState state;
+            Block supportBlock;
+            if (!block.getRelative(BlockFace.UP).getType().isSolid()) {
+            	byte lrdata;
+            	switch (f) {
+            	case EAST:
+                    lrdata = 0x1;
+                    break;
+
+                case WEST:
+                    lrdata = 0x2;
+                    break;
+
+                case SOUTH:
+                    lrdata = 0x3;
+                    break;
+
+                case NORTH:
+                    lrdata = 0x4;
+                    break;
+				default:
+					lrdata = 0x1;
+					break;
+            	}
+            	block = under.getRelative(f,1);
+            	block.setType(Material.LEVER);
+            	state = block.getState(); 
+            	state.getData().setData(lrdata);
+            	state.update();
+                lever = (Lever) state.getData();
+            	supportBlock = block.getRelative(f.getOppositeFace());
+            	supportBlock.setType(Material.EMERALD_BLOCK);
+            } else {
+            	block.setType(Material.LEVER);
+            	state = block.getState(); 
+               lever = (Lever) state.getData();
+               supportBlock = block.getRelative(lever.getAttachedFace());
+            }
+            lever.setPowered(on);
+            state.setData(lever);
+            state.update();
+
+            BlockState initialSupportState = supportBlock.getState();
+            BlockState supportState = supportBlock.getState();
+            supportState.setType(Material.AIR);
+            supportState.update(true, false);
+            initialSupportState.update(true);
+        	
+        }
     }
     
     public void changeBtnInner(Block middle, boolean on) {
@@ -397,7 +447,7 @@ public class Util {
         }, 1L);
     }
     
-    public void clear(Block hatchMiddle, boolean respawn, PortalStick plugin, int id, int data, Block sign) {
+    public void clear(Block hatchMiddle, boolean powered, PortalStick plugin, int id, int data, Block sign) {
         if (plugin.eventListener.cubes.containsKey(hatchMiddle)) {
             if (EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)) != null)
                 EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)).remove();
@@ -475,7 +525,7 @@ public class Util {
     }
 
     }*/
-        if (respawn) {
+        if (powered) {
             FallingBlock f = hatchMiddle.getWorld()
                     .spawnFallingBlock(
                             hatchMiddle.getLocation(), id,
