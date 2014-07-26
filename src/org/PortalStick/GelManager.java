@@ -11,7 +11,6 @@ import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.PortalStick.util.Config.Sound;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,7 +27,7 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 public class GelManager {
 	private final PortalStick plugin;
 	final HashMap<String, Float> onRedGel = new HashMap<String, Float>();
-	public final HashSet<Entity> ignore = new HashSet<Entity>();
+	public final HashSet<UUID> ignore = new HashSet<UUID>();
 	final HashMap<String, Integer> redTasks = new HashMap<String, Integer>();
 	public final HashMap<V10Location, Integer> tubePids = new HashMap<V10Location, Integer>();
 	public final HashSet<V10Location> activeGelTubes = new HashSet<V10Location>();
@@ -51,7 +50,7 @@ public class GelManager {
 
 		if (region.getBoolean(RegionSetting.ENABLE_BLUE_GEL_BLOCKS))
 		{
-			if(ignore.contains(entity) || (entity instanceof Player && ((Player)entity).isSneaking()))
+			if(ignore.contains(entity.getUniqueId()) || (entity instanceof Player && ((Player)entity).isSneaking()))
 			  return;
 			String bg = region.getString(RegionSetting.BLUE_GEL_BLOCK);
 			Block block2;
@@ -198,8 +197,8 @@ public class GelManager {
 		
 		plugin.util.playSound(Sound.GEL_BLUE_BOUNCE, new V10Location(loc));
 		
-		ignore.add(entity);
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity); }}, 5L);
+		ignore.add(entity.getUniqueId());
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { ignore.remove(entity.getUniqueId()); }}, 5L);
 	}
 	public byte blueGelCube(final FrozenSand entity, Location loc, Region region, byte dir)
 	{	

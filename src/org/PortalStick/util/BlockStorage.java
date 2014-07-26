@@ -19,6 +19,10 @@ public class BlockStorage {
         return id;
     }
     
+    public byte getData() {
+        return data;
+    }
+    
     public void set() {
         Location loc = location.getHandle();
         if(loc != null) {

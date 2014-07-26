@@ -29,10 +29,10 @@ public class SetBlockLater extends BukkitRunnable {
 		this.blk.setType(mt);
 		this.blk.setData(data);
 		
-		if (this.plugin.eventListener.paneltasks.containsKey(this)) {
-			this.plugin.eventListener.paneltasks.remove(this);
+//		if (this.plugin.eventListener.paneltasks.containsKey(this)) {
+//			this.plugin.eventListener.paneltasks.remove(this);
 			
-		}
+//		}
 
 	}
 }

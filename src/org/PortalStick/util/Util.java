@@ -254,22 +254,21 @@ public class Util {
         }
         return target;
     }
-    public Entry<Block, FrozenSand> getTargetFlying(final Player player, PortalStick plugin) {
+    public Entry<V10Location, FrozenSand> getTargetFlying(final Player player, PortalStick plugin) {
 
         BlockIterator iterator = new BlockIterator(player.getWorld(), player
                 .getLocation().toVector(), player.getEyeLocation()
                 .getDirection(), 0, 2);
-        Block item;
+        Block item, check;
         while (iterator.hasNext()) {
             item = iterator.next();
-            for (Entry<Block, FrozenSand> fb : plugin.eventListener.FlyingBlocks.entrySet()) {
+            for (Entry<V10Location, FrozenSand> fb : plugin.eventListener.flyingBlocks.entrySet()) {
                 int acc = 2;
+                check = fb.getValue().getLocation().getBlock();
                 for (int x = -acc; x < acc; x++)
                     for (int z = -acc; z < acc; z++)
                         for (int y = -acc; y < acc; y++) {
-                            
-                            if (fb.getValue().getLocation().getBlock()
-                                    .getRelative(x, y, z).equals(item)) {
+                            if (check.getRelative(x, y, z).equals(item)) {
                                 return fb;
                             }
                         }
@@ -343,6 +342,10 @@ public class Util {
             searchAmount += item.getAmount();
         }
         return searchAmount - amount;
+    }
+    
+    public void changeBtn(V10Location middle, boolean on) {
+        changeBtn(middle.getHandle().getBlock(), on);
     }
     
     public void changeBtn(Block middle, boolean on) {
@@ -448,44 +451,45 @@ public class Util {
     }
     
     public void clear(Block hatchMiddle, boolean powered, PortalStick plugin, int id, int data, Block sign) {
-        if (plugin.eventListener.cubes.containsKey(hatchMiddle)) {
-            if (EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)) != null)
-                EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(hatchMiddle)).remove();
-            plugin.eventListener.cubes.remove(hatchMiddle);
-        } else if (plugin.eventListener.FlyingBlocks.containsKey(hatchMiddle)) {
-            if (plugin.eventListener.buttons.containsValue(plugin.eventListener.FlyingBlocks.get(hatchMiddle))) {
-                Iterator<Entry<Block, FrozenSand>> it = plugin.eventListener.buttons.entrySet().iterator();
-                Entry<Block, FrozenSand> e;
-                Block middle;
+        V10Location loc = new V10Location(hatchMiddle);
+        if (plugin.eventListener.cubes.containsKey(loc)) {
+            Entity entity = EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(loc));
+            if (entity != null)
+                entity.remove();
+            plugin.eventListener.cubes.remove(loc);
+        } else if (plugin.eventListener.flyingBlocks.containsKey(loc)) {
+            if (plugin.eventListener.buttons.containsValue(plugin.eventListener.flyingBlocks.get(loc))) {
+                Iterator<Entry<V10Location, FrozenSand>> it = plugin.eventListener.buttons.entrySet().iterator();
+                Entry<V10Location, FrozenSand> e;
+                V10Location middle;
                 while (it.hasNext()) {
                     e = it.next();
-                    if (e.getValue() == plugin.eventListener.FlyingBlocks.get(hatchMiddle)) {
+                    if (e.getValue() == plugin.eventListener.flyingBlocks.get(loc)) {
                         middle = e.getKey();
                         changeBtn(middle, !plugin.eventListener.buttons.containsKey(middle));
                         it.remove();
                     }
                 }
             }
-            plugin.eventListener.FlyingBlocks.get(hatchMiddle).clearAllPlayerViews();
-            plugin.eventListener.FlyingBlocks.remove(hatchMiddle);
+            plugin.eventListener.flyingBlocks.get(loc).clearAllPlayerViews();
+            plugin.eventListener.flyingBlocks.remove(loc);
             
 
-        } else if (plugin.eventListener.cubesPlayer.containsKey(hatchMiddle)) {
+        } else if (plugin.eventListener.cubesPlayer.containsKey(loc)) {
 
             // remove cubesPlayerItem.get(hatchMiddle)
             // from cubesPlayer.get(hatchMiddle)
-            remove(plugin.eventListener.cubesPlayer.get(hatchMiddle)
-                    .getInventory(),
-                    plugin.eventListener.cubesPlayerItem.get(hatchMiddle)
+            Player p = Bukkit.getPlayer(plugin.eventListener.cubesPlayer.get(loc));
+            remove(p.getInventory(),
+                    plugin.eventListener.cubesPlayerItem.get(loc)
                     .getType(), 1, plugin.eventListener.cubesPlayerItem
-                    .get(hatchMiddle).getData()
+                    .get(loc).getData()
                     .getData());
-            doInventoryUpdate(
-                    plugin.eventListener.cubesPlayer.get(hatchMiddle), plugin);
+            doInventoryUpdate(p, plugin);
 
-            plugin.eventListener.cubesPlayer.remove(hatchMiddle);
+            plugin.eventListener.cubesPlayer.remove(loc);
 
-            plugin.eventListener.cubesPlayerItem.remove(hatchMiddle);
+            plugin.eventListener.cubesPlayerItem.remove(loc);
 
         }
         BlockFace[] blockfaces = new BlockFace[] {
@@ -494,9 +498,9 @@ public class Util {
                 BlockFace.SOUTH_WEST, BlockFace.WEST,
                 BlockFace.NORTH_WEST, BlockFace.NORTH,
                 BlockFace.SELF};
-        Block blk = hatchMiddle.getRelative(BlockFace.DOWN,3);
-        for (Entry<BukkitTask, Block> t : plugin.eventListener.hatches.entrySet()) {
-            if (t.getValue() == blk) {
+        V10Location loc2 = new V10Location(hatchMiddle.getRelative(BlockFace.DOWN,3));
+        for (Entry<BukkitTask, V10Location> t : plugin.eventListener.hatches.entrySet()) {
+            if (t.getValue().equals(loc2)) {
                 t.getKey().cancel();
                 plugin.eventListener.hatches.remove(t.getKey());
                 }
@@ -531,8 +535,8 @@ public class Util {
                             hatchMiddle.getLocation(), id,
                             (byte) data);
             f.setDropItem(false);
-            plugin.eventListener.cubes.put(hatchMiddle, f.getUniqueId());
-            plugin.eventListener.cubesign.put(hatchMiddle, sign);
+            plugin.eventListener.cubes.put(loc, f.getUniqueId());
+            plugin.eventListener.cubesign.put(loc, new V10Location(sign));
         }
     }
     
