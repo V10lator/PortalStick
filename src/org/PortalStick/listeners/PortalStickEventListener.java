@@ -209,7 +209,7 @@ public class PortalStickEventListener implements Listener {
 										.getKey()
 										.getWorld()
 										.spawnFallingBlock(
-												fb.getLocation(),
+												entry.getKey().getLocation(),
 												fb.getMaterial()
 												.getId(),
 												(byte) fb
