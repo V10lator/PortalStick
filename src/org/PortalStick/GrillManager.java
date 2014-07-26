@@ -8,6 +8,7 @@ import java.util.List;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.PortalStick.util.Config.Sound;
+import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -42,6 +43,9 @@ public class GrillManager {
 	public void loadGrill(String blockloc) {
 		String[] locarr = blockloc.split(",");
 		String world = locarr[0];
+		if (Bukkit.getWorld(world)==null)  {
+			return;
+		}
 		if (!placeRecursiveEmancipationGrill(new V10Location(world, (int)Double.parseDouble(locarr[1]), (int)Double.parseDouble(locarr[2]), (int)Double.parseDouble(locarr[3]))))
 			plugin.config.deleteGrill(blockloc);
 	}

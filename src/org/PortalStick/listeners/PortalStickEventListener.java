@@ -193,55 +193,57 @@ public class PortalStickEventListener implements Listener {
 
 	@EventHandler
 	public void onEntityDeath(EntityRemoveEvent event) {
-		if (event.getEntity().getType() == EntityType.FALLING_BLOCK) {
-			FallingBlock fb = ((FallingBlock) event.getEntity());
-			final UUID uuid = fb.getUniqueId();
-			final String worldName = fb.getWorld().getName();
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,
-					new Runnable() {
-				@Override
-				public void run() {
-					if (cubes.containsValue(uuid)) {
-					    World world = plugin.getServer().getWorld(worldName);
-					    if(world == null) {
-					        if(plugin.config.debug)
-					            plugin.getLogger().warning("World "+worldName+" not found!");
-					        return;
-					    }
-					    Entity entity = EntityUtil.getEntity(world, uuid);
-					    if(entity == null) {
-					        if(plugin.config.debug)
-                                plugin.getLogger().warning("Flying block not found!");
-                            return;
-					    }
-					    FallingBlock block = (FallingBlock)entity;
-					    //TODO: Again, why are we replacing the entity with a new entity of the exact same type?
-						for (Entry<V10Location, UUID> entry : cubes
-								.entrySet()) {
+		if (event.getEntity().getType().equals(EntityType.FALLING_BLOCK)) {
+		    FallingBlock fb = (FallingBlock) event.getEntity();
+		    if(blockMap.contains((FallingBlock) event.getEntity())) {
+		        blockMap.remove((FallingBlock) event.getEntity());
+		        return;
+		    }
+		    
+		    UUID uuid = fb.getUniqueId();
+		    
+			FrozenSand fblock = null;
+			for (Entry<V10Location, UUID> entry : cubes.entrySet()) {
+				if (uuid.equals(entry.getValue())) {
+					String id = String.valueOf(((FallingBlock) event.getEntity())
+							.getMaterial().getId())+":"+String.valueOf(((FallingBlock) event.getEntity())
+									.getBlockData());
+					fblock = new FrozenSandFactory(plugin).withLocation(event.getEntity().getLocation()).withText(id).build();
 
-							FallingBlock f = entry
-									.getKey()
-									.getHandle()
-									.getWorld()
-									.spawnFallingBlock(
-											block.getLocation(),
-											block.getMaterial()
-											.getId(),
-											(byte) block
-											.getBlockData());
-							f.setDropItem(false);
-							f.setVelocity(entity
-									.getVelocity());
-							entity.remove();
-							cubes.put(entry.getKey(), f.getUniqueId());
-						}
-					}
+					flyingBlocks.put(entry.getKey(), fblock);
+					event.getEntity().remove();
+					cubes.remove(entry.getKey());
+					break;
 				}
-			}, 1L);
+			}
+			if (fblock == null) return;
+			Block blockUnder = event.getEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
+			if (blockUnder.getType() == Material.WOOL
+					&& (blockUnder.getData() == (byte) 15
+					|| blockUnder.getData() == (byte) 14 || blockUnder
+					.getData() == (byte) 5)) {
 
+				Block middle = plugin.util.chkBtn(event.getEntity().getLocation());
+				if (middle != null) {
+				    V10Location loc = new V10Location(middle);
+				    if(!buttons.containsKey(loc)) {
+
+				        plugin.util.changeBtn(middle, true);
+				        buttons.put(loc, fblock);
+				    }
+				}
+			} else if (blockUnder.getType() == Material.WOOL
+					&& (blockUnder.getData() == (byte) 1)) {
+
+				fblock.setVelocity(event.getEntity().getVelocity());
+				return;
+			} 
+		}else {
+			checkPiston(event.getEntity().getLocation(), event.getEntity());
 		}
-
 	}
+
+	
 
 
 	@EventHandler
@@ -305,22 +307,23 @@ public class PortalStickEventListener implements Listener {
 		UUID uuid = p.getUniqueId();
 		if (!buttonsToPlayer.containsKey(uuid)) {
 			Block middle = plugin.util.chkBtn(to);
+			if (middle != null) {
 			V10Location loc = new V10Location(middle);
-			if (!(middle == null) && !buttonsToPlayer.containsValue(loc)
+			if (!buttonsToPlayer.containsValue(loc)
 					&& !buttons.containsKey(loc)) {
 				buttonsToPlayer.put(uuid, loc);
 				plugin.util.changeBtn(middle, true);
 				buttons.put(loc, null);
 			}
+			}
 		} else {
 			Block middle = plugin.util.chkBtn(to);
-			V10Location loc = new V10Location(middle);
 			if (middle == null) {
 
 			    V10Location loc2 = buttonsToPlayer.get(uuid);
 				Block middle2 = loc2.getHandle().getBlock();
 
-				plugin.util.changeBtn(middle2, !buttons.containsKey(middle2));
+				plugin.util.changeBtn(middle2,false);
 				buttonsToPlayer.remove(uuid);
 				buttons.remove(loc2);
 			}
@@ -393,7 +396,7 @@ public class PortalStickEventListener implements Listener {
 
 	@EventHandler
 	public void drop(PlayerDropItemEvent event) {
-		if (cubesPlayer.containsValue(event.getPlayer())) {
+		if (cubesPlayer.containsValue(event.getPlayer().getUniqueId())) {
 
 			for (Entry<V10Location, UUID> entry : cubesPlayer.entrySet()) {
 				if (event.getPlayer().getUniqueId().equals(entry.getValue())) {
@@ -460,7 +463,6 @@ public class PortalStickEventListener implements Listener {
 		if (event.getAction() != Action.LEFT_CLICK_BLOCK
 				|| cubesPlayer.containsValue(event.getPlayer()))
 			return;
-		boolean isCubeFallen = false;
 		V10Location loc = new V10Location(event.getClickedBlock());
 		Iterator<BlockStorage> iter = cubesFallen.iterator();
 		BlockStorage storage;
@@ -784,8 +786,8 @@ public class PortalStickEventListener implements Listener {
 			} else if (blk.getType() == Material.WALL_SIGN) {
 				Sign s = (Sign) blk.getState();
 				if (s.getLine(0).equals("cube")) {
-					Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) ((Sign)blk).getData())
-							.getAttachedFace());
+					Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) blk
+							.getState().getData()).getAttachedFace());
 					
 					try {
 						final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
@@ -810,7 +812,8 @@ public class PortalStickEventListener implements Listener {
 								Block blk = loc.getHandle().getBlock();
 								if (blk.isBlockPowered()
                                         || blk.isBlockIndirectlyPowered()) {
-								    Block next = blk.getRelative(((org.bukkit.material.Sign) ((Sign)blk).getData()).getFacing());
+								    Block next = blk.getRelative(((org.bukkit.material.Sign) blk
+											.getState().getData()).getFacing());
 									plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), plugin, id, data,
                                             blk);
 								} 
@@ -837,17 +840,13 @@ public class PortalStickEventListener implements Listener {
 		    
 		    UUID uuid = fb.getUniqueId();
 		    if(cubes.containsValue(uuid)) {
-		        Block up = event.getBlock().getRelative(BlockFace.UP);
+		        Block up = event.getBlock();
 		        if (up.getType().name().contains("LAVA")) {
 		            Location loc;
-		            Block tmp;
 		            for (Entry<V10Location, UUID> entry: cubes.entrySet()) {
-		                if (uuid.equals(entry)) {
+		                if (uuid.equals(entry.getValue())) {
 		                    loc = entry.getKey().getHandle();
-		                    tmp = cubesign.get(loc).getHandle().getBlock();
-		                    if (tmp.isBlockPowered()
-									|| tmp.isBlockIndirectlyPowered()) {
-								FallingBlock f = loc
+		                    FallingBlock f = loc
 										.getWorld()
 										.spawnFallingBlock(
 												loc,
@@ -859,7 +858,7 @@ public class PortalStickEventListener implements Listener {
 								cubes.put(entry.getKey(), f.getUniqueId());
 								event.setCancelled(true);
 								return;
-		                    }
+		                    
 						}
 					}
 		        }
