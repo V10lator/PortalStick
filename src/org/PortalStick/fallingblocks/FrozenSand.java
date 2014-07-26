@@ -2,7 +2,6 @@ package org.PortalStick.fallingblocks;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import org.PortalStick.MoveEvent;
 import org.PortalStick.PortalStick;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -279,7 +278,7 @@ public class FrozenSand {
 				
 				@Override
 				public void run() {
-					MoveEvent event = new MoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
+					FlyingBlockMoveEvent event = new FlyingBlockMoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
 					Bukkit.getServer().getPluginManager().callEvent(event);
 					if (!event.isCancelled()) {
 						move(getLocation().add(motion));

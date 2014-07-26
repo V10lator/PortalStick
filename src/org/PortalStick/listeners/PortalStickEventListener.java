@@ -1,4 +1,4 @@
-package org.PortalStick;
+package org.PortalStick.listeners;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -7,8 +7,12 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.PortalStick.CheckWireTask;
+import org.PortalStick.PortalStick;
+import org.PortalStick.Region;
 import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.fallingblocks.FrozenSandFactory;
+import org.PortalStick.fallingblocks.FlyingBlockMoveEvent;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
@@ -50,7 +54,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
-public class EventListener implements Listener {
+public class PortalStickEventListener implements Listener {
 
 	public final ArrayList<Block> wire = new ArrayList<Block>();
 	public final HashMap<Player, Block> buttonsToPlayer = new HashMap<Player, Block>();
@@ -70,11 +74,11 @@ public class EventListener implements Listener {
 			BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
 			BlockFace.EAST, BlockFace.SOUTH, BlockFace.SOUTH_WEST,
 			BlockFace.SOUTH_EAST };
-	public EventListener(PortalStick portalStick) {
+	public PortalStickEventListener(PortalStick portalStick) {
 		plugin = portalStick;
 	}
 	@EventHandler 
-	public void flyingBlockMoveEvent(final MoveEvent event) {
+	public void flyingBlockMoveEvent(final FlyingBlockMoveEvent event) {
 		if (!FlyingBlocks.containsValue(event.getEntity())) return;
 		Block under = event.getTo().getBlock().getRelative(BlockFace.DOWN);
 		BlockFace face = FaceUtil.getDirection(event.getVelocity());
@@ -926,7 +930,7 @@ public class EventListener implements Listener {
 		if (event.getBlock().getWorld().getName().toLowerCase()
 				.contains("portal")||event.getBlock().getWorld().getName().toLowerCase()
 				.contains("lobby")) {
-			for (final Block blk : plugin.util.getNearbyBlocks(event.getBlock()
+			for (final Block blk : plugin.blockUtil.getNearbyBlocks(event.getBlock()
 					.getLocation(), 1)) {
 
 				if (blk.getType() == Material.STAINED_CLAY

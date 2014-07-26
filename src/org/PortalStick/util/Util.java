@@ -536,25 +536,7 @@ public class Util {
             }
         return error ? null : middle;
     }
-    public List<Block> getNearbyBlocks(Location location, int Radius) {
-        List<Block> Blocks = new ArrayList<Block>();
-
-        for (int X = location.getBlockX() - Radius; X <= location.getBlockX()
-                + Radius; X++) {
-            for (int Y = location.getBlockY() - Radius; Y <= location
-                    .getBlockY() + Radius; Y++) {
-                for (int Z = location.getBlockZ() - Radius; Z <= location
-                        .getBlockZ() + Radius; Z++) {
-                    Block block = location.getWorld().getBlockAt(X, Y, Z);
-                    if (!block.isEmpty()) {
-                        Blocks.add(block);
-                    }
-                }
-            }
-        }
-
-        return Blocks;
-    }
+    
 
     
     public Block chkBtnInner (Location l) {

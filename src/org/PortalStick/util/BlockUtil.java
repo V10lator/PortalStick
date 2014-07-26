@@ -1,7 +1,10 @@
 package org.PortalStick.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -38,7 +41,25 @@ public class BlockUtil {
 			return block.getTypeId() + ":" + block.getData();
 		return Integer.toString(block.getTypeId());
 	}
-	
+	public List<Block> getNearbyBlocks(Location location, int Radius) {
+        List<Block> Blocks = new ArrayList<Block>();
+
+        for (int X = location.getBlockX() - Radius; X <= location.getBlockX()
+                + Radius; X++) {
+            for (int Y = location.getBlockY() - Radius; Y <= location
+                    .getBlockY() + Radius; Y++) {
+                for (int Z = location.getBlockZ() - Radius; Z <= location
+                        .getBlockZ() + Radius; Z++) {
+                    Block block = location.getWorld().getBlockAt(X, Y, Z);
+                    if (!block.isEmpty()) {
+                        Blocks.add(block);
+                    }
+                }
+            }
+        }
+
+        return Blocks;
+    }
 	public BlockFace getFaceOfMaterial(Block block, BlockFace[] faces, String material, HashMap<BlockFace, Block> faceMap) {
 		Block block2;
 		for (BlockFace face : faces)

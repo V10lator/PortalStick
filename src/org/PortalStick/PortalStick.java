@@ -21,6 +21,7 @@ import org.PortalStick.commands.ReloadCommand;
 import org.PortalStick.commands.SetRegionCommand;
 import org.PortalStick.fallingblocks.FlyingBlocksAPI;
 import org.PortalStick.fallingblocks.TagIdGenerator;
+import org.PortalStick.listeners.PortalStickEventListener;
 import org.PortalStick.listeners.PortalStickBlockListener;
 import org.PortalStick.listeners.PortalStickEntityListener;
 import org.PortalStick.listeners.PortalStickPlayerListener;
@@ -56,7 +57,7 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
-	public EventListener eventListener = new EventListener(this);
+	public PortalStickEventListener eventListener = new PortalStickEventListener(this);
 	public WorldGuardPlugin worldGuard = null;
 	
 	public final Util util = new Util(this);
