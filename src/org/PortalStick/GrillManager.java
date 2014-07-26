@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.PortalStick.util.Config.Sound;
@@ -199,6 +200,8 @@ public class GrillManager {
 			if(item.getTypeId() == (Integer)is)
 			  return;
 		  }
+		  if(entity instanceof FallingBlock && plugin.eventListener.cubes.containsValue(entity.getUniqueId()))
+		      plugin.eventListener.respawnCubes.add(entity.getUniqueId());
 		  entity.remove();
 		  playGrillAnimation(entity.getLocation());
 		}

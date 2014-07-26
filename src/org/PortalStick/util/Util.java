@@ -450,7 +450,7 @@ public class Util {
         }, 1L);
     }
     
-    public void clear(Block hatchMiddle, boolean powered, PortalStick plugin, int id, int data, Block sign) {
+    public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign) {
         V10Location loc = new V10Location(hatchMiddle);
         if (plugin.eventListener.cubes.containsKey(loc)) {
             Entity entity = EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(loc));

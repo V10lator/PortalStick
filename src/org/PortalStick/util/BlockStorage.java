@@ -11,7 +11,7 @@ public class BlockStorage {
     
     public BlockStorage(Block block) {
         this.id = block.getTypeId(); // TODO: Deprecated...
-        this.location = new V10Location(block.getLocation());
+        this.location = new V10Location(block);
         this.data = block.getData();
     }
     

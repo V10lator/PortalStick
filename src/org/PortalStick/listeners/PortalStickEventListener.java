@@ -3,6 +3,7 @@ package org.PortalStick.listeners;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -66,6 +67,7 @@ public class PortalStickEventListener implements Listener {
 	public final HashMap<V10Location, UUID> cubesPlayer = new HashMap<V10Location, UUID>();
 	private final ArrayList<BlockStorage> cubesFallen = new ArrayList<BlockStorage>();
 	public final HashMap<V10Location, ItemStack> cubesPlayerItem = new HashMap<V10Location, ItemStack>();
+	public final HashSet<UUID> respawnCubes = new HashSet<UUID>();
 	private final PortalStick plugin;
 	private final ArrayList<FallingBlock> blockMap = new ArrayList<FallingBlock>();
 	public final HashMap<V10Location, V10Location> cubesign = new HashMap<V10Location, V10Location>();
@@ -205,12 +207,17 @@ public class PortalStickEventListener implements Listener {
 			FrozenSand fblock = null;
 			for (Entry<V10Location, UUID> entry : cubes.entrySet()) {
 				if (uuid.equals(entry.getValue())) {
-					String id = String.valueOf(((FallingBlock) event.getEntity())
-							.getMaterial().getId())+":"+String.valueOf(((FallingBlock) event.getEntity())
-									.getBlockData());
-					fblock = new FrozenSandFactory(plugin).withLocation(event.getEntity().getLocation()).withText(id).build();
+				    if(!respawnCubes.contains(event.getEntity().getUniqueId())) {
+				        String id = String.valueOf(((FallingBlock) event.getEntity())
+				                .getMaterial().getId())+":"+String.valueOf(((FallingBlock) event.getEntity())
+				                        .getBlockData());
+				        fblock = new FrozenSandFactory(plugin).withLocation(event.getEntity().getLocation()).withText(id).build();
 
-					flyingBlocks.put(entry.getKey(), fblock);
+				        flyingBlocks.put(entry.getKey(), fblock);
+				    } else {
+				        respawnCubes.remove(event.getEntity().getUniqueId());
+				        plugin.util.clear(entry.getKey().getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), cubesign.get(entry.getKey()).getHandle().getBlock());
+				    }
 					event.getEntity().remove();
 					cubes.remove(entry.getKey());
 					break;
@@ -814,7 +821,7 @@ public class PortalStickEventListener implements Listener {
                                         || blk.isBlockIndirectlyPowered()) {
 								    Block next = blk.getRelative(((org.bukkit.material.Sign) blk
 											.getState().getData()).getFacing());
-									plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), plugin, id, data,
+									plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), id, data,
                                             blk);
 								} 
 							}}, 1l);
