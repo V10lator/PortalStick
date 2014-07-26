@@ -204,8 +204,7 @@ public class PortalStickEventListener implements Listener {
 						for (Entry<Block, UUID> entry : cubes
 								.entrySet()) {
 
-							if (((FallingBlock) event.getEntity())
-									.equals(EntityUtil.getEntity(event.getEntity().getWorld(), entry.getValue()))) {
+							if (fb.getUniqueId().compareTo(entry.getValue())==0) {
 								FallingBlock f = entry
 										.getKey()
 										.getWorld()
@@ -1023,18 +1022,13 @@ public class PortalStickEventListener implements Listener {
 		} else if ((event.getEntity().getType().equals(EntityType.FALLING_BLOCK))
 				&& cubes.containsValue(event.getEntity().getUniqueId())) {
 
-			if (event.getBlock().getRelative(BlockFace.UP).getType() == Material.LAVA
-					|| event.getBlock().getRelative(BlockFace.UP).getType() == Material.STATIONARY_LAVA) {
-				if (cubes.containsValue(event.getEntity().getUniqueId())) {
+			if (event.getBlock().getType().name().contains("LAVA")) {
 					Iterator<Entry<Block, UUID>> it = cubes.entrySet().iterator();
 					while (it.hasNext()) {
 						Entry<Block, UUID> entry = it.next();
 						if (event.getEntity().getUniqueId().compareTo(entry
 								.getValue())==0) {
 
-							if (cubesign.get(entry.getKey()).isBlockPowered()
-									|| cubesign.get(entry.getKey())
-									.isBlockIndirectlyPowered()) {
 								FallingBlock f = entry
 										.getKey()
 										.getWorld()
@@ -1049,11 +1043,11 @@ public class PortalStickEventListener implements Listener {
 								cubes.put(entry.getKey(), f.getUniqueId());
 								event.setCancelled(true);
 								return;
-							}
+							
 						}
 					}
 
-				}
+				
 			}
 			FrozenSand fblock = null;
 			for (Entry<Block, UUID> entry : cubes.entrySet()) {
