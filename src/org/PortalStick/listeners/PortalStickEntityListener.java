@@ -173,7 +173,7 @@ public class PortalStickEntityListener implements Listener {
 	      if(!f.exists())
 	          f.createNewFile();
 	      BufferedWriter writer = new BufferedWriter(new FileWriter(f));
-	      writer.write(entity.getType().getName()+" at "+loc.getX()+"/"+loc.getY()+"/"+loc.getZ());
+	      writer.write(entity.getType().getName()+" at "+loc.getX()+"/"+loc.getY()+"/"+loc.getZ()+"\r\n");
 	      writer.flush();
 	      writer.close();
 	  } catch(Exception e) {}
