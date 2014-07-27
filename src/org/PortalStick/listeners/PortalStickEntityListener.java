@@ -1,5 +1,8 @@
 package org.PortalStick.listeners;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -164,8 +167,18 @@ public class PortalStickEntityListener implements Listener {
 	  if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 		return;
 //	  System.out.print("Spawned: "+entity.getType());
-	  plugin.userManager.createUser(entity);
 	  Location loc = entity.getLocation();
+	  try {
+	      File f = new File(plugin.getDataFolder(), "debug.txt");
+	      if(!f.exists())
+	          f.createNewFile();
+	      BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+	      writer.write(entity.getType().getName()+" at "+loc.getX()+"/"+loc.getY()+"/"+loc.getZ());
+	      writer.flush();
+	      writer.close();
+	  } catch(Exception e) {}
+	  
+	  plugin.userManager.createUser(entity);
       Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
 	  if(entity instanceof InventoryHolder && !region.name.equals("global") && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
 	      plugin.userManager.getUser(entity).saveInventory((InventoryHolder)entity);
