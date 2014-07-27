@@ -13,6 +13,11 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CheckWireTask extends BukkitRunnable {
@@ -121,6 +126,20 @@ public class CheckWireTask extends BukkitRunnable {
 				lastblock.setType(Material.EMERALD_BLOCK);
 				
 
+			} else {
+				for (Entity e : lastblock.getWorld().getEntities()) {
+					if (e instanceof ItemFrame && plugin.util.compareLocation(e.getLocation().getBlock().getLocation(), lastblock.getLocation())) {
+						ItemFrame ifr = ((ItemFrame)e);
+						ItemStack i = ifr.getItem();
+		                if (i.getType() == Material.MAP) {
+		                	if (i.getData().getData() == (byte)8 || i.getData().getData() == (byte)9) {
+		                		i.setDurability((short) (on?8:9));
+		                		ifr.setItem(i);
+		                		
+		                	}
+		                }
+					}
+				}
 			}
 		}
 
