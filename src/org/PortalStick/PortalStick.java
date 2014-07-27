@@ -73,6 +73,7 @@ public class PortalStick extends JavaPlugin {
 
 	public void onDisable() {
 		//config.unLoad() handles cleanup, so let's call it
+		eventListener.cleanUpWire();
 		config.unLoad();
 		getServer().getScheduler().cancelTasks(this);
 	}

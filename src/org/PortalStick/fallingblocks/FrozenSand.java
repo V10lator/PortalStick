@@ -1,12 +1,19 @@
 package org.PortalStick.fallingblocks;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
@@ -34,7 +41,7 @@ public class FrozenSand {
 	ProtocolManager pm;
 	private Vector motion;
 	private BukkitTask velocitytask = null;
-	protected FrozenSand(PortalStick plugin, Integer id2, String worldName, double x, double y, double z, Player attachPlayer, Player ridePlayer, String id) {
+	protected FrozenSand(final PortalStick plugin, Integer id2, String worldName, double x, double y, double z, Player attachPlayer, Player ridePlayer, String id) {
 	    this.plugin = plugin;
 		entityId = plugin.tagIdGenerator.nextId(1);
 		this.x = x;
@@ -46,6 +53,58 @@ public class FrozenSand {
 		this.ridePlayer = ridePlayer;
 		this.pm = ProtocolLibrary.getProtocolManager();
 		this.storageId = id2;
+		final FrozenSand sand = this;
+		velocitytask = Bukkit.getScheduler().runTaskTimer(Bukkit.getPluginManager().getPlugin("PortalStick"), new Runnable(){
+
+			@Override
+			public void run() {
+				if (!plugin.util.isSolid(getLocation().getBlock().getRelative(BlockFace.DOWN).getType())) {
+					if (!plugin.funnelBridgeManager.cubeinFunnel.containsKey(sand)) {
+						FallingBlock f = getLocation()
+								.getWorld()
+								.spawnFallingBlock(
+										getLocation(),
+										getMaterial(),
+										getData());
+						final UUID uuid = f.getUniqueId();
+						Iterator<Entry<V10Location, FrozenSand>> it = plugin.eventListener.flyingBlocks.entrySet().iterator();
+						while (it.hasNext()) {
+							Entry<V10Location, FrozenSand> e = it.next();
+							if (e.getValue() == sand) {
+								plugin.eventListener.cubes.put(e.getKey(), uuid);
+								it.remove();
+							}
+						}
+						
+						
+						f.setDropItem(false);
+						clearAllPlayerViews();
+					}
+				}
+				if (motion != null) {
+					if (!plugin.funnelBridgeManager.cubeinFunnel.containsKey(sand)) {
+					FlyingBlockMoveEvent event = new FlyingBlockMoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
+					Bukkit.getServer().getPluginManager().callEvent(event);
+					if (!event.isCancelled()) {
+						move(getLocation().add(motion));
+						motion = event.getVelocity();
+					} else {
+						motion = null;
+					}
+					} else {
+						if (!plugin.util.isSolid(getLocation().clone().add(motion).getBlock().getType())
+								&&!plugin.util.isSolid(getLocation().clone().add(motion).add(-0.5,0,0).getBlock().getType())
+								&&!plugin.util.isSolid(getLocation().clone().add(motion).add(0,0,0.5).getBlock().getType())) {
+							move(getLocation().add(motion));
+						}
+					}
+				}
+				
+
+
+			}
+		}
+		,2l,1l);
 	}
 	protected void generate(Player observer, String message, double diffY, double x, double y, double z) {
 
@@ -271,27 +330,8 @@ public class FrozenSand {
 		 public int getTouchSlimeIndex() {
 			 return entityId+2;
 		 }
-		public void setVelocity(final Vector velocity) {
-			final FrozenSand sand = this;
+		public void setVelocity(final Vector velocity) {			
 			motion = velocity;
-			velocitytask = Bukkit.getScheduler().runTaskTimer(Bukkit.getPluginManager().getPlugin("PortalStick"), new Runnable(){
-				
-				@Override
-				public void run() {
-					FlyingBlockMoveEvent event = new FlyingBlockMoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
-					Bukkit.getServer().getPluginManager().callEvent(event);
-					if (!event.isCancelled()) {
-						move(getLocation().add(motion));
-						motion = event.getVelocity();
-					} else {
-						velocitytask.cancel();
-					}
-						
-					
-				}},1l,1l);
-			
-				
-			
 		}
 		
 	    private void move(Location add) {

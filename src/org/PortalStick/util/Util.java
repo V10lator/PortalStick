@@ -622,4 +622,9 @@ public class Util {
         }
         return error ? null : middle;
     }
+
+	public boolean isSolid(Material type) {
+		return (type.isSolid() && !type.name().contains("SIGN"));
+	}
+
 }
