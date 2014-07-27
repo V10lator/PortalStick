@@ -1,7 +1,10 @@
 package org.PortalStick;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
+import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -154,7 +157,13 @@ public class Funnel extends Bridge {
 			plugin.funnelBridgeManager.involvedPortals.remove(p);
 		for (Entity e : plugin.funnelBridgeManager.glassBlocks.keySet())
 			plugin.funnelBridgeManager.EntityExitsFunnel(e);
-		
+		Iterator<Entry<FrozenSand, Funnel>> it = plugin.funnelBridgeManager.cubeinFunnel.entrySet().iterator();
+		while (it.hasNext()) {
+			Entry<FrozenSand, Funnel> e = it.next();
+			if (e.getValue() == this) {
+				it.remove();
+			}
+		}
 		involvedPortals.clear();
 	}
 }

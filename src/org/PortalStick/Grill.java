@@ -15,16 +15,14 @@ public class Grill {
 	
 	final HashSet<V10Location> border;
 	private final HashSet<V10Location> inside;
-	public final V10Location redstoneExit;
 	public ArrayList<FrozenSand> blocks = new ArrayList<FrozenSand>();
 	final V10Location firstBlock;
 	public boolean disabled;
 	
-	public Grill(PortalStick plugin, HashSet<V10Location> Border, V10Location redstoneExit, HashSet<V10Location> Inside, V10Location FirstBlock)
+	public Grill(PortalStick plugin, HashSet<V10Location> Border, HashSet<V10Location> Inside, V10Location FirstBlock)
 	{
 		this.plugin = plugin;
 		border = Border;
-		this.redstoneExit = redstoneExit;
 		inside = Inside;
 		firstBlock = FirstBlock;
 		disabled = false;

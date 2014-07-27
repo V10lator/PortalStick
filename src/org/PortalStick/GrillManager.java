@@ -35,7 +35,6 @@ public class GrillManager {
 	private final PortalStick plugin; 
 	
 	private HashSet<V10Location> border;
-	private V10Location redstoneExit;
 	private HashSet<V10Location> inside;
 	private boolean complete;
 	private int max = 0;
@@ -91,7 +90,6 @@ public class GrillManager {
     	//Attempt to get complete border
     	border = new HashSet<V10Location>();
     	inside = new HashSet<V10Location>();
-    	redstoneExit = null;
     	startRecurse(initial, borderID, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.DOWN, BlockFace.UP);
     	if (!complete)
     		startRecurse(initial, borderID, BlockFace.UP, BlockFace.WEST, BlockFace.EAST, BlockFace.DOWN, BlockFace.SOUTH, BlockFace.NORTH);
@@ -100,15 +98,10 @@ public class GrillManager {
     	if (!complete)
     		return false;
     	//Create grill
-    	Grill grill = new Grill(plugin, border, redstoneExit, inside, initial);
+    	Grill grill = new Grill(plugin, border, inside, initial);
     	border = inside = null;
     	grills.add(grill);
-    	redstoneExit = null;
     	grill.create();
-    	if(grill.redstoneExit != null) {
-            Block block = grill.redstoneExit.getHandle().getBlock();
-            block.setTypeIdAndData(Material.REDSTONE_TORCH_OFF.getId(), block.getData(), true);
-        }
     	return true;
     }
     
@@ -189,14 +182,12 @@ public class GrillManager {
     		recurse(initial, id, new V10Location(b.getRelative(two)), one, two, three, four);
     		recurse(initial, id, new V10Location(b.getRelative(three)), one, two, three, four);
     		recurse(initial, id, new V10Location(b.getRelative(four)), one, two, three, four);
-    	} else if(redstoneExit == null &&
-    	        vb.getHandle().getBlock().getType() == Material.REDSTONE_TORCH_ON) {
-    	    redstoneExit = vb;
     	}
     }
 
 	public void emancipate(Region region, Entity entity)
 	{
+		
 	  User user = plugin.userManager.getUser(entity);
 	  boolean clear = region.getBoolean(RegionSetting.GRILLS_REMOVE_ITEMS) && !user.usingTool;
 	  if(region.getBoolean(RegionSetting.GRILLS_CLEAR_ITEM_DROPS))

@@ -33,17 +33,25 @@ public class CheckWireTask extends BukkitRunnable {
 		// What you want to schedule goes here
 		Block lastblock = blk;
 
-		byte data, data1, data2, data3, data4;
+		byte data, data1, data2, data3, data4, data5, data6, data7, data8;
 		if(on) {
 		    data1 = DyeColor.PINK.getData();
 		    data2 = DyeColor.LIME.getData();
 		    data3 = DyeColor.RED.getData();
 		    data4 = DyeColor.GREEN.getData();
+		    data5 = DyeColor.MAGENTA.getData();
+		    data6 = DyeColor.YELLOW.getData();
+		    data7 = DyeColor.PURPLE.getData();
+		    data8= DyeColor.ORANGE.getData();
 		} else {
 		    data1 = DyeColor.LIME.getData();
 		    data2 = DyeColor.PINK.getData();
 		    data3 = DyeColor.GREEN.getData();
 		    data4 = DyeColor.RED.getData();
+		    data5 = DyeColor.YELLOW.getData();
+		    data6 = DyeColor.MAGENTA.getData();
+		    data7 = DyeColor.ORANGE.getData();
+		    data8 = DyeColor.PURPLE.getData();
 		}
 		
 		Material mat;
@@ -72,6 +80,18 @@ public class CheckWireTask extends BukkitRunnable {
 							.runTaskLater(plugin, 0);
 
 					
+				} else if (lastblock.getData() == data5) {
+					lastblock.setData(data6);
+					new CheckWireTask(plugin, lastblock, blk, on)
+							.runTaskLater(plugin, 0);
+
+					
+				}else if (lastblock.getData() == data7) {
+					lastblock.setData(data8);
+					new CheckWireTask(plugin, lastblock, blk, on)
+							.runTaskLater(plugin, 0);
+
+					
 				}
 
 			} else if (mat == Material.WOOL) {
@@ -82,6 +102,15 @@ public class CheckWireTask extends BukkitRunnable {
 	                .runTaskLater(plugin, 0);
 			    } else if(data == (byte)13 && !on) {
 			        lastblock.setData((byte)4);
+	                new CheckWireTask(plugin, lastblock, blk, on)
+	                .runTaskLater(plugin, 0);
+			    }
+			    if(data == (byte)2 && on) {
+			        lastblock.setData((byte)9);
+	                new CheckWireTask(plugin, lastblock, blk, on)
+	                .runTaskLater(plugin, 0);
+			    } else if(data == (byte)9 && !on) {
+			        lastblock.setData((byte)2);
 	                new CheckWireTask(plugin, lastblock, blk, on)
 	                .runTaskLater(plugin, 0);
 			    }
