@@ -32,7 +32,7 @@ public abstract class BaseCommand {
 		usedCommand = cmd;
 		
 		int nl = preArgs.length - 1;
-		if (argLength != nl) {
+		if (!(argLength == -1)&&argLength != nl) {
 			sendUsage();
 			return true;
 		}

@@ -28,6 +28,8 @@ import org.bukkit.util.Vector;
 
 
 
+
+
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 
 public class EntityManager implements Runnable {
@@ -346,19 +348,18 @@ public class EntityManager implements Runnable {
 			if (grill != null && !grill.disabled)
 			{
 				plugin.grillManager.emancipate(regionTo, entity);
-				if(grill.redstoneExit != null) {
-				    final V10Location loc = grill.redstoneExit;
-				    Block block = loc.getHandle().getBlock();
-				    block.setTypeIdAndData(Material.REDSTONE_TORCH_ON.getId(), block.getData(), true);
-				    plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
-				        public void run() {
-				            Block block = loc.getHandle().getBlock();
-		                    block.setTypeIdAndData(Material.REDSTONE_TORCH_OFF.getId(), block.getData(), true);
-				        }
-				    }, 4L);
+				for (V10Location loc: grill.border) {
+					Block block = loc.getHandle().getBlock();
+					new CheckWireTask(plugin, block, block, true).runTaskLater(
+							plugin, 1L); 
+					new CheckWireTask(plugin, block, block, false).runTaskLater(
+							plugin, 4L); 
 				}
 				return null;
+				
 			}
+				
+			
 		}
 		
 		//Aerial faith plate

@@ -18,6 +18,7 @@ import org.PortalStick.commands.RegionInfoCommand;
 import org.PortalStick.commands.RegionListCommand;
 import org.PortalStick.commands.RegionToolCommand;
 import org.PortalStick.commands.ReloadCommand;
+import org.PortalStick.commands.SayCommand;
 import org.PortalStick.commands.SetRegionCommand;
 import org.PortalStick.fallingblocks.FlyingBlocksAPI;
 import org.PortalStick.fallingblocks.TagIdGenerator;
@@ -102,6 +103,7 @@ public class PortalStick extends JavaPlugin {
 		//Register commands
 		ArrayList<BaseCommand> tmpList = new ArrayList<BaseCommand>();
 		tmpList.add(new RegionToolCommand(this));
+		tmpList.add(new SayCommand(this));
 		tmpList.add(new SetRegionCommand(this));
 		tmpList.add(new ReloadCommand(this));
 		tmpList.add(new DeleteAllCommand(this));

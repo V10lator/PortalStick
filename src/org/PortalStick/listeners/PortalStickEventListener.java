@@ -739,31 +739,41 @@ public class PortalStickEventListener implements Listener {
 	@EventHandler
 	public void onBlockPhysics(BlockPhysicsEvent event) {
 
-	    V10Location v10loc = new V10Location(event.getBlock());
-	    for(Grill grill: plugin.grillManager.grills) {
-	        if(v10loc.equals(grill.redstoneExit)) {
-	            event.setCancelled(true);
-	            return;
-	        }
-	    }
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 			@Override
 			public void run() {
+				byte data, data1, data2, data3, data4, data5, data6, data7, data8;
 			    Iterator<V10Location> iter = wire.iterator();
 			    Block blk;
+			    data1 = DyeColor.LIME.getData();
+			    data2 = DyeColor.PINK.getData();
+			    data3 = DyeColor.GREEN.getData();
+			    data4 = DyeColor.RED.getData();
+			    data5 = DyeColor.YELLOW.getData();
+			    data6 = DyeColor.MAGENTA.getData();
+			    data7 = DyeColor.ORANGE.getData();
+			    data8 = DyeColor.PURPLE.getData();
 				while (iter.hasNext()) {
 				    blk = iter.next().getHandle().getBlock();
 					if (!(blk.isBlockPowered() || blk
 							.isBlockIndirectlyPowered())) {
-						if (blk.getData() == DyeColor.LIME
-								.getData()) {
-							blk.setData(DyeColor.PINK.getData());
+						if (blk.getData() == data1) {
+							blk.setData(data2);
 							new CheckWireTask(plugin, blk, blk, false).runTaskLater(
 									plugin, 1L);
 							return;
-						} else if (blk.getData() == DyeColor.GREEN
-								.getData()) {
-							blk.setData(DyeColor.RED.getData());
+						} else if (blk.getData() == data3) {
+							blk.setData(data4);
+							new CheckWireTask(plugin, blk, blk, false).runTaskLater(
+									plugin, 1L);
+							return;
+						}else if (blk.getData() == data5) {
+							blk.setData(data6);
+							new CheckWireTask(plugin, blk, blk, false).runTaskLater(
+									plugin, 1L);
+							return;
+						}else if (blk.getData() == data7) {
+							blk.setData(data8);
 							new CheckWireTask(plugin, blk, blk, false).runTaskLater(
 									plugin, 1L);
 							return;
@@ -774,6 +784,15 @@ public class PortalStickEventListener implements Listener {
 				}
 			}
 		}, 2L);
+		byte data1, data2, data3, data4, data5, data6, data7, data8;
+	    data1 = DyeColor.PINK.getData();
+	    data2 = DyeColor.LIME.getData();
+	    data3 = DyeColor.RED.getData();
+	    data4 = DyeColor.GREEN.getData();
+	    data5 = DyeColor.MAGENTA.getData();
+	    data6 = DyeColor.YELLOW.getData();
+	    data7 = DyeColor.PURPLE.getData();
+	    data8= DyeColor.ORANGE.getData();
 
 		for (Block blk : plugin.blockUtil.getNearbyBlocks(event.getBlock()
 				.getLocation(), 1)) {
@@ -782,17 +801,29 @@ public class PortalStickEventListener implements Listener {
 					&& (blk.isBlockPowered() || blk
 							.isBlockIndirectlyPowered())) {
 
-				if (blk.getData() == DyeColor.PINK
-						.getData()) {
-					blk.setData(DyeColor.LIME.getData());
+				if (blk.getData() == data1) {
+					blk.setData(data2);
 					new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
 							1L);
 					wire.add(new V10Location(blk));
 					return;
 				}
-				if (blk.getData() == DyeColor.RED
-					.getData()) {
-				    blk.setData(DyeColor.GREEN.getData());
+				if (blk.getData() == data3) {
+				    blk.setData(data4);
+				    new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
+				            1L);
+				    wire.add(new V10Location(blk));
+				return;
+				}
+				if (blk.getData() == data5) {
+					blk.setData(data6);
+					new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
+							1L);
+					wire.add(new V10Location(blk));
+					return;
+				}
+				if (blk.getData() == data7) {
+				    blk.setData(data8);
 				    new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
 				            1L);
 				    wire.add(new V10Location(blk));
