@@ -59,6 +59,8 @@ public class FrozenSand {
 			@Override
 			public void run() {
 				if (!plugin.util.isSolid(getLocation().getBlock().getRelative(BlockFace.DOWN).getType())) {
+					if (plugin.eventListener.flyingBlocks.containsValue(sand)) {
+					
 					if (!plugin.funnelBridgeManager.cubeinFunnel.containsKey(sand)) {
 						FallingBlock f = getLocation()
 								.getWorld()
@@ -79,6 +81,8 @@ public class FrozenSand {
 						
 						f.setDropItem(false);
 						clearAllPlayerViews();
+					}
+					
 					}
 				}
 				if (motion != null) {
