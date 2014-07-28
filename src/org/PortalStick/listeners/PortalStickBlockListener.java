@@ -1,16 +1,24 @@
 package org.PortalStick.listeners;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.UUID;
+import java.util.Map.Entry;
 
 import org.PortalStick.Bridge;
+import org.PortalStick.CheckWireTask;
 import org.PortalStick.Funnel;
 import org.PortalStick.Grill;
 import org.PortalStick.Portal;
 import org.PortalStick.PortalStick;
 import org.PortalStick.Region;
+import org.PortalStick.fallingblocks.FlyingBlockMoveEvent;
+import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
+import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -18,6 +26,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +44,8 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 
 
 
@@ -275,11 +286,145 @@ public class PortalStickBlockListener implements Listener
 	    Block block = event.getBlock();
 	    if(plugin.config.DisabledWorlds.contains(block.getLocation().getWorld().getName()))
 	        return;
-		if(plugin.portalManager.torches.contains(new V10Location(block)) ||
-		        (block.getType() == Material.SUGAR_CANE_BLOCK && plugin.grillManager.insideBlocks.containsKey(new V10Location(block)))) {
+		if(plugin.portalManager.torches.contains(new V10Location(block))) {
 		    event.setCancelled(true);
 		    return;
 		}
+		
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                byte data, data1, data2, data3, data4, data5, data6, data7, data8;
+                Iterator<V10Location> iter = plugin.cubeManager.wire.iterator();
+                Block blk;
+                data1 = DyeColor.LIME.getData();
+                data2 = DyeColor.PINK.getData();
+                data3 = DyeColor.GREEN.getData();
+                data4 = DyeColor.RED.getData();
+                data5 = DyeColor.YELLOW.getData();
+                data6 = DyeColor.MAGENTA.getData();
+                data7 = DyeColor.ORANGE.getData();
+                data8 = DyeColor.PURPLE.getData();
+                while (iter.hasNext()) {
+                    blk = iter.next().getHandle().getBlock();
+                    if (!(blk.isBlockPowered() || blk
+                            .isBlockIndirectlyPowered())) {
+                        if (blk.getData() == data1) {
+                            blk.setData(data2);
+                            new CheckWireTask(plugin, blk, blk, false).runTaskLater(
+                                    plugin, 1L);
+                            return;
+                        } else if (blk.getData() == data3) {
+                            blk.setData(data4);
+                            new CheckWireTask(plugin, blk, blk, false).runTaskLater(
+                                    plugin, 1L);
+                            return;
+                        }else if (blk.getData() == data5) {
+                            blk.setData(data6);
+                            new CheckWireTask(plugin, blk, blk, false).runTaskLater(
+                                    plugin, 1L);
+                            return;
+                        }else if (blk.getData() == data7) {
+                            blk.setData(data8);
+                            new CheckWireTask(plugin, blk, blk, false).runTaskLater(
+                                    plugin, 1L);
+                            return;
+                        }
+                        iter.remove();
+
+                    }
+                }
+            }
+        }, 2L);
+        byte data1, data2, data3, data4, data5, data6, data7, data8;
+        data1 = DyeColor.PINK.getData();
+        data2 = DyeColor.LIME.getData();
+        data3 = DyeColor.RED.getData();
+        data4 = DyeColor.GREEN.getData();
+        data5 = DyeColor.MAGENTA.getData();
+        data6 = DyeColor.YELLOW.getData();
+        data7 = DyeColor.PURPLE.getData();
+        data8= DyeColor.ORANGE.getData();
+
+        for (Block blk : plugin.blockUtil.getNearbyBlocks(event.getBlock()
+                .getLocation(), 1)) {
+
+            if (blk.getType() == Material.STAINED_CLAY){
+                if (blk.isBlockPowered() || blk
+                            .isBlockIndirectlyPowered()) {
+
+                if (blk.getData() == data1) {
+                    blk.setData(data2);
+                    new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
+                            1L);
+                    plugin.cubeManager.wire.add(new V10Location(blk));
+                    return;
+                }
+                if (blk.getData() == data3) {
+                    blk.setData(data4);
+                    new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
+                            1L);
+                    plugin.cubeManager.wire.add(new V10Location(blk));
+                return;
+                }
+                if (blk.getData() == data5) {
+                    blk.setData(data6);
+                    new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
+                            1L);
+                    plugin.cubeManager.wire.add(new V10Location(blk));
+                    return;
+                }
+                if (blk.getData() == data7) {
+                    blk.setData(data8);
+                    new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
+                            1L);
+                    plugin.cubeManager.wire.add(new V10Location(blk));
+                return;
+                }
+            } 
+                
+        } else if (blk.getType() == Material.WALL_SIGN) {
+                Sign s = (Sign) blk.getState();
+                if (s.getLine(0).equals("cube")) {
+                    Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) blk
+                            .getState().getData()).getAttachedFace());
+                    
+                    try {
+                        final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
+                                BlockFace.DOWN, 2));
+                        final int id;
+                        final int data;
+                        if (!s.getLine(1).isEmpty()) {
+                            try {
+                                String[] split = s.getLine(1).split(":");
+                                id = Integer.parseInt(split[0]);
+                                data = split.length > 1 ? Integer.parseInt(split[1]) : 0;
+                            } catch (Exception nfe) {
+                                return;
+                            }
+                        } else {
+                            id = data = 0;
+                        }
+                        final V10Location loc = new V10Location(blk);
+                        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+                                @Override
+                            public void run() {
+                                Block blk = loc.getHandle().getBlock();
+                                if (blk.isBlockPowered()
+                                        || blk.isBlockIndirectlyPowered()) {
+                                    Block next = blk.getRelative(((org.bukkit.material.Sign) blk
+                                            .getState().getData()).getFacing());
+                                    plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), id, data,
+                                            blk);
+                                } 
+                            }}, 1l);
+                        
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
 	}
 	
 	@EventHandler(ignoreCancelled = true)
@@ -790,5 +935,104 @@ public class PortalStickBlockListener implements Listener
 		else if(destination.getType() == Material.AIR)
 		  destination.setTypeId(mat2);
 	  }
+	}
+	
+	@EventHandler 
+	public void flyingBlockMoveEvent(final FlyingBlockMoveEvent event) {
+	    if(plugin.config.DisabledWorlds.contains(event.getTo().getWorld().getName()))
+            return;
+	    if (!plugin.cubeManager.flyingBlocks.containsValue(event.getEntity())) return;
+	    Block under = event.getTo().getBlock().getRelative(BlockFace.DOWN);
+	    BlockFace face = FaceUtil.getDirection(event.getVelocity());
+	    Vector half = FaceUtil.faceToVector(face).multiply(0.5);
+	    Block to = event.getTo().clone().add(half).getBlock();
+	    Block from = event.getFrom().getBlock();
+	    Iterator<Entry<V10Location, FrozenSand>> fb = plugin.cubeManager.flyingBlocks.entrySet().iterator();
+	    V10Location respawnLoc = null;
+	    Entry<V10Location, FrozenSand> e;
+	    while (fb.hasNext()) {
+	        e = fb.next();
+	        if (e.getValue() == event.getEntity()) {
+	            respawnLoc = e.getKey();
+	            break;
+	        }
+	    }
+
+	    byte useGel = plugin.gelManager.useGelCube(event.getEntity(), new V10Location(event.getTo()), event.getVelocity(), under);
+	    Region region = plugin.regionManager.getRegion(new V10Location(to));
+	    String rg = region.getString(RegionSetting.RED_GEL_BLOCK);
+	    if (plugin.util.isSolid(to.getType())) {
+	        if (region.getBoolean(RegionSetting.ENABLE_RED_GEL_BLOCKS) && plugin.blockUtil.compareBlockToString(from.getRelative(BlockFace.DOWN), rg)){
+
+	            for (BlockFace rface : FaceUtil.getFaces(face)) {
+	                if (!plugin.util.isSolid(from.getRelative(rface).getType())) {
+	                    event.setCancelled(true);
+	                    event.getEntity().setVelocity(FaceUtil.faceToVector(rface));
+	                    return;
+	                }
+	            }
+	        } else {
+	            event.setCancelled(true);
+	        }
+
+	        return;
+	    }
+	    if (region.getBoolean(RegionSetting.ENABLE_RED_GEL_BLOCKS) && plugin.blockUtil.compareBlockToString(under, rg)) {
+	        event.setVelocity(event.getVelocity().multiply(0.9));
+	        return;
+	    }
+
+	    if (useGel != -1){
+
+	        if (useGel == 0) {
+	            Iterator<FrozenSand> it = plugin.cubeManager.flyingBlocks.values().iterator();
+	            while (it.hasNext()) {
+	                if (it.next() == event.getEntity()) {
+	                    it.remove();
+	                }
+	            }
+	            event.setCancelled(true);
+	            event.getEntity().clearAllPlayerViews();
+	            Location fl = event.getTo();
+	            fl.setY(fl.getBlockY()+1);
+	            FallingBlock f = to
+	                    .getWorld()
+	                    .spawnFallingBlock(
+	                            fl,
+	                            event.getEntity().getMaterial(),
+	                            event.getEntity().getData());
+	            final UUID uuid = f.getUniqueId();
+	            plugin.cubeManager.cubes.put(respawnLoc, uuid);
+	            plugin.gelManager.ignore.add(uuid);
+	            f.setDropItem(false);
+	            Vector v = event.getVelocity().clone();
+	            v.setY(region.getDouble(RegionSetting.BLUE_GEL_MIN_VELOCITY));
+	            f.setVelocity(v);
+
+	            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { plugin.gelManager.ignore.remove(uuid); }}, 20L);
+	        }
+	        return;
+	    }
+
+	    if (under.getType() == Material.WOOL
+	            && (under.getData() == (byte) 15
+	            || under.getData() == (byte) 14 || under
+	            .getData() == (byte) 5)) {
+
+	        Block middle = plugin.util.chkBtn(to.getLocation());
+	        if (middle != null) {
+	            V10Location loc = new V10Location(middle);
+	            if(!plugin.cubeManager.buttons.containsKey(loc)) {
+
+	                plugin.util.changeBtn(middle, true);
+	                plugin.cubeManager.buttons.put(loc, event.getEntity());
+	            }
+	        }
+	    }
+
+	    event.setVelocity(event.getVelocity().multiply(0.2));
+
+	    if (event.getVelocity().length() < 0.00001)
+	        event.setCancelled(true);
 	}
 }

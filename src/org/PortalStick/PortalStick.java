@@ -1,8 +1,5 @@
 package org.PortalStick;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -37,12 +34,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class PortalStick extends JavaPlugin {
@@ -58,6 +49,7 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
+	public final CubeManager cubeManager = new CubeManager(this);
 	public PortalStickEventListener eventListener = new PortalStickEventListener(this);
 	public WorldGuardPlugin worldGuard = null;
 	

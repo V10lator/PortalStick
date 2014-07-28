@@ -1,23 +1,31 @@
 package org.PortalStick;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.UUID;
 
+import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.fallingblocks.LocationIterator;
+import org.PortalStick.listeners.PortalStickEventListener.SignResetter;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.PortalStick.util.Config.Sound;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.material.Directional;
 import org.bukkit.util.Vector;
 
 
@@ -30,7 +38,17 @@ import org.bukkit.util.Vector;
 
 
 
+
+
+
+
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
 public class EntityManager implements Runnable {
 	private final PortalStick plugin;
@@ -420,18 +438,56 @@ public class EntityManager implements Runnable {
 					return null;
 				}
 			}
-		
+			checkPiston(locTo, entity);
 		}
 		
 		boolean isPlayer = entity instanceof Player;
+		boolean living = isPlayer || entity instanceof LivingEntity;
 		//Turrets
 /*        if(regionTo.getBoolean(RegionSetting.ENABLE_TURRETS) && (
                 isPlayer ||
                 (regionTo.getBoolean(RegionSetting.TURRETS_ATTACK_EVERYTHING) &&
-                        entity instanceof LivingEntity))) {
+                        living))) {
             plugin.turretManager.check(entity, vlocTo);
         }
-*/		
+*/
+		
+		if(living) {
+		    //Buttons
+		    UUID uuid = entity.getUniqueId();
+		    if (!plugin.cubeManager.buttonsToEntity.containsKey(uuid)) {
+		        Block middle = plugin.util.chkBtn(locTo);
+		        if (middle != null) {
+		            V10Location loc = new V10Location(middle);
+		            if (!plugin.cubeManager.buttonsToEntity.containsValue(loc)
+		                    && !plugin.cubeManager.buttons.containsKey(loc)) {
+		                plugin.cubeManager.buttonsToEntity.put(uuid, loc);
+		                plugin.util.changeBtn(middle, true);
+		                plugin.cubeManager.buttons.put(loc, null);
+		            }
+		        }
+		    } else {
+		        Block middle = plugin.util.chkBtn(locTo);
+		        if (middle == null) {
+
+		            V10Location loc2 = plugin.cubeManager.buttonsToEntity.get(uuid);
+		            Block middle2 = loc2.getHandle().getBlock();
+
+		            plugin.util.changeBtn(middle2,false);
+		            plugin.cubeManager.buttonsToEntity.remove(uuid);
+		            plugin.cubeManager.buttons.remove(loc2);
+		        }
+		    }
+		    
+		    // Push cubes
+	        for (FrozenSand s : plugin.cubeManager.flyingBlocks.values()) {
+	            if (vlocTo.equals(new V10Location(s.getLocation()))) {
+	                
+	                s.setVelocity(FaceUtil.faceToVector(FaceUtil.getDirection(locTo.toVector().subtract(locFrom.toVector()))));
+	            }
+	        }
+		}
+
 		Location ret = null;
 		//Teleport
 		if (!isPlayer || plugin.hasPermission((Player)entity, plugin.PERM_TELEPORT))
@@ -455,5 +511,225 @@ public class EntityManager implements Runnable {
  		plugin.funnelBridgeManager.EntityMoveCheck(entity);
 		
 		return ret;
+	}
+	
+	public boolean checkPiston(Location to, Entity entity) {
+
+	    BlockFace pistonBlockFace = null;
+
+	    Block orig = to.getBlock();
+	    Block pistonBlock = null;
+	    BlockFace[] BlockFaces = new BlockFace[] { BlockFace.UP,
+	            BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST,
+	            BlockFace.SOUTH, BlockFace.WEST };
+	    for (BlockFace bf : BlockFaces) {
+	        if (orig.getRelative(bf).getType() == Material.PISTON_BASE
+	                || orig.getRelative(bf).getType() == Material.PISTON_STICKY_BASE) {
+
+	            pistonBlock = orig.getRelative(bf);
+	            pistonBlockFace = bf;
+	            break;
+	        }
+	    }
+	    if (pistonBlock == null) {
+	        return false;
+	    }
+	    BlockFace pistondir = ((Directional) pistonBlock.getState().getData())
+	            .getFacing().getOppositeFace();
+	    Block sBlock = pistonBlock.getRelative(pistondir);
+	    if (pistondir == pistonBlockFace && (sBlock.getType()
+	            .equals(Material.WALL_SIGN) || sBlock.getType()
+	            .equals(Material.SIGN_POST))) {
+	        Sign s = (Sign) sBlock.getState();
+
+	        double speed = 0.0D;
+	        double x = 0.0D;
+	        double y = 0.0D;
+	        double z = 0.0D;
+	        boolean pos = true;
+	        boolean ok = true;
+	        if (s.getLine(0).contains("direction")) {
+	            pos = false;
+	            y = entity.getLocation().getDirection().getY();
+	            double tmp = y;
+	            if (s.getLine(0).contains(",")) {
+
+	                String[] text = s.getLine(0).split(",");
+	                if (y < Double.parseDouble(text[1]))
+	                {
+	                    try {
+	                        y = Double.parseDouble(text[1]);
+	                    } catch (Exception nfe) {
+	                        y = tmp;
+	                    }
+	                }
+	            }
+	        } else {
+	            String[] text = s.getLine(0).split(",");
+	            try {
+	                x = Double.parseDouble(text[0]);
+	                y = Double.parseDouble(text[1]);
+	                z = Double.parseDouble(text[2]);
+	            } catch (Exception nfe) {
+	                ok = false;
+	            }
+	        }
+	        if(ok) {
+	            try {
+	                speed = Double.parseDouble(s.getLine(1));
+	            } catch (NumberFormatException nfe) {
+	                ok = false;
+	            }
+
+	            boolean pos2 = pos;
+	            if (ok) {
+
+	                if (entity instanceof Player) {
+	                    sBlock.setType(Material.REDSTONE_BLOCK);
+	                    if (entity.isInsideVehicle()) {
+	                        entity.getVehicle().eject();
+	                    }
+	                    Location playerloc = entity.getLocation()
+	                            .getBlock().getLocation();
+	                    Vector vector = new Vector(0, 0, 0);
+	                    Location dest = null;
+	                    if (pos2) {
+
+	                        dest = new Location(playerloc
+	                                .getWorld(), x, y, z);
+
+	                        vector = dest.toVector().subtract(
+	                                playerloc.toVector());
+
+
+	                    } else {
+	                        vector = entity.getLocation().getDirection();
+	                    }
+
+	                    FallingBlock f = entity.getWorld()
+	                            .spawnFallingBlock(playerloc, Material.GLASS, (byte)0);
+	                    plugin.cubeManager.blockMap.add(f.getUniqueId());
+	                    f.setDropItem(false);
+	                    f.setPassenger(entity);
+
+	                    Vector v =vector.normalize()
+	                            .multiply(speed);
+	                    if (!pos2) {
+	                        v.setY(y);
+	                    } else {
+	                        v.setY(vector.getY());
+	                    }
+	                    f.setVelocity(v);
+	                    ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+	                    PacketContainer metadata = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+	                    WrappedDataWatcher dw = new WrappedDataWatcher();
+	                    dw.setObject(0, Byte.valueOf((byte) 0x20));
+
+	                    metadata.getIntegers().write(0, f.getEntityId());
+	                    metadata.getWatchableCollectionModifier().write(0, dw.getWatchableObjects());
+	                    for (Player pl : Bukkit.getOnlinePlayers()) {
+	                        try {
+	                            pm.sendServerPacket(pl, metadata);
+	                        } catch (InvocationTargetException e) {
+	                            // TODO Auto-generated catch block
+	                            e.printStackTrace();
+	                        }
+	                    } 
+
+
+
+
+	                }
+	                Bukkit.getScheduler().scheduleSyncDelayedTask(
+	                        plugin,
+	                        new SignResetter(s),
+	                        2L);
+
+	                if (entity.isInsideVehicle()) {
+	                    entity.getVehicle().eject();
+	                }
+	                Location playerloc = entity.getLocation().getBlock()
+	                        .getLocation();
+	                Vector vector = new Vector(0, 0, 0);
+	                if (pos2) {
+	                    Location dest = new Location(
+	                            playerloc.getWorld(), x, y, z);
+
+	                    vector = dest.toVector().subtract(
+	                            playerloc.toVector());
+
+	                } else {
+	                    vector = entity.getLocation().getDirection();
+	                }
+
+	                FallingBlock f = entity.getWorld().spawnFallingBlock(
+	                        playerloc, Material.GLASS, (byte)0);
+	                plugin.cubeManager.blockMap.add(f.getUniqueId());
+	                f.setDropItem(false);
+	                f.setPassenger(entity);
+	                f.setVelocity(vector.normalize().multiply(speed));
+	                ProtocolManager pm = ProtocolLibrary.getProtocolManager();
+	                PacketContainer metadata = pm.createPacket(PacketType.Play.Server.ENTITY_METADATA);
+	                WrappedDataWatcher dw = new WrappedDataWatcher();
+	                dw.setObject(0, Byte.valueOf((byte) 0x20));
+
+	                metadata.getIntegers().write(0, f.getEntityId());
+	                metadata.getWatchableCollectionModifier().write(0, dw.getWatchableObjects());
+	                for (Player pl : Bukkit.getOnlinePlayers()) {
+	                    try {
+	                        pm.sendServerPacket(pl, metadata);
+	                    } catch (InvocationTargetException e) {
+	                        // TODO Auto-generated catch block
+	                        e.printStackTrace();
+	                    }
+	                }
+	                final V10Location loc = new V10Location(sBlock);
+	                Bukkit.getScheduler().scheduleSyncDelayedTask(
+	                        plugin, new Runnable() {
+	                            @Override
+	                            public void run() {
+	                                Block block = loc.getHandle().getBlock();
+	                                Sign s = (Sign) block.getState();
+	                                block.setType(
+	                                        Material.REDSTONE_BLOCK);
+	                                Bukkit.getScheduler()
+	                                .scheduleSyncDelayedTask(
+	                                        plugin,
+	                                        new SignResetter(s),
+	                                        2L);
+	                            }
+	                        }, 2L);
+	            }
+	        }
+	        return ok;
+	    }
+
+
+
+	    return false;
+	}
+
+	private class SignResetter implements Runnable {
+	    final V10Location v10loc;
+	    final Material type;
+	    final String[] lines;
+	    final byte data;
+
+	    SignResetter(Sign s) {
+	        this.v10loc = new V10Location(s.getLocation());
+	        this.type = s.getType();
+	        this.data = s.getRawData();
+	        this.lines = s.getLines();
+	    }
+	    public void run() {
+	        Block block = v10loc.getHandle().getBlock();
+	        block.setType(type);
+	        block.setData(data);
+	        Sign newSign = (Sign) block.getState();
+	        for (int i = 0; i < 4; i++) {
+	            newSign.setLine(i, lines[i]);
+	        }
+	        newSign.update();
+	    }
 	}
 }

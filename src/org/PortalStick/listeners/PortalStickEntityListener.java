@@ -5,12 +5,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.PortalStick.Grill;
 import org.PortalStick.Portal;
 import org.PortalStick.PortalStick;
 import org.PortalStick.Region;
 import org.PortalStick.User;
+import org.PortalStick.fallingblocks.FrozenSand;
+import org.PortalStick.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
@@ -188,97 +192,223 @@ public class PortalStickEntityListener implements Listener {
 	public void blockLand(EntityChangeBlockEvent event)
 	{
 	  Entity entity = event.getEntity();
-	  if(entity instanceof FallingBlock && !plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()) && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
-	    event.setCancelled(true);
+	  if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
+          return;
+	  if(entity instanceof FallingBlock) {
+	      if(plugin.gelManager.flyingGels.containsKey(entity.getUniqueId())) {
+	          event.setCancelled(true);
+	          return;
+	      }
+	      FallingBlock fb = (FallingBlock) event.getEntity();
+	      UUID uuid = fb.getUniqueId();
+          if(plugin.cubeManager.blockMap.contains(uuid)) {
+              event.setCancelled(true);
+              plugin.cubeManager.blockMap.remove(uuid);
+              return;
+          }
+          
+          if(plugin.cubeManager.cubes.containsValue(uuid)) {
+              Block up = event.getBlock();
+              if (up.getType().name().contains("LAVA")) {
+                  Location loc;
+                  for (Entry<V10Location, UUID> entry: plugin.cubeManager.cubes.entrySet()) {
+                      if (uuid.equals(entry.getValue())) {
+                          loc = entry.getKey().getHandle();
+                          FallingBlock f = loc
+                                      .getWorld()
+                                      .spawnFallingBlock(
+                                              loc,
+                                              ((FallingBlock) event.getEntity()).getBlockId(),
+                                              (byte)((FallingBlock) event.getEntity())
+                                              .getBlockData());
+                              f.setDropItem(false);
+                              event.getEntity().remove();
+                              plugin.cubeManager.cubes.put(entry.getKey(), f.getUniqueId());
+                              event.setCancelled(true);
+                              return;
+                          
+                      }
+                  }
+              }
+          }
+          FrozenSand fblock = null;
+          for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
+              if (uuid.equals(entry.getValue())) {
+                  event.setCancelled(true);
+                  String id = String.valueOf(((FallingBlock) event.getEntity())
+                          .getMaterial().getId())+":"+String.valueOf(((FallingBlock) event.getEntity())
+                                  .getBlockData());
+                  fblock = new FrozenSandFactory(plugin).withLocation(event.getEntity().getLocation()).withText(id).build();
+
+                  plugin.cubeManager.flyingBlocks.put(entry.getKey(), fblock);
+                  event.getEntity().remove();
+                  plugin.cubeManager.cubes.remove(entry.getKey());
+                  break;
+              }
+          }
+          if (fblock == null) return;
+          Block blockUnder = event.getBlock().getRelative(BlockFace.DOWN);
+          if (blockUnder.getType() == Material.WOOL
+                  && (blockUnder.getData() == (byte) 15
+                  || blockUnder.getData() == (byte) 14 || blockUnder
+                  .getData() == (byte) 5)) {
+
+              Block middle = plugin.util.chkBtn(event.getBlock().getLocation());
+
+              if (middle != null) {
+                  V10Location loc = new V10Location(middle);
+                  if(!plugin.cubeManager.buttons.containsKey(loc)) {
+
+                      plugin.util.changeBtn(middle, true);
+                      plugin.cubeManager.buttons.put(loc, fblock);
+                  }
+              }
+          } else if (blockUnder.getType() == Material.WOOL
+                  && (blockUnder.getData() == (byte) 1)) {
+
+              fblock.setVelocity(event.getEntity().getVelocity());
+              return;
+          }
+	  } else {
+	      plugin.entityManager.checkPiston(event.getBlock().getLocation(), event.getEntity());
+	  }
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void despawn(EntityRemoveEvent event)
 	{
-	  Entity entity = event.getEntity();
-	  if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
-		return;
-	  
-	  //Remove flying gels from the map. We can't do this if they don't try to place themself in the event above...
-	  if(entity instanceof FallingBlock && plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))
-	  {
-		V10Location from = plugin.gelManager.flyingGels.get(entity.getUniqueId());
-		plugin.gelManager.flyingGels.remove(entity.getUniqueId());
-		Location loc = entity.getLocation();
-		V10Location vloc = new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
-		ArrayList<BlockStorage> blocks;
-		if(plugin.gelManager.gels.containsKey(from))
-		  blocks = plugin.gelManager.gels.get(from);
-		else
-		{
-		  blocks = new ArrayList<BlockStorage>();
-		  plugin.gelManager.gels.put(from, blocks);
-		}
-		FallingBlock fb = (FallingBlock)entity;
-		Block b = loc.getBlock();
-		int mat = fb.getBlockId();
-		byte data = fb.getBlockData();
-		BlockStorage bh;
-		Block b2;
-		boolean bl;
-		int mat2;
-		for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
-		{
-		  b2 = b.getRelative(face);
-		  if(b2.getType() != Material.AIR && !b2.isLiquid() && b2.getType().isSolid())
-		  {
-			bl = false;
-			mat2 = b2.getTypeId();
-			for(int mat3: gelBlacklist)
-			  if(mat2 == mat3)
-			  {
-				bl = true;
-				break;
-			  }
-			if(bl)
-			  continue;
-			vloc = new V10Location(b2);
-			if(plugin.portalManager.borderBlocks.containsKey(vloc) ||
-					plugin.portalManager.insideBlocks.containsKey(vloc) ||
-					plugin.portalManager.behindBlocks.containsKey(vloc) ||
-					plugin.grillManager.borderBlocks.containsKey(vloc) ||
-					plugin.grillManager.insideBlocks.containsKey(vloc) ||
-					plugin.funnelBridgeManager.bridgeBlocks.containsKey(vloc) ||
-					plugin.funnelBridgeManager.bridgeMachineBlocks.containsKey(vloc))
-			  continue;
-			bh = new BlockStorage(b2);
-			boolean contains = false;
-			for(BlockStorage bs: blocks) {
-			    if(bh.getLocation().equals(bs.getLocation())) {
-			        contains = true;
-			        break;
-			    }
-			}
-			if(!contains)
-			{
-			  if(plugin.gelManager.gelMap.containsKey(vloc))
-				bh = plugin.gelManager.gelMap.get(vloc);
-			  else
-				plugin.gelManager.gelMap.put(vloc, bh);
-			  blocks.add(bh);
-			  b2.setTypeIdAndData(mat, data, true);
-			}
-		  }
-		}
-	  }
-	  
-	  User user = plugin.userManager.getUser(entity);
-	  // TODO: Check if fixed
-	  //if(user == null) //TODO: Workaround against BKCommonLib bugs.
-		//return;
-	  
-	  Location loc = entity.getLocation();
-      Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
-	  if(entity instanceof InventoryHolder && region.name != "global" && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
-		user.revertInventory((InventoryHolder)entity);
-	  plugin.userManager.deleteUser(entity);
-	  if(entity instanceof Player) //TODO
-		plugin.gelManager.resetPlayer((Player)entity);
+	    Entity entity = event.getEntity();
+	    if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
+	        return;
+
+	    //Remove flying gels from the map. We can't do this if they don't try to place themself in the event above...
+	    if(entity instanceof FallingBlock) {
+	        UUID uuid = entity.getUniqueId();
+	        if(plugin.gelManager.flyingGels.containsKey(uuid))
+	        {
+	            V10Location from = plugin.gelManager.flyingGels.get(uuid);
+	            plugin.gelManager.flyingGels.remove(uuid);
+	            Location loc = entity.getLocation();
+	            V10Location vloc = new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
+	            ArrayList<BlockStorage> blocks;
+	            if(plugin.gelManager.gels.containsKey(from))
+	                blocks = plugin.gelManager.gels.get(from);
+	            else
+	            {
+	                blocks = new ArrayList<BlockStorage>();
+	                plugin.gelManager.gels.put(from, blocks);
+	            }
+	            FallingBlock fb = (FallingBlock)entity;
+	            Block b = loc.getBlock();
+	            int mat = fb.getBlockId();
+	            byte data = fb.getBlockData();
+	            BlockStorage bh;
+	            Block b2;
+	            boolean bl;
+	            int mat2;
+	            for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
+	            {
+	                b2 = b.getRelative(face);
+	                if(b2.getType() != Material.AIR && !b2.isLiquid() && b2.getType().isSolid())
+	                {
+	                    bl = false;
+	                    mat2 = b2.getTypeId();
+	                    for(int mat3: gelBlacklist)
+	                        if(mat2 == mat3)
+	                        {
+	                            bl = true;
+	                            break;
+	                        }
+	                    if(bl)
+	                        continue;
+	                    vloc = new V10Location(b2);
+	                    if(plugin.portalManager.borderBlocks.containsKey(vloc) ||
+	                            plugin.portalManager.insideBlocks.containsKey(vloc) ||
+	                            plugin.portalManager.behindBlocks.containsKey(vloc) ||
+	                            plugin.grillManager.borderBlocks.containsKey(vloc) ||
+	                            plugin.grillManager.insideBlocks.containsKey(vloc) ||
+	                            plugin.funnelBridgeManager.bridgeBlocks.containsKey(vloc) ||
+	                            plugin.funnelBridgeManager.bridgeMachineBlocks.containsKey(vloc))
+	                        continue;
+	                    bh = new BlockStorage(b2);
+	                    boolean contains = false;
+	                    for(BlockStorage bs: blocks) {
+	                        if(bh.getLocation().equals(bs.getLocation())) {
+	                            contains = true;
+	                            break;
+	                        }
+	                    }
+	                    if(!contains)
+	                    {
+	                        if(plugin.gelManager.gelMap.containsKey(vloc))
+	                            bh = plugin.gelManager.gelMap.get(vloc);
+	                        else
+	                            plugin.gelManager.gelMap.put(vloc, bh);
+	                        blocks.add(bh);
+	                        b2.setTypeIdAndData(mat, data, true);
+	                    }
+	                }
+	            }
+	        } else {
+	            FallingBlock fb = (FallingBlock)entity;
+	            FrozenSand fblock = null;
+	            for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
+	                if (uuid.equals(entry.getValue())) {
+	                    if(!plugin.cubeManager.respawnCubes.contains(uuid)) {
+	                        String id = String.valueOf(fb
+	                                .getMaterial().getId())+":"+String.valueOf(fb
+	                                        .getBlockData());
+	                        fblock = new FrozenSandFactory(plugin).withLocation(fb.getLocation()).withText(id).build();
+
+	                        plugin.cubeManager.flyingBlocks.put(entry.getKey(), fblock);
+	                    } else {
+	                        plugin.cubeManager.respawnCubes.remove(uuid);
+	                        plugin.util.clear(entry.getKey().getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), plugin.cubeManager.cubesign.get(entry.getKey()).getHandle().getBlock());
+	                    }
+	                    event.getEntity().remove();
+	                    plugin.cubeManager.cubes.remove(entry.getKey());
+	                    break;
+	                }
+	            }
+	            if (fblock == null) return;
+	            Block blockUnder = entity.getLocation().getBlock().getRelative(BlockFace.DOWN);
+	            if (blockUnder.getType() == Material.WOOL
+	                    && (blockUnder.getData() == (byte) 15
+	                    || blockUnder.getData() == (byte) 14 || blockUnder
+	                    .getData() == (byte) 5)) {
+
+	                Block middle = plugin.util.chkBtn(event.getEntity().getLocation());
+	                if (middle != null) {
+	                    V10Location loc = new V10Location(middle);
+	                    if(!plugin.cubeManager.buttons.containsKey(loc)) {
+
+	                        plugin.util.changeBtn(middle, true);
+	                        plugin.cubeManager.buttons.put(loc, fblock);
+	                    }
+	                }
+	            } else if (blockUnder.getType() == Material.WOOL
+	                    && (blockUnder.getData() == (byte) 1)) {
+
+	                fblock.setVelocity(entity.getVelocity());
+	                return;
+	            } 
+	        }
+	    } else {
+            plugin.entityManager.checkPiston(entity.getLocation(), event.getEntity());
+        }
+
+	    User user = plugin.userManager.getUser(entity);
+	    // TODO: Check if fixed
+	    //if(user == null) //TODO: Workaround against BKCommonLib bugs.
+	    //return;
+
+	    Location loc = entity.getLocation();
+	    Region region = plugin.regionManager.getRegion(new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ()));
+	    if(entity instanceof InventoryHolder && region.name != "global" && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
+	        user.revertInventory((InventoryHolder)entity);
+	    plugin.userManager.deleteUser(entity);
+	    if(entity instanceof Player) //TODO
+	        plugin.gelManager.resetPlayer((Player)entity);
 	}
 	
 	@EventHandler
