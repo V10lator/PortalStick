@@ -17,7 +17,6 @@ import org.PortalStick.commands.RegionToolCommand;
 import org.PortalStick.commands.ReloadCommand;
 import org.PortalStick.commands.SayCommand;
 import org.PortalStick.commands.SetRegionCommand;
-import org.PortalStick.fallingblocks.FlyingBlocksAPI;
 import org.PortalStick.fallingblocks.TagIdGenerator;
 import org.PortalStick.listeners.PortalStickBlockListener;
 import org.PortalStick.listeners.PortalStickEntityListener;
@@ -59,7 +58,7 @@ public class PortalStick extends JavaPlugin {
 	
 	public final Random rand = new Random();
 	
-	public final FlyingBlocksAPI flyingBlocksAPI = new FlyingBlocksAPI();
+	public final FrozenSandManager flyingBlocksAPI = new FrozenSandManager();
 	public final TagIdGenerator tagIdGenerator = new TagIdGenerator();
 
 	public void onDisable() {

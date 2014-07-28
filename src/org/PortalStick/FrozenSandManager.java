@@ -1,8 +1,10 @@
-package org.PortalStick.fallingblocks;
+package org.PortalStick;
 
 import java.util.ArrayList;
 
-public class FlyingBlocksAPI {
+import org.PortalStick.fallingblocks.FrozenSand;
+
+public class FrozenSandManager {
 	public ArrayList<FrozenSand> fakeBlocks = new ArrayList<FrozenSand>();
 	public int lastId = 0;
 
