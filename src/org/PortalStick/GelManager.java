@@ -139,9 +139,6 @@ public class GelManager {
 	}
 	private boolean isPortal(V10Location vl)
 	{
-	  for(V10Location loc: plugin.portalManager.borderBlocks.keySet())
-		if(loc.equals(vl))
-		  return true;
 	  for(V10Location loc: plugin.portalManager.insideBlocks.keySet())
 		if(loc.equals(vl))
 		  return true;

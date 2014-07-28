@@ -2,11 +2,14 @@ package org.PortalStick;
 
 import java.util.HashSet;
 
+import org.PortalStick.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 public class Portal {
 	private final PortalStick plugin;
@@ -35,46 +38,23 @@ public class Portal {
 	public void delete()
 	{
 		BlockStorage bh;
-		for (V10Location loc: coord.border)
+		for (int i = 0; i < 2; i++)
 		{
-			if (plugin.portalManager.oldBlocks.containsKey(loc))
-			{
-				bh = plugin.portalManager.oldBlocks.get(loc);
-				bh.set();
-				if(plugin.gelManager.gelMap.containsKey(loc))
-					plugin.gelManager.removeGel(bh);
-				plugin.portalManager.oldBlocks.remove(loc);
-			}
-			plugin.portalManager.borderBlocks.remove(loc);
-		}
-		for (V10Location loc: coord.inside)
-		{
-		  if(loc == null)
+		  if(coord.inside[i] == null)
 			continue;
-		  if (plugin.portalManager.oldBlocks.containsKey(loc))
+		  if(coord.insideFrozen[i] != null) {
+		      coord.insideFrozen[i].clearAllPlayerViews();
+		      coord.insideFrozen[i] = null;
+		  }
+		  if (plugin.portalManager.oldBlocks.containsKey(coord.inside[i]))
 			{
-				bh = plugin.portalManager.oldBlocks.get(loc);
+				bh = plugin.portalManager.oldBlocks.get(coord.inside[i]);
 				bh.set();
-				if(plugin.gelManager.gelMap.containsKey(loc))
+				if(plugin.gelManager.gelMap.containsKey(coord.inside[i]))
 					plugin.gelManager.removeGel(bh);
-				plugin.portalManager.oldBlocks.remove(loc);
+				plugin.portalManager.oldBlocks.remove(coord.inside[i]);
 			}
-		  plugin.portalManager.insideBlocks.remove(loc);
-		}
-		if (plugin.config.FillPortalBack > -1)
-		{
-			for (V10Location loc: coord.behind)
-			{
-				if (plugin.portalManager.oldBlocks.containsKey(loc))
-				{
-					bh = plugin.portalManager.oldBlocks.get(loc);
-					bh.set();
-					if(plugin.gelManager.gelMap.containsKey(loc))
-						plugin.gelManager.removeGel(bh);
-					plugin.portalManager.oldBlocks.remove(loc);
-				}
-				plugin.portalManager.behindBlocks.remove(loc);
-			}
+		  plugin.portalManager.insideBlocks.remove(coord.inside[i]);
 		}
 		if(coord.horizontal)
 		{
@@ -95,35 +75,31 @@ public class Portal {
 		Portal oldDestination = getDestination();
 		if(oldDestination != null)
 		  if (oldDestination.getDestination() == null) oldDestination.close();
+	    plugin.getLogger().info("Deleted portal ("+(orange ? "orange" : "blue")+")");
 
    	}
 	
 	public void open()
 	{
-		Block b;
-//		BlockStorage bh;
-		for (V10Location loc: coord.inside)
+	    Location loc;
+	    Portal destination = getDestination();
+	    boolean receiver = placetorch || (destination != null && destination.transmitter);
+		for (int i = 0; i < 2; i++)
     	{
-		  if(loc == null)
-			continue;
-			b = loc.getHandle().getBlock();
-//			bh = new BlockStorage(b);
-//			if(plugin.gelManager.gelMap.containsKey(bh))
-//			  plugin.gelManager.removeGel(bh);
-			b.setType(Material.AIR);
+		    if(coord.inside[i] == null)
+		        continue;
+		    loc = coord.inside[i].getHandle();
+		    if(receiver)
+		        loc.getBlock().setType(Material.REDSTONE_TORCH_ON);
+		    else
+		        loc.getBlock().setType(Material.AIR);
+		    coord.insideFrozen[i] = new FrozenSandFactory(plugin).withLocation(loc).withText("1:0").build(); //TODO: Do not hardcode 1:0
     	}
-		
-		Portal destination = getDestination();
-		if (placetorch || (destination != null && destination.transmitter))
-		{
-		    for (V10Location b2: coord.inside)
-                if(b2 != null)
-                  b2.getHandle().getBlock().setType(Material.REDSTONE_TORCH_ON);
-			placetorch = false;
-		}
-		
+		if(receiver)
+		    placetorch = false;
 		open = true;
 		plugin.funnelBridgeManager.reorientBridge(this);
+		plugin.getLogger().info("Opened portal ("+(orange ? "orange" : "blue")+")");
 	}
 	
 	public void switchRedstoneTransmitter(boolean on) {
@@ -179,54 +155,43 @@ public class Portal {
 	
 	public void close()
 	{
-		byte color;
-		if (orange)
-			color = (byte) plugin.util.getRightPortalColor(owner.colorPreset);
-		else
-			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);
+		byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));
 		int w = Material.WOOL.getId();
-		for (V10Location b: coord.inside)
-    	{
-		  if(b != null)
-		  {
-    		b.getHandle().getBlock().setTypeIdAndData(w, color, true);
-    		open = false;
-		  }
-    	}
-		
+		for (int i = 0; i < 2; i++)
+		{
+		    if(coord.inside[i] != null)
+		    {
+		        if(coord.insideFrozen[i] != null) {
+		            coord.insideFrozen[i].clearAllPlayerViews();
+		            coord.insideFrozen[i] = null;
+		        }
+		        coord.inside[i].getHandle().getBlock().setTypeIdAndData(w, color, true);
+		    }
+		}
+		open = false;
+		plugin.getLogger().info("Closed portal ("+(orange ? "orange" : "blue")+")");
 		plugin.funnelBridgeManager.reorientBridge(this);
 	}
 	
 	public void recreate()
 	{
-		byte color;
-		if (orange)
-			color = (byte) plugin.util.getRightPortalColor(owner.colorPreset);
-		else
-			color = (byte) plugin.util.getLeftPortalColor(owner.colorPreset);			
+	    if(!open) {
+	        byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));			
 		
-		for (V10Location b: coord.border)
-    		b.getHandle().getBlock().setData(color);
-
-		if (!open)
-			for (V10Location b: coord.inside)
-			  if(b != null)
-	    		b.getHandle().getBlock().setData(color);
-		
-		if (plugin.config.CompactPortal)
-			for (V10Location b: coord.behind)
-	    		b.getHandle().getBlock().setData(color);
+	        for (V10Location b: coord.inside)
+	            if(b != null)
+	                b.getHandle().getBlock().setData(color);
+	    }
 	}
 	
 	public void create()
 	{
-		byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));
-
 		Block rb;
 		BlockStorage bh;
-		int wool = Material.WOOL.getId();
-    	for (V10Location loc: coord.border)
+    	for (V10Location loc: coord.inside)
     	{
+    	    if(loc == null)
+    	        continue;
     		if (plugin.portalManager.insideBlocks.containsKey(loc))
     			plugin.portalManager.insideBlocks.get(loc).delete();
     		if (plugin.portalManager.behindBlocks.containsKey(loc))
@@ -243,57 +208,7 @@ public class Portal {
     		  }
     		  plugin.portalManager.oldBlocks.put(loc, bh);
     		}
-    		rb.setTypeIdAndData(wool, color, false);
-    		plugin.portalManager.borderBlocks.put(loc, this);
-       	}
-    	for (V10Location loc: coord.inside)
-    	{
-    	  if(loc != null && !plugin.portalManager.oldBlocks.containsKey(loc))
-    	  {
-    		rb = loc.getHandle().getBlock();
-    		bh = new BlockStorage(rb);
-    		if(plugin.gelManager.gelMap.containsKey(loc))
-    		{
-      		  bh = plugin.gelManager.gelMap.get(loc);
-      		  plugin.gelManager.removeGel(bh);
-    		}
-    		plugin.portalManager.oldBlocks.put(loc, bh);
-    	  }
-    	}
-    	byte data;
-    	if (plugin.config.FillPortalBack > -1)
-    	{
-    		for (V10Location loc: coord.behind)
-        	{
-        		if (plugin.portalManager.borderBlocks.containsKey(loc))
-        			plugin.portalManager.borderBlocks.get(loc).delete();
-        		if (plugin.portalManager.insideBlocks.containsKey(loc))
-        			plugin.portalManager.insideBlocks.get(loc).delete();
-
-        		rb = loc.getHandle().getBlock();
-        		if(!plugin.portalManager.oldBlocks.containsKey(loc))
-        		{
-        		  bh = new BlockStorage(rb);
-        		  if(plugin.gelManager.gelMap.containsKey(loc))
-        		  {
-        			bh = plugin.gelManager.gelMap.get(loc);
-          		  	plugin.gelManager.removeGel(bh);
-        		  }
-        		  plugin.portalManager.oldBlocks.put(loc, bh);
-        		}
-        		if (plugin.config.CompactPortal)
-        		{
-        			wool = Material.WOOL.getId();
-            		data = color;
-        		}
-        		else
-        		{
-        			wool = plugin.config.FillPortalBack;
-        			data = plugin.config.portalBackData;
-        		}
-        		rb.setTypeIdAndData(wool, data, false);
-        		plugin.portalManager.behindBlocks.put(loc, this);
-        	}
+    		plugin.portalManager.insideBlocks.put(loc, this);
     	}
     	
     	Region region = plugin.regionManager.getRegion(coord.inside[0]);

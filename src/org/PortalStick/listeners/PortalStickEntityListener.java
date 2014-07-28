@@ -135,9 +135,7 @@ public class PortalStickEntityListener implements Listener {
 			loc = new V10Location(block.getLocation());
 			if (block.getType() == Material.WOOL)
 			{
-				portal = plugin.portalManager.borderBlocks.get(loc);
-				if (portal == null)
-				  portal = plugin.portalManager.insideBlocks.get(loc);
+				portal = plugin.portalManager.insideBlocks.get(loc);
 				if (portal == null)
 				  portal = plugin.portalManager.behindBlocks.get(loc);
 				if (portal != null)
@@ -322,8 +320,7 @@ public class PortalStickEntityListener implements Listener {
 	                    if(bl)
 	                        continue;
 	                    vloc = new V10Location(b2);
-	                    if(plugin.portalManager.borderBlocks.containsKey(vloc) ||
-	                            plugin.portalManager.insideBlocks.containsKey(vloc) ||
+	                    if(plugin.portalManager.insideBlocks.containsKey(vloc) ||
 	                            plugin.portalManager.behindBlocks.containsKey(vloc) ||
 	                            plugin.grillManager.borderBlocks.containsKey(vloc) ||
 	                            plugin.grillManager.insideBlocks.containsKey(vloc) ||

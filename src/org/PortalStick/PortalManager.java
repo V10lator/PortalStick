@@ -30,7 +30,6 @@ public class PortalManager {
 	}
 	
 	public final ArrayList<Portal> portals = new ArrayList<Portal>();
-	public final HashMap<V10Location, Portal> borderBlocks = new HashMap<V10Location, Portal>();
 	public final HashMap<V10Location, Portal> behindBlocks = new HashMap<V10Location, Portal>();
 	public final HashMap<V10Location, Portal> insideBlocks = new HashMap<V10Location, Portal>();
 	final HashMap<V10Location, Portal> awayBlocks = new HashMap<V10Location, Portal>();
@@ -72,53 +71,12 @@ public class PortalManager {
 		boolean ol;
 		BlockStorage bh;
 		Block block;
-		for (V10Location loc: portal.border)
-		{
-			if(borderBlocks.containsKey(loc))
-			{
-			  overlap.add(borderBlocks.get(loc));
-			  ol = true;
-			}
-			else if(insideBlocks.containsKey(loc))
-			{
-			  overlap.add(insideBlocks.get(loc));
-			  ol = true;
-			}
-			else if(behindBlocks.containsKey(loc))
-			{
-			  overlap.add(behindBlocks.get(loc));
-			  ol = false;
-			}
-			else
-			  ol = false;
-			
-			if(!ol)
-			{
-			  block = loc.getHandle().getBlock();
-			  id = block.getTypeId();
-			  region = plugin.regionManager.getRegion(loc);
-			  if(!region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL))
-			  {
-				if(plugin.gelManager.gelMap.containsKey(loc))
-				{
-				  bh = plugin.gelManager.gelMap.get(loc);
-				  id = bh.getID();
-				}
-				if(!region.getList(RegionSetting.PORTAL_BLOCKS).contains(id))
-				  return false;
-			  }
-			}
-		}
 		for (V10Location loc: portal.inside)
 		{
-			if(loc == null)
-			  continue;
-			if(borderBlocks.containsKey(loc))
-			{
-			  overlap.add(borderBlocks.get(loc));
-			  ol = true;
-			}
-			else if(insideBlocks.containsKey(loc))
+		    if(loc == null)
+	              continue;
+		    
+			if(insideBlocks.containsKey(loc))
 			{
 			  overlap.add(insideBlocks.get(loc));
 			  ol = true;
@@ -138,7 +96,7 @@ public class PortalManager {
 			  region = plugin.regionManager.getRegion(loc);
 			  if(!region.getBoolean(RegionSetting.ALL_BLOCKS_PORTAL))
 			  {
-				bh = new BlockStorage(block);
+			    bh = new BlockStorage(block);
 				if(plugin.gelManager.gelMap.containsKey(loc))
 				{
 				  bh = plugin.gelManager.gelMap.get(loc);
@@ -191,27 +149,13 @@ public class PortalManager {
 	private PortalCoord generatePortal(V10Location block, BlockFace face)
 	{
 		PortalCoord portal = new PortalCoord();
-		Block rb = block.getHandle().getBlock();
+		Location loc = block.getHandle();
+		Block rb = loc.getBlock();
 		
 		switch(face)
 		{
 		  case DOWN:
 		  case UP:
-			if (!plugin.config.CompactPortal || plugin.config.FillPortalBack < 0)
-			{
-				portal.border.add(new V10Location(rb.getRelative(BlockFace.NORTH)));
-				if(!plugin.config.CompactPortal)
-				{
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.NORTH_WEST))); 
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.WEST)));
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.SOUTH_WEST)));
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.SOUTH)));
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.SOUTH_EAST)));
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.EAST)));
-				  portal.border.add(new V10Location(rb.getRelative(BlockFace.NORTH_EAST)));
-				}
-			}
-			
 			portal.inside[0] = new V10Location(rb);
 	    	
 	    	portal.teleport[0] = new V10Location(rb.getRelative(face));
@@ -247,34 +191,6 @@ public class PortalManager {
 	    	break;
 	      default:
 	    	face = BlockFace.NORTH;
-	    }
-	    
-	    if (!plugin.config.CompactPortal || plugin.config.FillPortalBack < 0)
-	    {
-	      Block block2 = rb.getRelative(BlockFace.DOWN, 2);
-	      portal.border.add(new V10Location(block2));
-	      
-	      if(!plugin.config.CompactPortal)
-	      {
-	    	block2 = block2.getRelative(face);
-	    	portal.border.add(new V10Location(block2));
-	    	for(int i = 0; i < 3; i++)
-		    {
-	    	  block2 = block2.getRelative(BlockFace.UP);
-	    	  portal.border.add(new V10Location(block2));
-		    }
-	    	face = face.getOppositeFace();
-	    	for(int i = 0; i < 2; i++)
-	    	{
-	    	  block2 = block2.getRelative(face);
-	    	  portal.border.add(new V10Location(block2));
-	    	}
-	    	for(int i = 0; i < 3; i++)
-	    	{
-	    	  block2 = block2.getRelative(BlockFace.DOWN);
-	    	  portal.border.add(new V10Location(block2));
-	    	}
-	      }
 	    }
 	    
 	    portal.inside[1] = block;
@@ -574,9 +490,7 @@ public class PortalManager {
 	{
 	  Portal oldPortal;
 	  V10Location loc = new V10Location(block);
-	  if(borderBlocks.containsKey(loc))
-		oldPortal = borderBlocks.get(loc);
-	  else if(insideBlocks.containsKey(loc))
+	  if(insideBlocks.containsKey(loc))
 		oldPortal = insideBlocks.get(loc);
 	  else
 		oldPortal = null;
@@ -586,9 +500,7 @@ public class PortalManager {
 		if(!oldPortals.contains(oldPortal))
 		  oldPortals.add(oldPortal);
 		
-		if(border)
-		  pc.border.add(loc);
-		else
+		if(!border)
 		{
 		  pc.inside[ii] = loc;
 		  block = block.getRelative(pc.teleportFace.getOppositeFace());
@@ -601,9 +513,7 @@ public class PortalManager {
 	  }
 	  else if(ap || pb.contains(block.getTypeId()))
 	  {
-		if(border)
-		  pc.border.add(loc);
-		else
+		if(!border)
 		{
 		  pc.inside[ii] = loc;
 		  block = block.getRelative(pc.teleportFace.getOppositeFace());

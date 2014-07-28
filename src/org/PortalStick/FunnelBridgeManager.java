@@ -133,13 +133,8 @@ public class FunnelBridgeManager {
 		{
 			for (V10Location b: portal.coord.inside)
 			{
-			  if(b != null && cbridge.isBlockNextToBridge(b))
+			  if(b != null && cbridge.isBlockNextToBridge(b) || cbridge.isBlockNextToBridge(new V10Location(b.getWorldName(), b.getX(), b.getY() - 1, b.getZ())))
 				cbridge.activate();
-			}
-			for (V10Location b: portal.coord.border)
-			{
-				if (cbridge.isBlockNextToBridge(b))
-					cbridge.activate();
 			}
 		}
 	}

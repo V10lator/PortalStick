@@ -45,8 +45,7 @@ public class Bridge {
 		while(true)
 		{			
 			portal = null;
-			if(plugin.portalManager.insideBlocks.containsKey(nextV10Location))
-			{
+			if(plugin.portalManager.insideBlocks.containsKey(nextV10Location)) {
 			  portal = plugin.portalManager.insideBlocks.get(nextV10Location);
 			  if(portal.open)
 			  {
@@ -59,13 +58,16 @@ public class Bridge {
 			  else
 				return;
 			}
-			else if(plugin.portalManager.borderBlocks.containsKey(nextV10Location))
-			{
-			  portal = plugin.portalManager.borderBlocks.get(nextV10Location);
-			  if(portal.open)
-				nextV10Location = new V10Location(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
-			  else
-				return;
+			else {
+			    V10Location loc2 = new V10Location(nextV10Location.getWorldName(), nextV10Location.getX(), nextV10Location.getY() + 1, nextV10Location.getZ());
+			    if(plugin.portalManager.insideBlocks.containsKey(loc2))
+			    {
+			        portal = plugin.portalManager.insideBlocks.get(loc2);
+			        if(portal.open)
+			            nextV10Location = new V10Location(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+			        else
+			            return;
+			    }
 			}
 			if (portal != null)
 			{

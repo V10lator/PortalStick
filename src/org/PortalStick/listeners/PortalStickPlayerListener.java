@@ -183,9 +183,8 @@ public class PortalStickPlayerListener implements Listener {
 		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getTypeId() == 0 && event.getClickedBlock().getType() == Material.WOOL)
 		{
 			V10Location loc = new V10Location(event.getClickedBlock());
-			Portal portal = plugin.portalManager.borderBlocks.get(loc);
-			if (portal == null) portal = plugin.portalManager.insideBlocks.get(loc);
-			if (portal == null && plugin.config.CompactPortal) portal = plugin.portalManager.behindBlocks.get(loc);
+			Portal portal = plugin.portalManager.insideBlocks.get(loc);
+			if (portal == null) portal = plugin.portalManager.behindBlocks.get(loc);
 			if (portal == null) return;
 			if (portal.owner.name != player.getName()) return;
 		

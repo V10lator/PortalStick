@@ -96,14 +96,17 @@ public class Funnel extends Bridge {
 			  else
 				return;
 			}
-			else if(plugin.portalManager.borderBlocks.containsKey(nextLibigotLocation))
-			{
-			  portal = plugin.portalManager.borderBlocks.get(nextLibigotLocation);
-			  if(portal.open)
-				nextLibigotLocation = new V10Location(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
-			  else
-				return;
-			}
+			else {
+                V10Location loc2 = new V10Location(nextLibigotLocation.getWorldName(), nextLibigotLocation.getX(), nextLibigotLocation.getY() + 1, nextLibigotLocation.getZ());
+                if(plugin.portalManager.insideBlocks.containsKey(loc2))
+                {
+                    portal = plugin.portalManager.insideBlocks.get(loc2);
+                    if(portal.open)
+                        nextLibigotLocation = new V10Location(portal.getDestination().coord.teleport[0].getHandle().getBlock().getRelative(BlockFace.DOWN));
+                    else
+                        return;
+                }
+            }
 			
 			if(portal != null && portal.open)
 			{

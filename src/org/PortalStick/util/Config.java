@@ -41,12 +41,10 @@ public class Config {
 	public int PortalTool;
 	public short portalToolData; //Short for spout compatiblity!
 	public String portalToolName, portalToolDesc;
-	public boolean CompactPortal;
 	public Region GlobalRegion;
 	public int RegionTool;
 	public boolean RestoreInvOnWorldChange;
 	public List<String> ColorPresets;
-	public int FillPortalBack;
 	public byte portalBackData;
 	
 	public boolean useNativeSounds, useSpoutSounds;
@@ -113,12 +111,10 @@ public class Config {
           portalToolData = 0;
         portalToolName = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-name", "&6Aperture Science Handheld Portal Device"));
         portalToolDesc = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-description", "&aThanks to the ASHPD,\n&2the impossible is easy."));
-        CompactPortal = getBoolean("main.compact-portal", false);
         RegionTool = getInt("main.region-tool", 268);
         RestoreInvOnWorldChange = getBoolean("main.restore-inventory-on-world-change", true);
         ColorPresets = getStringList("main.portal-color-presets", Arrays.asList(new String[]{"3-1","2-6","9-10","5-13","8-7","15-4"}));
         split = getString("main.fill-portal-back", "-1").split(":");
-        FillPortalBack = Integer.parseInt(split[0]);
         if(split.length > 1)
           portalBackData = Byte.parseByte(split[1]);
         else

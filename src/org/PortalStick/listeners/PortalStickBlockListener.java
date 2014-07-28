@@ -87,9 +87,7 @@ public class PortalStickBlockListener implements Listener
 	  plugin.funnelBridgeManager.updateBridge(loc);
 	  
 	  Portal portal = null;
-	  if(plugin.portalManager.borderBlocks.containsKey(loc))
-		portal = plugin.portalManager.borderBlocks.get(loc);
-	  else if(plugin.portalManager.behindBlocks.containsKey(loc))
+	  if(plugin.portalManager.behindBlocks.containsKey(loc))
 		portal = plugin.portalManager.behindBlocks.get(loc);
 	  else if (plugin.portalManager.insideBlocks.containsKey(loc))
 	  {
@@ -208,12 +206,6 @@ public class PortalStickBlockListener implements Listener
 	  for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
 	  {
 		loc = new V10Location(block.getRelative(face));
-		if (plugin.portalManager.borderBlocks.containsKey(loc) ||
-				plugin.portalManager.behindBlocks.containsKey(loc))
-		{
-		  event.setCancelled(true);
-		  return;
-		}
 		if(plugin.portalManager.insideBlocks.containsKey(loc))
 		{
 		  event.setCancelled(true);
@@ -247,8 +239,7 @@ public class PortalStickBlockListener implements Listener
 		V10Location loc = new V10Location(event.getBlock());
 		if(plugin.config.DisabledWorlds.contains(loc.getWorldName()))
 		  return;
-		if (plugin.portalManager.borderBlocks.containsKey(loc) ||
-				plugin.portalManager.insideBlocks.containsKey(loc) ||
+		if (plugin.portalManager.insideBlocks.containsKey(loc) ||
 				plugin.portalManager.behindBlocks.containsKey(loc))
 		{
 			event.setCancelled(true);
@@ -872,11 +863,6 @@ public class PortalStickBlockListener implements Listener
 				 endBlock.setTypeIdAndData(sourceB.getTypeId(), sourceB.getData(), false);
 				 sourceB.setType(Material.AIR);
 			 }
-		 }
-		 else
-		 {
-			 if (plugin.portalManager.borderBlocks.containsKey(loc) || plugin.grillManager.borderBlocks.containsKey(loc) || plugin.grillManager.insideBlocks.containsKey(loc))
-				 event.setCancelled(true);
 		 }
 		 
 		 //Update bridge if piston made space
