@@ -75,7 +75,6 @@ public class Portal {
 		Portal oldDestination = getDestination();
 		if(oldDestination != null)
 		  if (oldDestination.getDestination() == null) oldDestination.close();
-	    plugin.getLogger().info("Deleted portal ("+(orange ? "orange" : "blue")+")");
 
    	}
 	
@@ -93,13 +92,12 @@ public class Portal {
 		        loc.getBlock().setType(Material.REDSTONE_TORCH_ON);
 		    else
 		        loc.getBlock().setType(Material.AIR);
-		    coord.insideFrozen[i] = new FrozenSandFactory(plugin).withLocation(loc).withText("1:0").build(); //TODO: Do not hardcode 1:0
+		    coord.insideFrozen[i] = new FrozenSandFactory(plugin).withLocation(loc).withText("95:"+(orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset))).build();
     	}
 		if(receiver)
 		    placetorch = false;
 		open = true;
 		plugin.funnelBridgeManager.reorientBridge(this);
-		plugin.getLogger().info("Opened portal ("+(orange ? "orange" : "blue")+")");
 	}
 	
 	public void switchRedstoneTransmitter(boolean on) {
@@ -169,7 +167,6 @@ public class Portal {
 		    }
 		}
 		open = false;
-		plugin.getLogger().info("Closed portal ("+(orange ? "orange" : "blue")+")");
 		plugin.funnelBridgeManager.reorientBridge(this);
 	}
 	
