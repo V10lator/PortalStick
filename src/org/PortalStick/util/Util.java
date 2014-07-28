@@ -262,7 +262,7 @@ public class Util {
         Block item, check;
         while (iterator.hasNext()) {
             item = iterator.next();
-            for (Entry<V10Location, FrozenSand> fb : plugin.eventListener.flyingBlocks.entrySet()) {
+            for (Entry<V10Location, FrozenSand> fb : plugin.cubeManager.flyingBlocks.entrySet()) {
                 int acc = 2;
                 check = fb.getValue().getLocation().getBlock();
                 for (int x = -acc; x < acc; x++)
@@ -452,44 +452,44 @@ public class Util {
     
     public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign) {
         V10Location loc = new V10Location(hatchMiddle);
-        if (plugin.eventListener.cubes.containsKey(loc)) {
-            Entity entity = EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.eventListener.cubes.get(loc));
+        if (plugin.cubeManager.cubes.containsKey(loc)) {
+            Entity entity = EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.cubeManager.cubes.get(loc));
             if (entity != null)
                 entity.remove();
-            plugin.eventListener.cubes.remove(loc);
-        } else if (plugin.eventListener.flyingBlocks.containsKey(loc)) {
-            if (plugin.eventListener.buttons.containsValue(plugin.eventListener.flyingBlocks.get(loc))) {
-                Iterator<Entry<V10Location, FrozenSand>> it = plugin.eventListener.buttons.entrySet().iterator();
+            plugin.cubeManager.cubes.remove(loc);
+        } else if (plugin.cubeManager.flyingBlocks.containsKey(loc)) {
+            if (plugin.cubeManager.buttons.containsValue(plugin.cubeManager.flyingBlocks.get(loc))) {
+                Iterator<Entry<V10Location, FrozenSand>> it = plugin.cubeManager.buttons.entrySet().iterator();
                 Entry<V10Location, FrozenSand> e;
                 V10Location middle;
                 while (it.hasNext()) {
                     e = it.next();
-                    if (e.getValue() == plugin.eventListener.flyingBlocks.get(loc)) {
+                    if (e.getValue() == plugin.cubeManager.flyingBlocks.get(loc)) {
                         middle = e.getKey();
-                        changeBtn(middle, !plugin.eventListener.buttons.containsKey(middle));
+                        changeBtn(middle, !plugin.cubeManager.buttons.containsKey(middle));
                         it.remove();
                     }
                 }
             }
-            plugin.eventListener.flyingBlocks.get(loc).clearAllPlayerViews();
-            plugin.eventListener.flyingBlocks.remove(loc);
+            plugin.cubeManager.flyingBlocks.get(loc).clearAllPlayerViews();
+            plugin.cubeManager.flyingBlocks.remove(loc);
             
 
-        } else if (plugin.eventListener.cubesPlayer.containsKey(loc)) {
+        } else if (plugin.cubeManager.cubesPlayer.containsKey(loc)) {
 
             // remove cubesPlayerItem.get(hatchMiddle)
             // from cubesPlayer.get(hatchMiddle)
-            Player p = Bukkit.getPlayer(plugin.eventListener.cubesPlayer.get(loc));
+            Player p = Bukkit.getPlayer(plugin.cubeManager.cubesPlayer.get(loc));
             remove(p.getInventory(),
-                    plugin.eventListener.cubesPlayerItem.get(loc)
-                    .getType(), 1, plugin.eventListener.cubesPlayerItem
+                    plugin.cubeManager.cubesPlayerItem.get(loc)
+                    .getType(), 1, plugin.cubeManager.cubesPlayerItem
                     .get(loc).getData()
                     .getData());
             doInventoryUpdate(p, plugin);
 
-            plugin.eventListener.cubesPlayer.remove(loc);
+            plugin.cubeManager.cubesPlayer.remove(loc);
 
-            plugin.eventListener.cubesPlayerItem.remove(loc);
+            plugin.cubeManager.cubesPlayerItem.remove(loc);
 
         }
         BlockFace[] blockfaces = new BlockFace[] {
@@ -499,10 +499,10 @@ public class Util {
                 BlockFace.NORTH_WEST, BlockFace.NORTH,
                 BlockFace.SELF};
         V10Location loc2 = new V10Location(hatchMiddle.getRelative(BlockFace.DOWN,3));
-        for (Entry<BukkitTask, V10Location> t : plugin.eventListener.hatches.entrySet()) {
+        for (Entry<BukkitTask, V10Location> t : plugin.cubeManager.hatches.entrySet()) {
             if (t.getValue().equals(loc2)) {
                 t.getKey().cancel();
-                plugin.eventListener.hatches.remove(t.getKey());
+                plugin.cubeManager.hatches.remove(t.getKey());
                 }
             }
         /*if (respawn) {
@@ -535,8 +535,8 @@ public class Util {
                             hatchMiddle.getLocation(), id,
                             (byte) data);
             f.setDropItem(false);
-            plugin.eventListener.cubes.put(loc, f.getUniqueId());
-            plugin.eventListener.cubesign.put(loc, new V10Location(sign));
+            plugin.cubeManager.cubes.put(loc, f.getUniqueId());
+            plugin.cubeManager.cubesign.put(loc, new V10Location(sign));
         }
     }
     

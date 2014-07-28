@@ -59,7 +59,7 @@ public class FrozenSand {
 			@Override
 			public void run() {
 				if (!plugin.util.isSolid(getLocation().getBlock().getRelative(BlockFace.DOWN).getType())) {
-					if (plugin.eventListener.flyingBlocks.containsValue(sand)) {
+					if (plugin.cubeManager.flyingBlocks.containsValue(sand)) {
 					
 					if (!plugin.funnelBridgeManager.cubeinFunnel.containsKey(sand)) {
 						FallingBlock f = getLocation()
@@ -69,11 +69,11 @@ public class FrozenSand {
 										getMaterial(),
 										getData());
 						final UUID uuid = f.getUniqueId();
-						Iterator<Entry<V10Location, FrozenSand>> it = plugin.eventListener.flyingBlocks.entrySet().iterator();
+						Iterator<Entry<V10Location, FrozenSand>> it = plugin.cubeManager.flyingBlocks.entrySet().iterator();
 						while (it.hasNext()) {
 							Entry<V10Location, FrozenSand> e = it.next();
 							if (e.getValue() == sand) {
-								plugin.eventListener.cubes.put(e.getKey(), uuid);
+								plugin.cubeManager.cubes.put(e.getKey(), uuid);
 								it.remove();
 							}
 						}

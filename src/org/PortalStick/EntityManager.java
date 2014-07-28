@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.fallingblocks.LocationIterator;
-import org.PortalStick.listeners.PortalStickEventListener.SignResetter;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.PortalStick.util.Config.Sound;

@@ -237,10 +237,10 @@ public class FunnelBridgeManager {
 							.getBlockData());
 			fblock = new FrozenSandFactory(plugin).withLocation(fb.getLocation()).withText(id).build();
 			cubeinFunnel.put(fblock, funnel);
-			for (Entry<V10Location, UUID> entry : plugin.eventListener.cubes.entrySet()) {
+			for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
 				if (fb.getUniqueId().equals(entry.getValue())) {
-					plugin.eventListener.flyingBlocks.put(entry.getKey(), fblock);
-					plugin.eventListener.cubes.remove(entry.getKey());
+					plugin.cubeManager.flyingBlocks.put(entry.getKey(), fblock);
+					plugin.cubeManager.cubes.remove(entry.getKey());
 					break;
 				}
 			}

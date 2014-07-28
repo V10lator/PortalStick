@@ -4,7 +4,6 @@
  */
 package org.PortalStick;
 
-import org.PortalStick.listeners.PortalStickEventListener;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,12 +12,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class AnimateHatch extends BukkitRunnable {
 	private V10Location blk;
 	private boolean on;
-	private PortalStickEventListener el;
+	private PortalStick plugin;
 
-	public AnimateHatch(Block blk, boolean on, PortalStickEventListener el) {
+	public AnimateHatch(Block blk, boolean on, PortalStick plugin) {
 		this.blk = new V10Location(blk);
 		this.on = on;
-		this.el = el;
+		this.plugin = plugin;
 	}
 
 	public void run() {
@@ -29,7 +28,7 @@ public class AnimateHatch extends BukkitRunnable {
 	}
 	
 	public void cancel() {
-		el.hatches.remove(this);
+		plugin.cubeManager.hatches.remove(this);
 	}
 	
 }

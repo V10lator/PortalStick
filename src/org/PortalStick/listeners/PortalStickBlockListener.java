@@ -295,7 +295,7 @@ public class PortalStickBlockListener implements Listener
             @Override
             public void run() {
                 byte data, data1, data2, data3, data4, data5, data6, data7, data8;
-                Iterator<V10Location> iter = plugin.cubeManager.wire.iterator();
+                Iterator<V10Location> iter = plugin.wireManager.wire.iterator();
                 Block blk;
                 data1 = DyeColor.LIME.getData();
                 data2 = DyeColor.PINK.getData();
@@ -357,28 +357,28 @@ public class PortalStickBlockListener implements Listener
                     blk.setData(data2);
                     new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
                             1L);
-                    plugin.cubeManager.wire.add(new V10Location(blk));
+                    plugin.wireManager.wire.add(new V10Location(blk));
                     return;
                 }
                 if (blk.getData() == data3) {
                     blk.setData(data4);
                     new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
                             1L);
-                    plugin.cubeManager.wire.add(new V10Location(blk));
+                    plugin.wireManager.wire.add(new V10Location(blk));
                 return;
                 }
                 if (blk.getData() == data5) {
                     blk.setData(data6);
                     new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
                             1L);
-                    plugin.cubeManager.wire.add(new V10Location(blk));
+                    plugin.wireManager.wire.add(new V10Location(blk));
                     return;
                 }
                 if (blk.getData() == data7) {
                     blk.setData(data8);
                     new CheckWireTask(plugin, blk, blk, true).runTaskLater(plugin,
                             1L);
-                    plugin.cubeManager.wire.add(new V10Location(blk));
+                    plugin.wireManager.wire.add(new V10Location(blk));
                 return;
                 }
             } 

@@ -203,8 +203,8 @@ public class GrillManager {
 			if(item.getTypeId() == (Integer)is)
 			  return;
 		  }
-		  if(entity instanceof FallingBlock && plugin.eventListener.cubes.containsValue(entity.getUniqueId()))
-		      plugin.eventListener.respawnCubes.add(entity.getUniqueId());
+		  if(entity instanceof FallingBlock && plugin.cubeManager.cubes.containsValue(entity.getUniqueId()))
+		      plugin.cubeManager.respawnCubes.add(entity.getUniqueId());
 		  entity.remove();
 		  playGrillAnimation(entity.getLocation());
 		}

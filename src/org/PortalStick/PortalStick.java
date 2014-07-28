@@ -19,7 +19,6 @@ import org.PortalStick.commands.SayCommand;
 import org.PortalStick.commands.SetRegionCommand;
 import org.PortalStick.fallingblocks.FlyingBlocksAPI;
 import org.PortalStick.fallingblocks.TagIdGenerator;
-import org.PortalStick.listeners.PortalStickEventListener;
 import org.PortalStick.listeners.PortalStickBlockListener;
 import org.PortalStick.listeners.PortalStickEntityListener;
 import org.PortalStick.listeners.PortalStickPlayerListener;
@@ -49,8 +48,8 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
-	public final CubeManager cubeManager = new CubeManager(this);
-	public PortalStickEventListener eventListener = new PortalStickEventListener(this);
+	public final CubeManager cubeManager = new CubeManager();
+	public final WireManager wireManager = new WireManager(this);
 	public WorldGuardPlugin worldGuard = null;
 	
 	public final Util util = new Util(this);
@@ -65,7 +64,7 @@ public class PortalStick extends JavaPlugin {
 
 	public void onDisable() {
 		//config.unLoad() handles cleanup, so let's call it
-		eventListener.cleanUpWire();
+		wireManager.cleanUpWire();
 		config.unLoad();
 		getServer().getScheduler().cancelTasks(this);
 	}
@@ -81,7 +80,6 @@ public class PortalStick extends JavaPlugin {
 		pm.registerEvents(new PortalStickBlockListener(this), this);
 		pm.registerEvents(new PortalStickVehicleListener(this), this);
 		pm.registerEvents(eL, this);
-		pm.registerEvents(eventListener, this);
 		
 		worldGuard = (WorldGuardPlugin) pm.getPlugin("WorldGuard");
 		
