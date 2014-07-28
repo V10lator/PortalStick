@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -30,10 +31,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 
@@ -520,5 +524,65 @@ public class PortalStickPlayerListener implements Listener {
 
 	        return;
 	    }
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void login(PlayerJoinEvent event) {
+	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
+            return;
+	    final UUID uuid = event.getPlayer().getUniqueId();
+	    Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+
+	        @Override
+	        public void run() {
+	            Player p = plugin.getServer().getPlayer(uuid);
+	            if(p == null)
+	                return;
+	            World world = p.getWorld();
+	            for (FrozenSand h : plugin.flyingBlocksAPI.fakeBlocks)
+	                if(world.equals(h.getLocation().getWorld()))
+	                    h.show(p);
+	        }
+	    },80L);
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTeleport(final PlayerTeleportEvent event) {
+	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
+            return;
+        final UUID uuid = event.getPlayer().getUniqueId();
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+
+            @Override
+            public void run() {
+                Player p = plugin.getServer().getPlayer(uuid);
+                if(p == null)
+                    return;
+                World world = p.getWorld();
+                for (FrozenSand h : plugin.flyingBlocksAPI.fakeBlocks)
+                    if(world.equals(h.getLocation().getWorld()))
+                        h.show(p);
+            }
+        },10L);
+    }
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void worldMove (PlayerChangedWorldEvent event) {
+	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
+            return;
+        final UUID uuid = event.getPlayer().getUniqueId();
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+
+            @Override
+            public void run() {
+                Player p = plugin.getServer().getPlayer(uuid);
+                if(p == null)
+                    return;
+                World world = p.getWorld();
+                for (FrozenSand h : plugin.flyingBlocksAPI.fakeBlocks)
+                    if(world.equals(h.getLocation().getWorld()))
+                        h.show(p);
+            }
+        },10L);
 	}
 }

@@ -59,7 +59,7 @@ public class PortalStick extends JavaPlugin {
 	
 	public final Random rand = new Random();
 	
-	public final FlyingBlocksAPI flyingBlocksAPI = new FlyingBlocksAPI(this);
+	public final FlyingBlocksAPI flyingBlocksAPI = new FlyingBlocksAPI();
 	public final TagIdGenerator tagIdGenerator = new TagIdGenerator();
 
 	public void onDisable() {
@@ -75,7 +75,6 @@ public class PortalStick extends JavaPlugin {
 		//Register events
 		Server s = getServer();
 		PluginManager pm = s.getPluginManager();
-		pm.registerEvents(flyingBlocksAPI, this);
 		pm.registerEvents(new PortalStickPlayerListener(this), this);
 		pm.registerEvents(new PortalStickBlockListener(this), this);
 		pm.registerEvents(new PortalStickVehicleListener(this), this);
