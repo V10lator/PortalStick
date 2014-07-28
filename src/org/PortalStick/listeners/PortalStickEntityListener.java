@@ -208,20 +208,10 @@ public class PortalStickEntityListener implements Listener {
           if(plugin.cubeManager.cubes.containsValue(uuid)) {
               Block up = event.getBlock();
               if (up.getType().name().contains("LAVA")) {
-                  Location loc;
                   for (Entry<V10Location, UUID> entry: plugin.cubeManager.cubes.entrySet()) {
                       if (uuid.equals(entry.getValue())) {
-                          loc = entry.getKey().getHandle();
-                          FallingBlock f = loc
-                                      .getWorld()
-                                      .spawnFallingBlock(
-                                              loc,
-                                              ((FallingBlock) event.getEntity()).getBlockId(),
-                                              (byte)((FallingBlock) event.getEntity())
-                                              .getBlockData());
-                              f.setDropItem(false);
+                          plugin.util.clear(entry.getKey().getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), plugin.cubeManager.cubesign.get(entry.getKey()).getHandle().getBlock());
                               event.getEntity().remove();
-                              plugin.cubeManager.cubes.put(entry.getKey(), f.getUniqueId());
                               event.setCancelled(true);
                               return;
                           

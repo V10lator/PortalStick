@@ -16,6 +16,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -449,8 +450,10 @@ public class Util {
             }
         }, 1L);
     }
-    
     public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign) {
+    	clear(hatchMiddle, powered, id, data, sign, false);
+    }
+    public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign, boolean first) {
         V10Location loc = new V10Location(hatchMiddle);
         if (plugin.cubeManager.cubes.containsKey(loc)) {
             Entity entity = EntityUtil.getEntity(hatchMiddle.getWorld(),plugin.cubeManager.cubes.get(loc));
@@ -530,6 +533,8 @@ public class Util {
 
     }*/
         if (powered) {
+        	Sign s = (Sign) sign.getState();
+        	if (!s.getLine(2).equals("norespawn")||first) {
             FallingBlock f = hatchMiddle.getWorld()
                     .spawnFallingBlock(
                             hatchMiddle.getLocation(), id,
@@ -537,6 +542,7 @@ public class Util {
             f.setDropItem(false);
             plugin.cubeManager.cubes.put(loc, f.getUniqueId());
             plugin.cubeManager.cubesign.put(loc, new V10Location(sign));
+        }
         }
     }
     

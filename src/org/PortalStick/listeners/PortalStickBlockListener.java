@@ -406,7 +406,7 @@ public class PortalStickBlockListener implements Listener
                                     Block next = blk.getRelative(((org.bukkit.material.Sign) blk
                                             .getState().getData()).getFacing());
                                     plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), id, data,
-                                            blk);
+                                            blk, true);
                                 } 
                             }}, 1l);
                         

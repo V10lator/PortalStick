@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.util.RegionSetting;
@@ -203,8 +205,6 @@ public class GrillManager {
 			if(item.getTypeId() == (Integer)is)
 			  return;
 		  }
-		  if(entity instanceof FallingBlock && plugin.cubeManager.cubes.containsValue(entity.getUniqueId()))
-		      plugin.cubeManager.respawnCubes.add(entity.getUniqueId());
 		  entity.remove();
 		  playGrillAnimation(entity.getLocation());
 		}
@@ -217,10 +217,20 @@ public class GrillManager {
 			if(id == (Integer)is)
 			  return;
 		  }
+		  if (plugin.cubeManager.cubes.containsValue(entity.getUniqueId())) {
+			  plugin.cubeManager.respawnCubes.add(entity.getUniqueId());
+		  }
 		  entity.remove();
 		  playGrillAnimation(entity.getLocation());
 		}
 		return;
+	  }
+	  if (plugin.cubeManager.cubesPlayer.containsValue(entity.getUniqueId())) {
+		  for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubesPlayer.entrySet()) {
+			  ItemStack is =  plugin.cubeManager.cubesPlayerItem.get(entry.getKey());
+			  plugin.util.clear(entry.getKey().getHandle().getBlock(), true, is.getTypeId(), is.getDurability(), plugin.cubeManager.cubesign.get(entry.getKey()).getHandle().getBlock());
+		  }
+		 
 	  }
 	  plugin.portalManager.deletePortals(user);
 	  InventoryHolder ih = (InventoryHolder)entity;
