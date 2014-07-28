@@ -47,6 +47,7 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
+	public final FrozenSandManager frozenSandManager = new FrozenSandManager();
 	public final CubeManager cubeManager = new CubeManager();
 	public final WireManager wireManager = new WireManager(this);
 	public WorldGuardPlugin worldGuard = null;
@@ -58,7 +59,6 @@ public class PortalStick extends JavaPlugin {
 	
 	public final Random rand = new Random();
 	
-	public final FrozenSandManager flyingBlocksAPI = new FrozenSandManager();
 	public final TagIdGenerator tagIdGenerator = new TagIdGenerator();
 
 	public void onDisable() {

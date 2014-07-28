@@ -237,8 +237,8 @@ public class FrozenSand {
                this.clearTags(p, entityIDs);
            } 
        }
-       if ( plugin.flyingBlocksAPI.fakeBlocks.contains(this)) {
-       plugin.flyingBlocksAPI.fakeBlocks.remove(this);
+       if ( plugin.frozenSandManager.fakeBlocks.contains(this)) {
+       plugin.frozenSandManager.fakeBlocks.remove(this);
        }
       
         

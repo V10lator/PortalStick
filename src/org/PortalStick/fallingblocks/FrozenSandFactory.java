@@ -60,9 +60,9 @@ public class FrozenSandFactory {
 	                plugin.getLogger().warning("Could not find valid world (" + this.worldName + ") for Hologram of ID " + this.saveId + ". Maybe the world isn't loaded yet?");
 	            return null;
 	        }
-	        int id = plugin.flyingBlocksAPI.getNextId();
+	        int id = plugin.frozenSandManager.getNextId();
 	        FrozenSand hologram = new FrozenSand(plugin, id,this.worldName, this.locX, this.locY, this.locZ, this.attachPlayer,this.ridePlayer, tag);
-	        plugin.flyingBlocksAPI.fakeBlocks.add(hologram);
+	        plugin.frozenSandManager.fakeBlocks.add(hologram);
 	        for (Player e : world.getPlayers()) {
 	                hologram.show(e);
 	        }

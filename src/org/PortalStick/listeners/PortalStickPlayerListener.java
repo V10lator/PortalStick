@@ -539,7 +539,7 @@ public class PortalStickPlayerListener implements Listener {
 	            if(p == null)
 	                return;
 	            World world = p.getWorld();
-	            for (FrozenSand h : plugin.flyingBlocksAPI.fakeBlocks)
+	            for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
 	                if(world.equals(h.getLocation().getWorld()))
 	                    h.show(p);
 	        }
@@ -559,7 +559,7 @@ public class PortalStickPlayerListener implements Listener {
                 if(p == null)
                     return;
                 World world = p.getWorld();
-                for (FrozenSand h : plugin.flyingBlocksAPI.fakeBlocks)
+                for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
                     if(world.equals(h.getLocation().getWorld()))
                         h.show(p);
             }
@@ -579,7 +579,7 @@ public class PortalStickPlayerListener implements Listener {
                 if(p == null)
                     return;
                 World world = p.getWorld();
-                for (FrozenSand h : plugin.flyingBlocksAPI.fakeBlocks)
+                for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
                     if(world.equals(h.getLocation().getWorld()))
                         h.show(p);
             }
