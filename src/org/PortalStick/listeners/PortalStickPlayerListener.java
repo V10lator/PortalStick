@@ -528,61 +528,42 @@ public class PortalStickPlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void login(PlayerJoinEvent event) {
-	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
-            return;
-	    final UUID uuid = event.getPlayer().getUniqueId();
-	    Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
-
-	        @Override
-	        public void run() {
-	            Player p = plugin.getServer().getPlayer(uuid);
-	            if(p == null)
-	                return;
-	            World world = p.getWorld();
-	            for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
-	                if(world.equals(h.getLocation().getWorld()))
-	                    h.show(p);
-	        }
-	    },80L);
+	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()),80L);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(final PlayerTeleportEvent event) {
-	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
-            return;
-        final UUID uuid = event.getPlayer().getUniqueId();
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
-
-            @Override
-            public void run() {
-                Player p = plugin.getServer().getPlayer(uuid);
-                if(p == null)
-                    return;
-                World world = p.getWorld();
-                for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
-                    if(world.equals(h.getLocation().getWorld()))
-                        h.show(p);
-            }
-        },10L);
+	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()),10L);
     }
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void worldMove (PlayerChangedWorldEvent event) {
-	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
-            return;
-        final UUID uuid = event.getPlayer().getUniqueId();
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
-
-            @Override
-            public void run() {
-                Player p = plugin.getServer().getPlayer(uuid);
-                if(p == null)
-                    return;
-                World world = p.getWorld();
+        Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()), 10L);
+	}
+	
+	private class UpdatePlayerView implements Runnable{
+	    private final UUID uuid;
+	    UpdatePlayerView(UUID uuid) {
+	        this.uuid = uuid;
+	    }
+	    
+	    @Override
+        public void run() {
+            Player p = plugin.getServer().getPlayer(uuid);
+            if(p == null)
+                return;
+            World world = p.getWorld();
+            boolean disabled = plugin.config.DisabledWorlds.contains(world.getName());
+            try {
+                p.setResourcePack(disabled ? null : plugin.config.textureURL);
+            } catch(IllegalArgumentException e) {
+                e.printStackTrace(); //TODO: Handle that.
+            }
+            if(!disabled) {
                 for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
                     if(world.equals(h.getLocation().getWorld()))
                         h.show(p);
             }
-        },10L);
+        }
 	}
 }

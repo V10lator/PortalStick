@@ -46,6 +46,7 @@ public class Config {
 	public boolean RestoreInvOnWorldChange;
 	public List<String> ColorPresets;
 	public byte portalBackData;
+	public String textureURL;
 	
 	public boolean useNativeSounds, useSpoutSounds;
 	public int soundRange;
@@ -119,6 +120,12 @@ public class Config {
           portalBackData = Byte.parseByte(split[1]);
         else
           portalBackData = 0;
+        
+        //Load texture settings
+        boolean useURL = getBoolean("texture.use-custom-texture", true);
+        textureURL = getString("texture.custom-URL", "https://eyrenetwork.net/Portal.zip");
+        if(!useURL)
+            textureURL = null;
         
         //Load sound settings
         useNativeSounds = getBoolean("sounds.use-minecraft-sounds", true);
