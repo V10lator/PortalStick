@@ -1,4 +1,4 @@
-package org.PortalStick.Managers;
+package org.PortalStick.managers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;

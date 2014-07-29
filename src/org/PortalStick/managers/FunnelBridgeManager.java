@@ -1,4 +1,4 @@
-package org.PortalStick.Managers;
+package org.PortalStick.managers;
 
 import java.util.HashMap;
 import java.util.HashSet;
