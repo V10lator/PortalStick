@@ -233,28 +233,36 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			    portal.delete();
 			} else {
 			    // Take cube
-				if (plugin.cubeManager.flyingBlocks.containsKey(loc)) {
-			        FrozenSand fb = plugin.cubeManager.flyingBlocks.get(loc);
-	                plugin.cubeManager.cubesPlayer.put(loc, player.getUniqueId());
-	                ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.id.split(":")[0])), 1, (byte)Integer.parseInt(fb.id.split(":")[1]));
-	                plugin.cubeManager.cubesPlayerItem.put(loc, item);
+				Iterator<Entry<V10Location, FrozenSand>> it = plugin.cubeManager.flyingBlocks.entrySet().iterator();
+				if (it.hasNext()) {
+					Entry<V10Location, FrozenSand> e = it.next();
+					if (plugin.util.compareLocation(e.getValue().getLocation().getBlock().getLocation(), loc.getHandle().getBlock().getLocation())) {
+						FrozenSand fb = e.getValue();
+		                plugin.cubeManager.cubesPlayer.put(e.getKey(), player.getUniqueId());
+		                ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.id.split(":")[0])), 1, (byte)Integer.parseInt(fb.id.split(":")[1]));
+		                plugin.cubeManager.cubesPlayerItem.put(loc, item);
 
-	                player.getInventory().addItem(item);
-	                plugin.util.doInventoryUpdate(player, plugin);
-	                fb.remove();
-	                V10Location middle;
-	                if (plugin.cubeManager.buttons.containsValue(fb)) {
-	                    Iterator<Entry<V10Location, FrozenSand>> iter = plugin.cubeManager.buttons.entrySet().iterator();
-	                    while (iter.hasNext()) {
-	                        Entry<V10Location, FrozenSand> e = iter.next();
-	                        if (e.getValue() == fb) {
-	                            middle = e.getKey();
-	                            plugin.util.changeBtn(middle, false);
-	                                iter.remove();
-	                        }
-	                    }
-	                }
-	                return;
+		                player.getInventory().addItem(item);
+		                plugin.util.doInventoryUpdate(player, plugin);
+		                fb.remove();
+		                V10Location middle;
+		                if (plugin.cubeManager.buttons.containsValue(fb)) {
+		                    Iterator<Entry<V10Location, FrozenSand>> iter = plugin.cubeManager.buttons.entrySet().iterator();
+		                    while (iter.hasNext()) {
+		                        Entry<V10Location, FrozenSand> en = iter.next();
+		                        if (en.getValue() == fb) {
+		                            middle = e.getKey();
+		                            plugin.util.changeBtn(middle, false);
+		                                iter.remove();
+		                        }
+		                    }
+		                }
+		                it.remove();
+		                return;	
+					}
+				}
+				if (plugin.cubeManager.flyingBlocks.containsKey(loc)) {
+			        
 			    }
 			}
 		    

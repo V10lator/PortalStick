@@ -48,6 +48,9 @@ public class FrozenSand implements Entity {
 	double x = 0;
 	double y = 0;
 	double z = 0;
+	double motx = 0;
+	double moty = 0;
+	double motz=0;
 	public int storageId = 0;
 	String worldName = "";
 	ProtocolManager pm;

@@ -604,11 +604,8 @@ public class EntityManager implements Runnable {
 	                if (pos2) {
 	                    Location dest = new Location(
 	                            playerloc.getWorld(), x, y, z);
-	                    Bukkit.getPlayer("sanjay900").sendMessage(playerloc.toString());;
-	                    Bukkit.getPlayer("sanjay900").sendMessage(dest.toString());;
 	                    vector = dest.toVector().subtract(
 	                            playerloc.toVector());
-	                    Bukkit.getPlayer("sanjay900").sendMessage(vector.toString());;
 
 	                } else {
 	                    vector = entity.getLocation().getDirection();
