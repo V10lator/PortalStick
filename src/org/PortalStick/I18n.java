@@ -47,23 +47,40 @@ public class I18n
 	  int bl = 4096;
 	  byte[] buffer = new byte[bl];
 	  int r;
+	  YamlConfiguration tmpIn, tmpOut;
+	  boolean changed;
+	  String en;
 	  while(entries.hasMoreElements())
 	  {
 		entry = entries.nextElement();
-		String en = entry.getName();
-		if(!en.startsWith(pkg))
+		en = entry.getName();
+		if(!en.startsWith(pkg) || entry.isDirectory())
 		  continue;
-		f = new File(ld, en.substring(5));
-		if(f.exists())
-		  continue;
-		f.createNewFile();
-		in = jar.getInputStream(entry);
-		out = new FileOutputStream(f);
-		while((r = in.read(buffer, 0, bl)) > 0)
-		  out.write(buffer, 0, r);
-		in.close();
-		out.flush();
-		out.close();
+		en = en.substring(5);
+		f = new File(ld, en);
+		if(f.exists()) {
+		    tmpIn = new YamlConfiguration();
+		    tmpIn.load(getClass().getResourceAsStream("/lang/"+en));
+		    tmpOut = new YamlConfiguration();
+		    tmpOut.load(f);
+		    changed = false;
+		    for(String var: tmpIn.getKeys(false))
+		        if(!tmpOut.isSet(var)) {
+		            tmpOut.set(var, tmpIn.get(var));
+		            changed = true;
+		        }
+		    if(changed)
+		        tmpOut.save(f);
+		} else {
+	        in = jar.getInputStream(entry);
+		    f.createNewFile();
+		    out = new FileOutputStream(f);
+		    while((r = in.read(buffer, 0, bl)) > 0)
+		        out.write(buffer, 0, r);
+		    in.close();
+		    out.flush();
+		    out.close();
+		}
 	  }
 	  jar.close();
 	}
