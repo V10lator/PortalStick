@@ -528,25 +528,23 @@ public class PortalStickPlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void login(PlayerJoinEvent event) {
-	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId(), true),80L);
+	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()),80L);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(final PlayerTeleportEvent event) {
-	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId(), false),10L);
+	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()),10L);
     }
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void worldMove (PlayerChangedWorldEvent event) {
-        Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId(), true), 10L);
+        Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()), 10L);
 	}
 	
 	private class UpdatePlayerView implements Runnable{
 	    private final UUID uuid;
-		private boolean textures;
-	    UpdatePlayerView(UUID uuid, boolean updateTextures) {
+	    UpdatePlayerView(UUID uuid) {
 	        this.uuid = uuid;
-	        this.textures = updateTextures;
 	    }
 	    
 	    @Override
@@ -556,12 +554,16 @@ public class PortalStickPlayerListener implements Listener {
                 return;
             World world = p.getWorld();
             boolean disabled = plugin.config.DisabledWorlds.contains(world.getName());
-            if (textures) {
-            try {
-                p.setResourcePack(disabled ? null : plugin.config.textureURL);
-            } catch(IllegalArgumentException e) {
-                e.printStackTrace(); //TODO: Handle that.
-            }
+            if(plugin.config.textureURL != null) {
+                User user = plugin.userManager.getUser(p);
+                if((disabled && !user.hasDefaultTexture) || (!disabled && user.hasDefaultTexture)) {
+                    try {
+                        p.setResourcePack(disabled ? null : plugin.config.textureURL);
+                    } catch(IllegalArgumentException e) {
+                        e.printStackTrace(); //TODO: Handle that.
+                    }
+                    user.hasDefaultTexture = !user.hasDefaultTexture;
+                }
             }
             if(!disabled) {
                 for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)

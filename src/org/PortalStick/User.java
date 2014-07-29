@@ -23,6 +23,7 @@ public class User {
 	public final String name;
 	public final boolean isPlayer;
 	public final HashSet<Item> droppedItems = new HashSet<Item>();
+	public boolean hasDefaultTexture = true;
 	
 	public User(String name) {
 	    this.name = name;
