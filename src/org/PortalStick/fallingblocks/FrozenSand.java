@@ -6,11 +6,13 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.Region;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -18,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -87,14 +90,115 @@ public class FrozenSand {
 				}
 				if (motion != null) {
 					if (!plugin.funnelBridgeManager.cubeinFunnel.containsKey(sand)) {
-					FlyingBlockMoveEvent event = new FlyingBlockMoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
-					Bukkit.getServer().getPluginManager().callEvent(event);
-					if (!event.isCancelled()) {
-						move(getLocation().add(motion));
-						motion = event.getVelocity();
-					} else {
-						motion = null;
-					}
+					    
+					    
+					    Location to = getLocation().clone().add(motion);
+					    Location from = getLocation().clone();
+				        if (plugin.cubeManager.flyingBlocks.containsValue(sand)) {
+				            Block under = to.getBlock().getRelative(BlockFace.DOWN);
+				            BlockFace face = FaceUtil.getDirection(motion);
+				            Vector half = FaceUtil.faceToVector(face).multiply(0.5);
+				            Block bTo = to.clone().add(half).getBlock();
+				            Block bFrom = from.getBlock();
+				            Iterator<Entry<V10Location, FrozenSand>> fb = plugin.cubeManager.flyingBlocks.entrySet().iterator();
+				            V10Location respawnLoc = null;
+				            Entry<V10Location, FrozenSand> e;
+				            while (fb.hasNext()) {
+				                e = fb.next();
+				                if (e.getValue() == sand) {
+				                    respawnLoc = e.getKey();
+				                break;
+				                }
+				            }
+
+				            V10Location vloc = new V10Location(to);
+				            byte useGel = plugin.gelManager.useGelCube(sand, vloc, motion, under);
+				            Region region = plugin.regionManager.getRegion(vloc);
+				            String rg = region.getString(RegionSetting.RED_GEL_BLOCK);
+				            if (plugin.util.isSolid(bTo.getType())) {
+				                if (region.getBoolean(RegionSetting.ENABLE_RED_GEL_BLOCKS) && plugin.blockUtil.compareBlockToString(bFrom.getRelative(BlockFace.DOWN), rg)){
+
+				                    for (BlockFace rface : FaceUtil.getFaces(face)) {
+				                        if (!plugin.util.isSolid(bFrom.getRelative(rface).getType())) {
+				                            sand.setVelocity(FaceUtil.faceToVector(rface));
+				                            motion = null;
+				                            return;
+				                        }
+				                    }
+				                } else {
+				                    motion = null;
+                                    return;
+				                }
+				            } else {
+				                if (region.getBoolean(RegionSetting.ENABLE_RED_GEL_BLOCKS) && plugin.blockUtil.compareBlockToString(under, rg))
+				                    motion = motion.multiply(0.9D);
+				                else {
+
+				                    if (useGel != -1){
+
+				                        if (useGel == 0) {
+				                            Iterator<FrozenSand> it = plugin.cubeManager.flyingBlocks.values().iterator();
+				                            while (it.hasNext()) {
+				                                if (it.next() == sand) {
+				                                    it.remove();
+				                                }
+				                            }
+				                            sand.clearAllPlayerViews();
+				                            to.setY(to.getBlockY()+1);
+				                            FallingBlock f = to
+				                                    .getWorld()
+				                                    .spawnFallingBlock(
+				                                            to,
+				                                            sand.getMaterial(),
+				                                            sand.getData());
+				                            final UUID uuid = f.getUniqueId();
+				                            plugin.cubeManager.cubes.put(respawnLoc, uuid);
+				                            plugin.gelManager.ignore.add(uuid);
+				                            f.setDropItem(false);
+				                            Vector v = motion;
+				                            motion = null;
+				                            v.setY(region.getDouble(RegionSetting.BLUE_GEL_MIN_VELOCITY));
+				                            f.setVelocity(v);
+
+				                            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() { public void run() { plugin.gelManager.ignore.remove(uuid); }}, 20L);
+				                        }
+				                        return;
+				                    }
+
+				                    if (under.getType() == Material.WOOL
+				                            && (under.getData() == (byte) 15
+				                            || under.getData() == (byte) 14 || under
+				                            .getData() == (byte) 5)) {
+
+				                        Block middle = plugin.util.chkBtn(bTo.getLocation());
+				                        if (middle != null) {
+				                            V10Location loc = new V10Location(middle);
+				                            if(!plugin.cubeManager.buttons.containsKey(loc)) {
+
+				                                plugin.util.changeBtn(middle, true);
+				                                plugin.cubeManager.buttons.put(loc, sand);
+				                            }
+				                        }
+				                    }
+
+				                    motion = motion.multiply(0.2);
+
+				                    if (motion.length() < 0.00001)
+				                        motion = null;
+				                }
+				            }
+				        }
+				        
+				        if(motion != null) {
+				            FlyingBlockMoveEvent event = new FlyingBlockMoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
+				            Bukkit.getServer().getPluginManager().callEvent(event);
+				            if (!event.isCancelled()) {
+				                move(getLocation().add(motion));
+				                motion = event.getVelocity();
+				            } else {
+				                motion = null;
+				            }
+				        }
 					} else {
 						if (!plugin.util.isSolid(getLocation().clone().add(motion).getBlock().getType())
 								&&!plugin.util.isSolid(getLocation().clone().add(motion).add(-0.5,0,0).getBlock().getType())
