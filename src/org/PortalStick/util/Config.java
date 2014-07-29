@@ -46,7 +46,7 @@ public class Config {
 	public boolean RestoreInvOnWorldChange;
 	public List<String> ColorPresets;
 	public byte portalBackData;
-	public String textureURL;
+	public String textureURL = null;
 	
 	public boolean useNativeSounds, useSpoutSounds;
 	public int soundRange;
@@ -123,7 +123,7 @@ public class Config {
         
         //Load texture settings
         boolean useURL = getBoolean("texture.use-custom-texture", true);
-        textureURL = getString("texture.custom-URL", "https://eyrenetwork.net/Portal.zip");
+        toggleTextureURL(false);
         if(!useURL)
             textureURL = null;
         
@@ -197,6 +197,21 @@ public class Config {
 		        }
 		    }
 		}
+	}
+	
+	public boolean toggleTextureURL(boolean save) {
+	    if(textureURL == null) {
+	        if(save)
+	            mainConfig.set("texture.use-custom-texture", true);
+	        textureURL = getString("texture.custom-URL", "https://eyrenetwork.net/Portal.zip");
+	    } else {
+	        if(save)
+	            mainConfig.set("texture.use-custom-texture", false);
+	        textureURL = null;
+	    }
+	    if(save)
+	        saveAll();
+	    return textureURL != null;
 	}
 	
 	private int getInt(String path, int def)

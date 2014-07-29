@@ -46,3 +46,6 @@ permissions:
   portalstick.admin.debug:
     description: Toggle debugging
     default: op
+  portalstick.admin.texture:
+    description: Toggle the texture package
+    default: op

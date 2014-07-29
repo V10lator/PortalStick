@@ -17,6 +17,7 @@ import org.PortalStick.commands.RegionToolCommand;
 import org.PortalStick.commands.ReloadCommand;
 import org.PortalStick.commands.SayCommand;
 import org.PortalStick.commands.SetRegionCommand;
+import org.PortalStick.commands.ToggleTextureCommand;
 import org.PortalStick.fallingblocks.TagIdGenerator;
 import org.PortalStick.listeners.PortalStickBlockListener;
 import org.PortalStick.listeners.PortalStickEntityListener;
@@ -116,6 +117,7 @@ public class PortalStick extends JavaPlugin {
 		tmpList.add(new RegionInfoCommand(this));
 		tmpList.add(new LanguageCommand(this));
 		tmpList.add(new GetGunCommand(this));
+		tmpList.add(new ToggleTextureCommand(this));
 		commands = tmpList.toArray(new BaseCommand[0]);
 		/*ProtocolLibrary.getProtocolManager().addPacketListener(
 				new PacketAdapter(this, ListenerPriority.NORMAL,
@@ -151,6 +153,7 @@ public class PortalStick extends JavaPlugin {
 	public final String PERM_TELEPORT 		= "portalstick.teleport";
 	public final String PERM_LANGUAGE		= "portalstick.admin.language";
 	public final String PERM_DEBUG			= "portalstick.admin.debug";
+	public final String PERM_TEXTURE        = "portalstick.admin.texture";
     
 	public boolean hasPermission(Player player, String node) {
 		if(player.hasPermission(node))
