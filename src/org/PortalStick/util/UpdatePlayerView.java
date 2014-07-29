@@ -28,6 +28,8 @@ public class UpdatePlayerView implements Runnable {
         String texturePack = disabled ? null : plugin.config.textureURL;
         if((user.hasDefaultTexture && texturePack != null) || (!user.hasDefaultTexture && texturePack == null)) {
             try {
+                if(texturePack == null)
+                    texturePack = plugin.config.defaultTextureURL;
                 p.setResourcePack(texturePack);
             } catch(IllegalArgumentException e) {
                 e.printStackTrace(); //TODO: Handle that.

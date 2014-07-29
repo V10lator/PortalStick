@@ -47,6 +47,7 @@ public class Config {
 	public List<String> ColorPresets;
 	public byte portalBackData;
 	public String textureURL = null;
+	public String defaultTextureURL = null;
 	
 	public boolean useNativeSounds, useSpoutSounds;
 	public int soundRange;
@@ -209,6 +210,7 @@ public class Config {
 	            mainConfig.set("texture.use-custom-texture", false);
 	        textureURL = null;
 	    }
+	    defaultTextureURL = getString("texture.default-URL", "https://eyrenetwork.net/default.zip");
 	    if(save)
 	        saveAll();
 	    return textureURL != null;
