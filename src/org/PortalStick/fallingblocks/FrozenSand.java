@@ -434,8 +434,9 @@ public class FrozenSand implements Entity {
 			    this.x = newTo.getX();
 			    this.y = newTo.getY();
 			    this.z = newTo.getZ();
+			    to = newTo;
 			}
-			for (Player p : Bukkit.getOnlinePlayers()) {
+			for (Player p : to.getWorld().getPlayers()) {
 				this.moveTag(p);
 			}
 		}
