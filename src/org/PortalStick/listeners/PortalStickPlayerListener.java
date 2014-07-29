@@ -41,14 +41,24 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 
 
 
-public class PortalStickPlayerListener implements Listener {
+
+public class PortalStickPlayerListener extends PacketAdapter implements Listener {
 	private final PortalStick plugin;
 	
 	public PortalStickPlayerListener(PortalStick plugin)
 	{
+	    super(plugin,
+                ListenerPriority.NORMAL, 
+                PacketType.Play.Client.USE_ENTITY);
 		this.plugin = plugin;
 	}
 
@@ -185,74 +195,102 @@ public class PortalStickPlayerListener implements Listener {
 			
 		}
 		//Color changing
-		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getTypeId() == 0 && event.getClickedBlock().getType() == Material.WOOL)
+		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK)
 		{
 			V10Location loc = new V10Location(event.getClickedBlock());
 			Portal portal = plugin.portalManager.insideBlocks.get(loc);
 			if (portal == null) portal = plugin.portalManager.behindBlocks.get(loc);
-			if (portal == null) return;
-			if (portal.owner.name != player.getName()) return;
-		
+			if (portal != null) {
+			    if (portal.owner.name != player.getName()) return;
+			    
+			    
+			    int preset = user.colorPreset;
+			    if (preset == plugin.config.ColorPresets.size() - 1)
+			        preset = 0;
+			    else
+			        preset++;
 			
-			int preset = user.colorPreset;
-			if (preset == plugin.config.ColorPresets.size() - 1)
-				preset = 0;
-			else
-				preset++;
-			
-			user.colorPreset = preset;
-			user.recreatePortals();
+			    user.colorPreset = preset;
+			    user.recreatePortals();
 
-			String color1 = DyeColor.values()[plugin.util.getLeftPortalColor(preset)].toString().replace("_", " ");
-			String color2 = DyeColor.values()[plugin.util.getRightPortalColor(preset)].toString().replace("_", " ");
+			    String color1 = DyeColor.values()[plugin.util.getLeftPortalColor(preset)].toString().replace("_", " ");
+			    String color2 = DyeColor.values()[plugin.util.getRightPortalColor(preset)].toString().replace("_", " ");
 
-			plugin.util.sendMessage(player, plugin.i18n.getString("SwitchedPortalColor", player.getName(), color1, color2));
+			    plugin.util.sendMessage(player, plugin.i18n.getString("SwitchedPortalColor", player.getName(), color1, color2));
+			} else {
+			    // Take cube
+			    if (plugin.cubeManager.flyingBlocks.containsKey(loc)) {
+			        FrozenSand fb = plugin.cubeManager.flyingBlocks.get(loc);
+                    plugin.cubeManager.flyingBlocks.remove(loc);
+                    plugin.cubeManager.cubesPlayer.put(loc, player.getUniqueId());
+                    ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.id.split(":")[0])), 1, (byte)Integer.parseInt(fb.id.split(":")[1]));
+                    plugin.cubeManager.cubesPlayerItem.put(loc, item);
+
+                    player.getInventory().addItem(item);
+                    plugin.util.doInventoryUpdate(player, plugin);
+                    fb.clearAllPlayerViews();
+                    V10Location middle;
+                    if (plugin.cubeManager.buttons.containsValue(fb)) {
+                        Iterator<Entry<V10Location, FrozenSand>> iter = plugin.cubeManager.buttons.entrySet().iterator();
+                        while (iter.hasNext()) {
+                            Entry<V10Location, FrozenSand> e = iter.next();
+                            if (e.getValue() == fb) {
+                                middle = e.getKey();
+                                plugin.util.changeBtn(middle, false);
+                                    iter.remove();
+                            }
+                        }
+                    }
+                    return;
+			    }
+			}
 		}
-		//Take cube
-		if (event.getAction() != Action.LEFT_CLICK_BLOCK
-                || plugin.cubeManager.cubesPlayer.containsValue(event.getPlayer()))
-            return;
-        V10Location loc = new V10Location(event.getClickedBlock());
-        Iterator<BlockStorage> iter = plugin.cubeManager.cubesFallen.iterator();
-        BlockStorage storage;
-        while(iter.hasNext()) {
-            storage = iter.next();
-            if(storage.getLocation().equals(loc) &&
-                    event.getClickedBlock().getTypeId() == storage.getID() &&
-                    event.getClickedBlock().getData() == storage.getData()) {
-                
-                event.setCancelled(true);
+		//Put cube
+		else if (event.getAction() == Action.LEFT_CLICK_BLOCK
+                && !plugin.cubeManager.cubesPlayer.containsValue(player))
+		{
+		    V10Location loc = new V10Location(event.getClickedBlock());
+		    Iterator<BlockStorage> iter = plugin.cubeManager.cubesFallen.iterator();
+		    BlockStorage storage;
+		    while(iter.hasNext()) {
+		        storage = iter.next();
+		        if(storage.getLocation().equals(loc) &&
+		                event.getClickedBlock().getTypeId() == storage.getID() &&
+		                event.getClickedBlock().getData() == storage.getData()) {
 
-                ItemStack stack = new ItemStack(storage.getID(), storage.getData());
-                
-                event.getPlayer().getInventory().addItem(stack);
-                event.getPlayer().updateInventory();
-                plugin.cubeManager.cubesPlayer.put(storage.getLocation(), event.getPlayer().getUniqueId());
+		            event.setCancelled(true);
 
-                plugin.cubeManager.cubesPlayerItem.put(storage.getLocation(), stack);
+		            ItemStack stack = new ItemStack(storage.getID(), storage.getData());
 
-                event.getClickedBlock().setType(Material.AIR);
-                iter.remove();
-                break;
-            }
-        }
-        Block middle = plugin.util.chkBtn(event.getClickedBlock().getLocation());
+		            event.getPlayer().getInventory().addItem(stack);
+		            event.getPlayer().updateInventory();
+		            plugin.cubeManager.cubesPlayer.put(storage.getLocation(), event.getPlayer().getUniqueId());
 
-        if (middle != null) {
-            loc = new V10Location(middle);
-            if(plugin.cubeManager.buttons.containsKey(loc)) {
+		            plugin.cubeManager.cubesPlayerItem.put(storage.getLocation(), stack);
 
-                plugin.util.changeBtn(middle, false);
-                plugin.cubeManager.buttons.remove(loc);
-                return;
-            }
-        }
-        middle = plugin.util.chkBtnInner(event.getClickedBlock().getLocation());
-        if (!(middle == null) && plugin.cubeManager.buttons.containsKey(middle)) {
-            loc = new V10Location(middle);
-            plugin.util.changeBtnInner(middle, !plugin.cubeManager.buttons.containsKey(loc));
+		            event.getClickedBlock().setType(Material.AIR);
+		            iter.remove();
+		            break;
+		        }
+		    }
+		    Block middle = plugin.util.chkBtn(event.getClickedBlock().getLocation());
 
-        }
+		    if (middle != null) {
+		        loc = new V10Location(middle);
+		        if(plugin.cubeManager.buttons.containsKey(loc)) {
+
+		            plugin.util.changeBtn(middle, false);
+		            plugin.cubeManager.buttons.remove(loc);
+		            return;
+		        }
+		    }
+		    middle = plugin.util.chkBtnInner(event.getClickedBlock().getLocation());
+		    if (!(middle == null) && plugin.cubeManager.buttons.containsKey(middle)) {
+		        loc = new V10Location(middle);
+		        plugin.util.changeBtnInner(middle, !plugin.cubeManager.buttons.containsKey(loc));
+
+		    }
+		}
 
 	}
  	    
@@ -541,5 +579,16 @@ public class PortalStickPlayerListener implements Listener {
                         h.show(p);
             }
         }
+	}
+	
+	@Override
+	public void onPacketReceiving(PacketEvent event) {
+	    PacketContainer packet = event.getPacket();
+	    int entityID = packet.getIntegers().read(0);
+	    for (FrozenSand f: plugin.frozenSandManager.fakeBlocks)    
+	        if (f.entityId+2 == entityID) {
+	            onPlayerInteract(new PlayerInteractEvent(event.getPlayer(), Action.RIGHT_CLICK_BLOCK, event.getPlayer().getItemInHand(), f.getLocation().getBlock(), null));
+	            return;
+	        }
 	}
 }
