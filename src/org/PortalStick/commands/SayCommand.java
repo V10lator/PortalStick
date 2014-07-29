@@ -21,7 +21,7 @@ public class SayCommand extends BaseCommand {
 		if(p != null) {
 		    StringBuilder sb = new StringBuilder(args[1]);
 		    for (int i = 2; i < args.length ;i++ )
-		        sb.append(args[i]);
+		        sb.append(' ').append(args[i]);
 		    p.sendMessage(ChatColor.translateAlternateColorCodes('&', sb.toString()));
 		} else
 		    plugin.util.sendMessage(sender, plugin.i18n.getString("SayFailed", playerName, args[0]));
