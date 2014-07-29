@@ -34,6 +34,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -465,7 +466,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	}
 	
 	@EventHandler
-	public void onPlayerAnimation(PlayerAnimationEvent event) {
+	public void onPlayerAnimation(PlayerInteractEntityEvent event) {
 	    Entity en = plugin.util.getTarget(event.getPlayer());
 	    if (en == null) return;
 	    for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
