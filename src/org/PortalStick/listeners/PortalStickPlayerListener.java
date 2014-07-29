@@ -399,7 +399,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	                                    .getData().getData());
 	                    f.setDropItem(false);
 	                    f.setVelocity(event.getPlayer().getLocation()
-	                            .getDirection().multiply(1));
+	                            .getDirection().multiply(0.3));
 	                    event.setCancelled(true);
 
 	                    final UUID uuid = event.getPlayer().getUniqueId();
