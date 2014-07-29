@@ -240,7 +240,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 						FrozenSand fb = e.getValue();
 		                plugin.cubeManager.cubesPlayer.put(e.getKey(), player.getUniqueId());
 		                ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.id.split(":")[0])), 1, (byte)Integer.parseInt(fb.id.split(":")[1]));
-		                plugin.cubeManager.cubesPlayerItem.put(loc, item);
+		                plugin.cubeManager.cubesPlayerItem.put(e.getKey(), item);
 
 		                player.getInventory().addItem(item);
 		                plugin.util.doInventoryUpdate(player, plugin);
@@ -261,9 +261,6 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 		                return;	
 					}
 				}
-				if (plugin.cubeManager.flyingBlocks.containsKey(loc)) {
-			        
-			    }
 			}
 		    
 		}
@@ -506,13 +503,19 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	}
 	
 	@Override
-	public void onPacketReceiving(PacketEvent event) {
+	public void onPacketReceiving(final PacketEvent event) {
 	    PacketContainer packet = event.getPacket();
 	    int entityID = packet.getIntegers().read(0);
-	    for (FrozenSand f: plugin.frozenSandManager.fakeBlocks) {  
+	    for (final FrozenSand f: plugin.frozenSandManager.fakeBlocks) {  
 	        if (f.entityId+2 == entityID) {
-	        	EntityUseAction action = packet.getEntityUseActions().read(0);
-	            onPlayerInteract(new PlayerInteractEvent(event.getPlayer(), action == EntityUseAction.INTERACT?Action.RIGHT_CLICK_BLOCK:Action.LEFT_CLICK_BLOCK, event.getPlayer().getItemInHand(), f.getLocation().getBlock(), null));
+	        	final EntityUseAction action = packet.getEntityUseActions().read(0);
+	           Bukkit.getScheduler().runTask(plugin, new Runnable(){
+
+				@Override
+				public void run() {
+					onPlayerInteract(new PlayerInteractEvent(event.getPlayer(), action == EntityUseAction.INTERACT?Action.RIGHT_CLICK_BLOCK:Action.LEFT_CLICK_BLOCK, event.getPlayer().getItemInHand(), f.getLocation().getBlock(), null));
+				}});
+	        	
 	            return;
 	        }
 		}

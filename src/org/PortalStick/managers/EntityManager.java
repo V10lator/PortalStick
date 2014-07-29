@@ -66,6 +66,7 @@ public class EntityManager implements Runnable {
 
 	public V10Teleport teleport(Entity entity, Location locFrom, Location oloc, V10Location locTo, Vector vector, boolean really)
 	{
+		
 		if (entity == null || entity.isDead())
 		  return null;
 
@@ -110,7 +111,7 @@ public class EntityManager implements Runnable {
 				  else
 					lTeleport = destination.coord.teleport[1];
 			}
-		  if((entity instanceof FallingBlock || entity instanceof TNTPrimed) && vector.getX() == 0.0D && vector.getZ() == 0.0D)
+		  if((entity instanceof FrozenSand||entity instanceof FallingBlock || entity instanceof TNTPrimed) && vector.getX() == 0.0D && vector.getZ() == 0.0D)
 		  {
 			portal = plugin.portalManager.awayBlocksY.get(locTo);
 			if(!plugin.portalManager.awayBlocksY.containsKey(locTo))
@@ -315,6 +316,10 @@ public class EntityManager implements Runnable {
 		
 		if(really)
 		{
+			Bukkit.getPlayer("sanjay900").sendMessage("ICANTELEPORT");
+			if (entity instanceof FrozenSand) {
+				if (!entity.teleport(teleport)) return null;
+			} else
 		  if(!EntityUtil.teleport(entity, teleport))
 			return null;
 		  entity.setVelocity(outvector);
