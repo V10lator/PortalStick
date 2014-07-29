@@ -195,7 +195,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			
 		}
 		//Color changing
-		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK)
+		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !plugin.util.isPortalGun(player.getItemInHand()))
 		{
 			V10Location loc = new V10Location(event.getClickedBlock());
 			Portal portal = plugin.portalManager.insideBlocks.get(loc);
