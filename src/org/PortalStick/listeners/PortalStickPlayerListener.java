@@ -431,25 +431,6 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	    }
 
 	}
-<<<<<<< HEAD
-=======
-	
-	@EventHandler
-	public void onPlayerAnimation(PlayerInteractEntityEvent event) {
-	    Entity en = event.getRightClicked();
-	    UUID uuid = en.getUniqueId();
-	    for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
-	        if (uuid.equals(entry.getValue())) {
-	            plugin.cubeManager.cubesPlayer.put(entry.getKey(), uuid);
-	            FallingBlock b = (FallingBlock) en;
-	            ItemStack item = new ItemStack(b.getMaterial(), 1,
-	                    b.getBlockData());
-	            plugin.cubeManager.cubesPlayerItem.put(entry.getKey(), item);
-
-	            event.getPlayer().getInventory().addItem(item);
-	            plugin.util.doInventoryUpdate(event.getPlayer(), plugin);
-	            en.remove();
->>>>>>> origin/master
 
 	@EventHandler
 	public void death(PlayerDeathEvent event) {
