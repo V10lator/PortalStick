@@ -154,6 +154,7 @@ public class PortalStick extends JavaPlugin {
 	public final String PERM_LANGUAGE		= "portalstick.admin.language";
 	public final String PERM_DEBUG			= "portalstick.admin.debug";
 	public final String PERM_TEXTURE        = "portalstick.admin.texture";
+	public final String PERM_SAY            = "portalstick.admin.say";
     
 	public boolean hasPermission(Player player, String node) {
 		if(player.hasPermission(node))

@@ -49,3 +49,6 @@ permissions:
   portalstick.admin.texture:
     description: Toggle the texture package
     default: op
+  portalstick.admin.say:
+    description: Use /portalstick say
+    default: op

@@ -13,18 +13,24 @@ public class SayCommand extends BaseCommand {
 	
 	public boolean execute() {
 		
+	    if(args.length < 1) {
+	        sendUsage();
+	        return true;
+	    }
 		Player p = Bukkit.getPlayer(args[0]);
-		String message = ChatColor.translateAlternateColorCodes("&".charAt(0), args[1]);
-		for (int i = 2; i < args.length ;i++ ) {
-			message += " " +ChatColor.translateAlternateColorCodes("&".charAt(0), args[i]);
-		}
-		p.sendMessage(message);
+		if(p != null) {
+		    StringBuilder sb = new StringBuilder(args[1]);
+		    for (int i = 2; i < args.length ;i++ )
+		        sb.append(args[i]);
+		    p.sendMessage(ChatColor.translateAlternateColorCodes('&', sb.toString()));
+		} else
+		    plugin.util.sendMessage(sender, plugin.i18n.getString("SayFailed", playerName, args[0]));
 		
 		return true;
 	}
 	
 	public boolean permission(Player player) {
-		return plugin.hasPermission(player, plugin.PERM_PLACE_PORTAL);
+		return plugin.hasPermission(player, plugin.PERM_SAY);
 	}
 
 }
