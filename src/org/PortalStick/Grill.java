@@ -48,21 +48,18 @@ public class Grill {
 		for (FrozenSand b: blocks)
 		{
 			
-			b.clearAllPlayerViews();
+			b.remove();
 		}
 
 	}
 	
 	public void disable()
 	{
-		for (V10Location b: inside)
-		{
-			disabled = true;
-		}
+		disabled = true;
 		for (FrozenSand b: blocks)
 		{
 			
-			b.clearAllPlayerViews();
+			b.remove();
 		}
 	}
 	

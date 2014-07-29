@@ -1,7 +1,8 @@
 package org.PortalStick.fallingblocks;
+
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
@@ -10,13 +11,21 @@ import org.PortalStick.Region;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
@@ -29,7 +38,7 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
 
-public class FrozenSand {
+public class FrozenSand implements Entity {
 
     private final PortalStick plugin;
 	private Player attachPlayer;
@@ -43,7 +52,9 @@ public class FrozenSand {
 	String worldName = "";
 	ProtocolManager pm;
 	private Vector motion;
-	private BukkitTask velocitytask = null;
+	public BukkitTask velocitytask = null;
+	private final UUID uuid = UUID.randomUUID();
+	
 	protected FrozenSand(final PortalStick plugin, Integer id2, String worldName, double x, double y, double z, Player attachPlayer, Player ridePlayer, String id) {
 	    this.plugin = plugin;
 		entityId = plugin.tagIdGenerator.nextId(1);
@@ -72,18 +83,16 @@ public class FrozenSand {
 										getMaterial(),
 										getData());
 						final UUID uuid = f.getUniqueId();
-						Iterator<Entry<V10Location, FrozenSand>> it = plugin.cubeManager.flyingBlocks.entrySet().iterator();
-						while (it.hasNext()) {
-							Entry<V10Location, FrozenSand> e = it.next();
+						for (Entry<V10Location, FrozenSand> e: plugin.cubeManager.flyingBlocks.entrySet()) {
 							if (e.getValue() == sand) {
 								plugin.cubeManager.cubes.put(e.getKey(), uuid);
-								it.remove();
+								break;
 							}
 						}
 						
 						
 						f.setDropItem(false);
-						clearAllPlayerViews();
+						remove();
 					}
 					
 					}
@@ -137,13 +146,7 @@ public class FrozenSand {
 				                    if (useGel != -1){
 
 				                        if (useGel == 0) {
-				                            Iterator<FrozenSand> it = plugin.cubeManager.flyingBlocks.values().iterator();
-				                            while (it.hasNext()) {
-				                                if (it.next() == sand) {
-				                                    it.remove();
-				                                }
-				                            }
-				                            sand.clearAllPlayerViews();
+				                            sand.remove();
 				                            to.setY(to.getBlockY()+1);
 				                            FallingBlock f = to
 				                                    .getWorld()
@@ -189,16 +192,8 @@ public class FrozenSand {
 				            }
 				        }
 				        
-				        if(motion != null) {
-				            FlyingBlockMoveEvent event = new FlyingBlockMoveEvent(sand,getLocation().clone().add(motion),getLocation().clone(), motion);
-				            Bukkit.getServer().getPluginManager().callEvent(event);
-				            if (!event.isCancelled()) {
-				                move(getLocation().add(motion));
-				                motion = event.getVelocity();
-				            } else {
-				                motion = null;
-				            }
-				        }
+				        if(motion != null)
+				            move(getLocation().add(motion));
 					} else {
 						if (!plugin.util.isSolid(getLocation().clone().add(motion).getBlock().getType())
 								&&!plugin.util.isSolid(getLocation().clone().add(motion).add(-0.5,0,0).getBlock().getType())
@@ -320,7 +315,7 @@ public class FrozenSand {
 		    }
 		}
 	}
-	protected void clearTags(Player observer, int... entityIds) {
+	public void clearTags(Player observer, int... entityIds) {
         if (entityIds.length > 0) {
         	PacketContainer packet = pm.createPacket(PacketType.Play.Server.ENTITY_DESTROY);
             packet.getIntegerArrays().write(0, entityIds);
@@ -332,20 +327,6 @@ public class FrozenSand {
             }
 
         }
-    }
-    public void clearAllPlayerViews() {
-    	 if (velocitytask!=null)velocitytask.cancel();
-    	 int[] entityIDs = this.getAllEntityIds();
-       for (Player p : Bukkit.getOnlinePlayers()) {
-    	   if (p != null) {
-               this.clearTags(p, entityIDs);
-           } 
-       }
-       if ( plugin.frozenSandManager.fakeBlocks.contains(this)) {
-       plugin.frozenSandManager.fakeBlocks.remove(this);
-       }
-      
-        
     }
     public int[] getAllEntityIds() {
         int[] entityIdList = new int[2];
@@ -443,9 +424,17 @@ public class FrozenSand {
 		}
 		
 	    private void move(Location add) {
+	        Location from = getLocation();
 			this.x = add.getX();
 			this.y = add.getY();
 			this.z = add.getZ();
+			Location to = getLocation();
+			Location newTo = plugin.entityManager.onEntityMove(this, from, to, false);
+			if(!to.equals(newTo)) {
+			    this.x = newTo.getX();
+			    this.y = newTo.getY();
+			    this.z = newTo.getZ();
+			}
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				this.moveTag(p);
 			}
@@ -481,5 +470,166 @@ public class FrozenSand {
                 return 0;
             return Byte.parseByte(split[1]);
 		}
-
+        @Override
+        public List<MetadataValue> getMetadata(String arg0) {
+            return null;
+        }
+        @Override
+        public boolean hasMetadata(String arg0) {
+            return false;
+        }
+        @Override
+        public void removeMetadata(String arg0, Plugin arg1) {
+        }
+        @Override
+        public void setMetadata(String arg0, MetadataValue arg1) {
+        }
+        @Override
+        public boolean eject() {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        public int getEntityId() {
+            return entityId + 2;
+        }
+        @Override
+        public float getFallDistance() {
+            return 0;
+        }
+        @Override
+        public int getFireTicks() {
+            return 0;
+        }
+        @Override
+        public EntityDamageEvent getLastDamageCause() {
+            return null;
+        }
+        @Override
+        public Location getLocation(Location arg0) {
+            return this.getLocation();
+        }
+        @Override
+        public int getMaxFireTicks() {
+            return 0;
+        }
+        @Override
+        public List<Entity> getNearbyEntities(double arg0, double arg1,
+                double arg2) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        @Override
+        public Entity getPassenger() {
+            return attachPlayer;
+        }
+        @Override
+        public Server getServer() {
+            return plugin.getServer();
+        }
+        @Override
+        public int getTicksLived() {
+            return 0;
+        }
+        @Override
+        public EntityType getType() {
+            return EntityType.FALLING_BLOCK;
+        }
+        @Override
+        public UUID getUniqueId() {
+            return uuid;
+        }
+        @Override
+        public Entity getVehicle() {
+            return ridePlayer;
+        }
+        @Override
+        public World getWorld() {
+            return getLocation().getWorld();
+        }
+        @Override
+        public boolean isDead() {
+            return plugin.frozenSandManager.fakeBlocks.contains(this);
+        }
+        @Override
+        public boolean isEmpty() {
+            return attachPlayer == null;
+        }
+        @Override
+        public boolean isInsideVehicle() {
+            return ridePlayer != null;
+        }
+        @Override
+        public boolean isOnGround() {
+            return false;
+        }
+        @Override
+        public boolean isValid() {
+            return isDead();
+        }
+        @Override
+        public boolean leaveVehicle() {
+            return false;
+        }
+        @Override
+        public void playEffect(EntityEffect arg0) {
+        }
+        @Override
+        public void remove() {
+            plugin.frozenSandManager.remove(this);
+        }
+        @Override
+        public void setFallDistance(float arg0) {
+        }
+        @Override
+        public void setFireTicks(int arg0) {
+        }
+        @Override
+        public void setLastDamageCause(EntityDamageEvent arg0) {
+        }
+        @Override
+        public boolean setPassenger(Entity arg0) {
+            return false;
+        }
+        @Override
+        public void setTicksLived(int arg0) {
+        }
+        @Override
+        public boolean teleport(Location arg0) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        public boolean teleport(Entity arg0) {
+            return teleport(arg0.getLocation());
+        }
+        @Override
+        public boolean teleport(Location arg0, TeleportCause arg1) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        public boolean teleport(Entity arg0, TeleportCause arg1) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + entityId;
+            result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+            return result;
+        }
+        @Override
+        public boolean equals(Object obj) {
+            if(this == obj)
+                return true;
+            if(obj != null && obj instanceof FrozenSand) {
+                FrozenSand other = (FrozenSand)obj;
+                return (entityId == other.entityId &&
+                        uuid.equals(other.uuid));
+            }
+            return false;
+        }
 	}

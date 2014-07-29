@@ -474,8 +474,7 @@ public class Util {
                     }
                 }
             }
-            plugin.cubeManager.flyingBlocks.get(loc).clearAllPlayerViews();
-            plugin.cubeManager.flyingBlocks.remove(loc);
+            plugin.cubeManager.flyingBlocks.get(loc).remove();
             
 
         } else if (plugin.cubeManager.cubesPlayer.containsKey(loc)) {

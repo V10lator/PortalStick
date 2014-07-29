@@ -44,7 +44,7 @@ public class Portal {
 		  if(coord.inside[i] == null)
 			continue;
 		  if(coord.insideFrozen[i] != null) {
-		      coord.insideFrozen[i].clearAllPlayerViews();
+		      coord.insideFrozen[i].remove();
 		      coord.insideFrozen[i] = null;
 		  }
 		  if (plugin.portalManager.oldBlocks.containsKey(coord.inside[i]))
@@ -161,7 +161,7 @@ public class Portal {
 		    if(coord.inside[i] != null)
 		    {
 		        if(coord.insideFrozen[i] != null) {
-		            coord.insideFrozen[i].clearAllPlayerViews();
+		            coord.insideFrozen[i].remove();
 		            coord.insideFrozen[i] = null;
 		        }
 		        coord.inside[i].getHandle().getBlock().setTypeIdAndData(w, color, true);
@@ -176,7 +176,7 @@ public class Portal {
 	    if(open) {
 	        for(FrozenSand sand: coord.insideFrozen)
 	            if(sand != null)
-	                sand.clearAllPlayerViews();
+	                sand.remove();
 	            
 	        open();
 	    }

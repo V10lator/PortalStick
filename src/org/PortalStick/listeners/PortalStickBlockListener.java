@@ -2,8 +2,6 @@ package org.PortalStick.listeners;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.UUID;
-import java.util.Map.Entry;
 
 import org.PortalStick.Bridge;
 import org.PortalStick.CheckWireTask;
@@ -12,8 +10,6 @@ import org.PortalStick.Grill;
 import org.PortalStick.Portal;
 import org.PortalStick.PortalStick;
 import org.PortalStick.Region;
-import org.PortalStick.fallingblocks.FlyingBlockMoveEvent;
-import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
@@ -44,14 +40,6 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-
-import com.bergerkiller.bukkit.common.utils.FaceUtil;
-
-
-
-
-
-
 
 public class PortalStickBlockListener implements Listener
 {

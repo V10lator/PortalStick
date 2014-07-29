@@ -235,14 +235,13 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			    // Take cube
 				if (plugin.cubeManager.flyingBlocks.containsKey(loc)) {
 			        FrozenSand fb = plugin.cubeManager.flyingBlocks.get(loc);
-	                plugin.cubeManager.flyingBlocks.remove(loc);
 	                plugin.cubeManager.cubesPlayer.put(loc, player.getUniqueId());
 	                ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.id.split(":")[0])), 1, (byte)Integer.parseInt(fb.id.split(":")[1]));
 	                plugin.cubeManager.cubesPlayerItem.put(loc, item);
 
 	                player.getInventory().addItem(item);
 	                plugin.util.doInventoryUpdate(player, plugin);
-	                fb.clearAllPlayerViews();
+	                fb.remove();
 	                V10Location middle;
 	                if (plugin.cubeManager.buttons.containsValue(fb)) {
 	                    Iterator<Entry<V10Location, FrozenSand>> iter = plugin.cubeManager.buttons.entrySet().iterator();
