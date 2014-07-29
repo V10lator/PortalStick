@@ -37,6 +37,9 @@ public class Portal {
 	
 	public void delete()
 	{
+		if (open) {
+			close();
+		}
 		BlockStorage bh;
 		for (int i = 0; i < 2; i++)
 		{
@@ -178,6 +181,21 @@ public class Portal {
 	        for (V10Location b: coord.inside)
 	            if(b != null)
 	                b.getHandle().getBlock().setData(color);
+	    } else {
+	    	byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));
+			int w = Material.WOOL.getId();
+			for (int i = 0; i < 2; i++)
+			{
+			    if(coord.inside[i] != null)
+			    {
+			        if(coord.insideFrozen[i] != null) {
+			        	Location loc = coord.insideFrozen[i].getLocation();
+			            coord.insideFrozen[i].clearAllPlayerViews();
+			            coord.insideFrozen[i] = new FrozenSandFactory(plugin).withLocation(loc).withText("95:"+color).build();
+			        }
+			        
+			    }
+			}
 	    }
 	}
 	

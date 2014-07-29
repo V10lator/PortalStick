@@ -57,7 +57,7 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
-	public final FrozenSandManager frozenSandManager = new FrozenSandManager();
+	public FrozenSandManager frozenSandManager = null;
 	public final CubeManager cubeManager = new CubeManager();
 	public final WireManager wireManager = new WireManager(this);
 	public WorldGuardPlugin worldGuard = null;
@@ -80,7 +80,7 @@ public class PortalStick extends JavaPlugin {
 	
 	public void onEnable() {
 		config = new Config(this);
-		
+		frozenSandManager = new FrozenSandManager(this);
 		//Register events
 		Server s = getServer();
 		PluginManager pm = s.getPluginManager();

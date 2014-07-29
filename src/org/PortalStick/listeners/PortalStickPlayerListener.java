@@ -1,5 +1,6 @@
 package org.PortalStick.listeners;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -427,36 +428,6 @@ public class PortalStickPlayerListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerAnimation(PlayerAnimationEvent event) {
-	    if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
-	        return;
-	    Entry<V10Location, FrozenSand> fb = plugin.util.getTargetFlying(event.getPlayer(),
-	            plugin);
-	    if (!(fb == null)) {
-	        V10Location loc = fb.getKey();
-	        plugin.cubeManager.flyingBlocks.remove(loc);
-	        plugin.cubeManager.cubesPlayer.put(loc, event.getPlayer().getUniqueId());
-	        ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.getValue().id.split(":")[0])), 1, (byte)Integer.parseInt(fb.getValue().id.split(":")[1]));
-	        plugin.cubeManager.cubesPlayerItem.put(loc, item);
-
-	        event.getPlayer().getInventory().addItem(item);
-	        plugin.util.doInventoryUpdate(event.getPlayer(), plugin);
-	        fb.getValue().clearAllPlayerViews();
-	        V10Location middle;
-	        if (plugin.cubeManager.buttons.containsValue(fb.getValue())) {
-	            Iterator<Entry<V10Location, FrozenSand>> iter = plugin.cubeManager.buttons.entrySet().iterator();
-	            while (iter.hasNext()) {
-	                Entry<V10Location, FrozenSand> e = iter.next();
-	                if (e.getValue() == fb.getValue()) {
-	                    middle = e.getKey();
-	                    plugin.util.changeBtn(middle, false);
-	                    iter.remove();
-	                }
-	            }
-	        }
-	        return;
-	    }
-
-
 	    Entity en = plugin.util.getTarget(event.getPlayer());
 	    if (en == null) return;
 	    for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
@@ -528,23 +499,26 @@ public class PortalStickPlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void login(PlayerJoinEvent event) {
-	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()),80L);
+	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId(), true),80L);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onTeleport(final PlayerTeleportEvent event) {
-	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()),10L);
+		if (event.getFrom().distance(event.getTo()) > 20)
+	    Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId(), false),10L);
     }
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void worldMove (PlayerChangedWorldEvent event) {
-        Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId()), 10L);
+        Bukkit.getScheduler().runTaskLater(plugin, new UpdatePlayerView(event.getPlayer().getUniqueId(), true), 10L);
 	}
 	
 	private class UpdatePlayerView implements Runnable{
 	    private final UUID uuid;
-	    UpdatePlayerView(UUID uuid) {
+		private boolean textures;
+	    UpdatePlayerView(UUID uuid, boolean updateTextures) {
 	        this.uuid = uuid;
+	        this.textures = updateTextures;
 	    }
 	    
 	    @Override
@@ -554,16 +528,12 @@ public class PortalStickPlayerListener implements Listener {
                 return;
             World world = p.getWorld();
             boolean disabled = plugin.config.DisabledWorlds.contains(world.getName());
-            if(plugin.config.textureURL != null) {
-                User user = plugin.userManager.getUser(p);
-                if((disabled && !user.hasDefaultTexture) || (!disabled && user.hasDefaultTexture)) {
-                    try {
-                        p.setResourcePack(disabled ? null : plugin.config.textureURL);
-                    } catch(IllegalArgumentException e) {
-                        e.printStackTrace(); //TODO: Handle that.
-                    }
-                    user.hasDefaultTexture = !user.hasDefaultTexture;
-                }
+            if (textures) {
+            try {
+                p.setResourcePack(disabled ? null : plugin.config.textureURL);
+            } catch(IllegalArgumentException e) {
+                e.printStackTrace(); //TODO: Handle that.
+            }
             }
             if(!disabled) {
                 for (FrozenSand h : plugin.frozenSandManager.fakeBlocks)
