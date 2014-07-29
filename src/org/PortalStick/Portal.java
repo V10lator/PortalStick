@@ -2,6 +2,7 @@ package org.PortalStick;
 
 import java.util.HashSet;
 
+import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
@@ -37,9 +38,6 @@ public class Portal {
 	
 	public void delete()
 	{
-		if (open) {
-			close();
-		}
 		BlockStorage bh;
 		for (int i = 0; i < 2; i++)
 		{
@@ -175,28 +173,15 @@ public class Portal {
 	
 	public void recreate()
 	{
-	    if(!open) {
-	        byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));			
-		
-	        for (V10Location b: coord.inside)
-	            if(b != null)
-	                b.getHandle().getBlock().setData(color);
-	    } else {
-	    	byte color = (byte) (orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset));
-			int w = Material.WOOL.getId();
-			for (int i = 0; i < 2; i++)
-			{
-			    if(coord.inside[i] != null)
-			    {
-			        if(coord.insideFrozen[i] != null) {
-			        	Location loc = coord.insideFrozen[i].getLocation();
-			            coord.insideFrozen[i].clearAllPlayerViews();
-			            coord.insideFrozen[i] = new FrozenSandFactory(plugin).withLocation(loc).withText("95:"+color).build();
-			        }
-			        
-			    }
-			}
+	    if(open) {
+	        for(FrozenSand sand: coord.insideFrozen)
+	            if(sand != null)
+	                sand.clearAllPlayerViews();
+	            
+	        open();
 	    }
+	    else
+	        close();
 	}
 	
 	public void create()
