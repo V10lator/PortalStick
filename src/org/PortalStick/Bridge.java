@@ -17,9 +17,9 @@ public class Bridge {
 	HashSet<V10Location> bridgeMachineBlocks = new HashSet<V10Location>();
 	V10Location startBlock;
 	public V10Location creationBlock;
-	BlockFace facingSide;
+	public BlockFace facingSide;
 
-	Bridge(PortalStick plugin, V10Location creationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks)
+	public Bridge(PortalStick plugin, V10Location creationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks)
 	{
 		this.plugin = plugin;
 		startBlock = startingBlock;

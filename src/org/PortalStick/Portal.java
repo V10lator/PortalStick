@@ -16,10 +16,10 @@ public class Portal {
 	public final User owner;
 	public final boolean orange;
 	public boolean open = false;
-	boolean disabled = false;
+	public boolean disabled = false;
 	public boolean transmitter = false;
 	private final HashSet<V10Location> awayBlocks;
-	final V10Location[] awayBlocksY = new V10Location[2];
+	public final V10Location[] awayBlocksY = new V10Location[2];
 	private boolean placetorch = false;
 	public final PortalCoord coord;
 	

@@ -15,7 +15,7 @@ public class Funnel extends Bridge {
 	private boolean reversed = false;
 	public boolean activated = true;
 	
-	Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
+	public Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
 		super(plugin, CreationBlock, startingBlock, face, machineBlocks);
 	}
 	

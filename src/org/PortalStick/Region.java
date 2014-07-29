@@ -21,7 +21,7 @@ public class Region extends User
 	public Portal blueDestination; // Destination of the blue automated portal
 	public Portal orangeDestination; // Destination of the orange automated portal
 	
-	Region(PortalStick plugin, String name)
+	public Region(PortalStick plugin, String name)
 	{
 		super("§region§_"+name);
 		this.plugin = plugin;

@@ -1,8 +1,10 @@
-package org.PortalStick;
+package org.PortalStick.Managers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.PortalStick.CheckWireTask;
+import org.PortalStick.PortalStick;
 import org.PortalStick.util.V10Location;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Block;

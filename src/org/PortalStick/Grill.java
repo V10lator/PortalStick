@@ -13,7 +13,7 @@ import org.bukkit.block.Block;
 public class Grill {
 	private final PortalStick plugin;
 	
-	final HashSet<V10Location> border;
+	public final HashSet<V10Location> border;
 	private final HashSet<V10Location> inside;
 	public ArrayList<FrozenSand> blocks = new ArrayList<FrozenSand>();
 	final V10Location firstBlock;

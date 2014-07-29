@@ -3,6 +3,16 @@ package org.PortalStick;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.PortalStick.Managers.CubeManager;
+import org.PortalStick.Managers.EntityManager;
+import org.PortalStick.Managers.FrozenSandManager;
+import org.PortalStick.Managers.FunnelBridgeManager;
+import org.PortalStick.Managers.GelManager;
+import org.PortalStick.Managers.GrillManager;
+import org.PortalStick.Managers.PortalManager;
+import org.PortalStick.Managers.RegionManager;
+import org.PortalStick.Managers.UserManager;
+import org.PortalStick.Managers.WireManager;
 import org.PortalStick.commands.BaseCommand;
 import org.PortalStick.commands.DeleteAllCommand;
 import org.PortalStick.commands.DeleteCommand;

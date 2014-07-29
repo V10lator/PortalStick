@@ -1,8 +1,9 @@
-package org.PortalStick;
+package org.PortalStick.Managers;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.PortalStick.Turret;
 import org.PortalStick.util.V10Location;
 import org.bukkit.entity.Entity;
 

@@ -18,7 +18,7 @@ public class Turret implements Runnable {
     private final PortalStick plugin;
     final V10Location location;
     final ArrayList<BlockStorage> blocksInSight = new ArrayList<BlockStorage>();
-    UUID target;
+    public UUID target;
     private int id = -1;
     
     private double vectorX, vectorY, vectorZ;
@@ -29,7 +29,7 @@ public class Turret implements Runnable {
         calculateBlocksInSight();
     }
     
-    void checkPossibleTarget(UUID uuid, V10Location loc) {
+    public void checkPossibleTarget(UUID uuid, V10Location loc) {
         if(!isVisible(loc))
             return;
         updateVector(loc);
@@ -37,7 +37,7 @@ public class Turret implements Runnable {
         id = Bukkit.getScheduler().runTaskTimer(plugin, this, 1L, 3L).getTaskId();
     }
     
-    void checkMovement(V10Location loc) {
+    public void checkMovement(V10Location loc) {
         if(isVisible(loc)) {
             updateVector(loc);
             return;
@@ -64,7 +64,7 @@ public class Turret implements Runnable {
     
     public void calculateBlocksInSight() {
         blocksInSight.clear();
-        // TODO
+        // TODO 
     }
     
     private BlockFace getFace(Block block) {
