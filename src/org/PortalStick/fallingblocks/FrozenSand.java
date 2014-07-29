@@ -430,7 +430,7 @@ public class FrozenSand implements Entity {
 			this.z = add.getZ();
 			Location to = getLocation();
 			Location newTo = plugin.entityManager.onEntityMove(this, from, to, false);
-			if(!to.equals(newTo)) {
+			if(newTo != null && !to.equals(newTo)) {
 			    this.x = newTo.getX();
 			    this.y = newTo.getY();
 			    this.z = newTo.getZ();
