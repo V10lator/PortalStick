@@ -18,6 +18,7 @@ import org.PortalStick.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.V10Location;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -247,7 +248,7 @@ public class PortalStickEntityListener implements Listener {
                   V10Location loc = new V10Location(middle);
                   if(!plugin.cubeManager.buttons.containsKey(loc)) {
 
-                      plugin.util.changeBtn(middle, true);
+                      plugin.util.changeBtn(loc, true);
                       plugin.cubeManager.buttons.put(loc, fblock);
                   }
               }
@@ -337,9 +338,11 @@ public class PortalStickEntityListener implements Listener {
 	                }
 	            }
 	        } else {
-	            FallingBlock fb = (FallingBlock)entity;
+	            final FallingBlock fb = (FallingBlock)entity;
 	            FrozenSand fblock = null;
-	            for (Entry<V10Location, UUID> entry : plugin.cubeManager.cubes.entrySet()) {
+	            Iterator<Entry<V10Location, UUID>> it = plugin.cubeManager.cubes.entrySet().iterator();
+	            while (it.hasNext()) {
+	            	final Entry<V10Location, UUID> entry = it.next();
 	                if (uuid.equals(entry.getValue())) {
 	                    if(!plugin.cubeManager.respawnCubes.contains(uuid)) {
 	                        String id = String.valueOf(fb
@@ -348,12 +351,19 @@ public class PortalStickEntityListener implements Listener {
 	                        fblock = new FrozenSandFactory(plugin).withLocation(fb.getLocation()).withText(id).build();
 
 	                        plugin.cubeManager.flyingBlocks.put(entry.getKey(), fblock);
+	                        it.remove();
 	                    } else {
 	                        plugin.cubeManager.respawnCubes.remove(uuid);
-	                        plugin.util.clear(entry.getKey().getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), plugin.cubeManager.cubesign.get(entry.getKey()).getHandle().getBlock());
+	                        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+
+								@Override
+								public void run() {
+									//Delay this as emacipation grills that are set up to reset cube spawners will then reset the cube first before it gets spawned.
+									plugin.util.clear(entry.getKey().getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), plugin.cubeManager.cubesign.get(entry.getKey()).getHandle().getBlock());
+								}}, 4l);
+	                        
 	                    }
 	                    event.getEntity().remove();
-	                    plugin.cubeManager.cubes.remove(entry.getKey());
 	                    break;
 	                }
 	            }

@@ -26,17 +26,17 @@ import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 
 public class Config {
-	
+
 	private final PortalStick plugin;
 	private FileConfiguration mainConfig;
 	private final FileConfiguration regionConfig;
 	private final FileConfiguration grillConfig;
 	private final FileConfiguration bridgeConfig;
-	
+
 	private final File regionConfigFile;
 	private final File grillConfigFile;
 	private final File bridgeConfigFile;
-	
+
 	public HashSet<String> DisabledWorlds;
 	public int PortalTool;
 	public short portalToolData; //Short for spout compatiblity!
@@ -48,51 +48,51 @@ public class Config {
 	public byte portalBackData;
 	public String textureURL = null;
 	public String defaultTextureURL = null;
-	
+
 	public boolean useNativeSounds, useSpoutSounds;
 	public int soundRange;
 	public final String[] soundUrls = new String[Sound.values().length];
 	public final String[] soundNative = new String[Sound.values().length];
 	public final String[] musicUrls = new String[Sound.values().length];
-	
+
 	public String lang;
-	
+
 	public boolean debug;
-	
+
 	public Config (PortalStick instance) {
-		
+
 		plugin = instance;
-		
+
 		regionConfigFile = getConfigFile("regions.yml");
 		grillConfigFile = getConfigFile("grills.yml");
 		bridgeConfigFile = getConfigFile("bridges.yml");
-		
-		
+
+
 		mainConfig = plugin.getConfig();
 		regionConfig = getConfig(regionConfigFile);
 		grillConfig = getConfig(grillConfigFile);
 		bridgeConfig = getConfig(bridgeConfigFile);
 	}
-	
+
 	public void deleteGrill(String grill) {
 		List<String> list =  grillConfig.getStringList("grills");
 		list.remove(grill);
 		grillConfig.set("grills", list);
 		saveAll();
 	}
-	
+
 	public void deleteRegion(String name) {
 		regionConfig.set(name, null);
 		saveAll();
 	}
-	
+
 	public void deleteBridge(String bridge) {
 		List<String> list = bridgeConfig.getStringList("bridges");
 		list.remove(bridge);
 		bridgeConfig.set("bridges", list);
 		saveAll();
 	}
-	
+
 	public void load() {
 		try {
 			mainConfig = plugin.getConfig();
@@ -160,7 +160,7 @@ public class Config {
 		//Load all current users
 //		for (Player player : plugin.getServer().getOnlinePlayers())
 //			plugin.userManager.createUser(player);
-		
+
         //Load all regions
         for (String regionName : regionConfig.getKeys(false))
         	if(!regionName.equals("global"))
@@ -186,7 +186,7 @@ public class Config {
         	plugin.getLogger().info(plugin.funnelBridgeManager.bridges.size() + " bridge(s) loaded");
         
         saveAll();
-		
+
         EntityAddEvent eae;
 		for(World w: plugin.getServer().getWorlds()) {
 		    if(!DisabledWorlds.contains(w.getName())) {
@@ -199,7 +199,7 @@ public class Config {
 		    }
 		}
 	}
-	
+
 	public boolean toggleTextureURL(boolean save) {
 	    if(textureURL == null) {
 	        if(save)
@@ -215,13 +215,13 @@ public class Config {
 	        saveAll();
 	    return textureURL != null;
 	}
-	
+
 	private int getInt(String path, int def)
 	{
 
 		if (mainConfig.get(path) == null)
 			mainConfig.set(path, def);
-	
+
 		return mainConfig.getInt(path, def);
 	}
 
@@ -248,12 +248,12 @@ public class Config {
 
 		return mainConfig.getBoolean(path, def);
 	}
-	
+
 	public void reLoad() {
 		unLoad();
 		load();
 	}
-	
+
 	public void unLoad()
 	{
 		EntityRemoveEvent ere;
@@ -272,7 +272,7 @@ public class Config {
 		for(V10Location loc: plugin.gelManager.gels.keySet())
 		  plugin.gelManager.stopGelTube(loc);
 	}
-	
+
 	public boolean loadRegionSettings(Region region, Player player) {
 		for (RegionSetting setting : RegionSetting.values()) {
 			Object prop = regionConfig.get(region.name + "." + setting.getYaml());
@@ -287,11 +287,11 @@ public class Config {
     	}
 		return region.updateLocation(player);
 	}
-	
+
 	private File getConfigFile(String filename)
 	{
 		if (!plugin.getDataFolder().exists()) plugin.getDataFolder().mkdir();
-		
+
 		File file = new File(plugin.getDataFolder(), filename);
 		return file;
 	}
@@ -305,7 +305,7 @@ public class Config {
 				config.set("setup", null);
 			}
 			config.save(file);
-			
+
 			return config;
 		} catch (Exception e) {
 			plugin.getLogger().severe("Unable to load YAML file " + file.getAbsolutePath());
@@ -313,9 +313,9 @@ public class Config {
 		}
 		return null;
 	}
-	
+
 	public void saveAll() {
-		
+
 		//Save regions
 		for (Map.Entry<String, Region> entry : plugin.regionManager.regions.entrySet()) {
 			Region region = entry.getValue();
@@ -331,7 +331,7 @@ public class Config {
 			plugin.getLogger().severe("Error while writing to regions.yml");
 			e.printStackTrace();
 		}
-		
+
 		//Save grills
 		grillConfig.set("grills", null);
 		List<String> list = new ArrayList<String>();
@@ -347,7 +347,7 @@ public class Config {
 			plugin.getLogger().severe("Error while writing to grills.yml");
 			e.printStackTrace();
 		}
-		
+
 		//Save bridges
 		bridgeConfig.set("bridges", null);
 		list = new ArrayList<String>();
@@ -363,13 +363,13 @@ public class Config {
 			plugin.getLogger().severe("Error while writing to bridges.yml");
 			e.printStackTrace();
 		}
-		
+
 		//Save main
 		mainConfig.set("Language", lang);
 		mainConfig.set("Debug", debug);
 		plugin.saveConfig();			
 	}
-	
+
 	public enum Sound {
 		PORTAL_CREATE_BLUE,
 		PORTAL_CREATE_ORANGE,

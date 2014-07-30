@@ -17,7 +17,6 @@ public class CubeManager {
     public final HashMap<V10Location, FrozenSand> buttons = new HashMap<V10Location, FrozenSand>();
     public final HashMap<V10Location, UUID> cubes = new HashMap<V10Location, UUID>();
     public final HashMap<V10Location, UUID> cubesPlayer = new HashMap<V10Location, UUID>();
-    public final ArrayList<BlockStorage> cubesFallen = new ArrayList<BlockStorage>();
     public final HashMap<V10Location, ItemStack> cubesPlayerItem = new HashMap<V10Location, ItemStack>();
     public final HashSet<UUID> respawnCubes = new HashSet<UUID>();
     public final HashSet<UUID> blockMap = new HashSet<UUID>();

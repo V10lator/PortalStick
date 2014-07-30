@@ -230,53 +230,7 @@ public class Util {
                 && (l.getZ() == l2.getZ());
 
     }
-    public Entity getTarget(final Player player) {
-
-        BlockIterator iterator = new BlockIterator(player.getWorld(), player
-                .getLocation().toVector(), player.getEyeLocation()
-                .getDirection(), 0, 100);
-        Entity target = null;
-        Block item;
-        List<Entity> entityList = null;
-        if(iterator.hasNext())
-            entityList = player.getNearbyEntities(100, 100, 100);
-        while (iterator.hasNext()) {
-            item = iterator.next();
-            for (Entity entity : entityList) {
-                int acc = 1;
-                for (int x = -acc; x < acc; x++)
-                    for (int z = -acc; z < acc; z++)
-                        for (int y = -acc; y < acc; y++)
-                            if (entity.getLocation().getBlock()
-                                    .getRelative(x, y, z).equals(item)) {
-                                return target = entity;
-                            }
-            }
-        }
-        return target;
-    }
-    public Entry<V10Location, FrozenSand> getTargetFlying(final Player player, PortalStick plugin) {
-
-        BlockIterator iterator = new BlockIterator(player.getWorld(), player
-                .getLocation().toVector(), player.getEyeLocation()
-                .getDirection(), 0, 2);
-        Block item, check;
-        while (iterator.hasNext()) {
-            item = iterator.next();
-            for (Entry<V10Location, FrozenSand> fb : plugin.cubeManager.flyingBlocks.entrySet()) {
-                int acc = 2;
-                check = fb.getValue().getLocation().getBlock();
-                for (int x = -acc; x < acc; x++)
-                    for (int z = -acc; z < acc; z++)
-                        for (int y = -acc; y < acc; y++) {
-                            if (check.getRelative(x, y, z).equals(item)) {
-                                return fb;
-                            }
-                        }
-            }
-        }
-        return null;
-    }
+   
     /**
      * Removes a item from a inventory
      * 
@@ -494,43 +448,6 @@ public class Util {
             plugin.cubeManager.cubesPlayerItem.remove(loc);
 
         }
-        BlockFace[] blockfaces = new BlockFace[] {
-                BlockFace.NORTH_EAST, BlockFace.EAST,
-                BlockFace.SOUTH_EAST, BlockFace.SOUTH,
-                BlockFace.SOUTH_WEST, BlockFace.WEST,
-                BlockFace.NORTH_WEST, BlockFace.NORTH,
-                BlockFace.SELF};
-        V10Location loc2 = new V10Location(hatchMiddle.getRelative(BlockFace.DOWN,3));
-        for (Entry<BukkitTask, V10Location> t : plugin.cubeManager.hatches.entrySet()) {
-            if (t.getValue().equals(loc2)) {
-                t.getKey().cancel();
-                plugin.cubeManager.hatches.remove(t.getKey());
-                }
-            }
-        /*if (respawn) {
-
-    for (int i = 0; i < blockfaces.length; i++) {
-
-    plugin.eventListener.hatches.put(
-    new AnimateHatch(blk
-    .getRelative(blockfaces[i]),
-    false, plugin.eventListener).runTaskLater(
-    plugin, 3L * i), blk);
-
-    }
-
-    } else {
-
-    for (int i = 0; i < blockfaces.length; i++) {
-
-    plugin.eventListener.hatches.put(
-    new AnimateHatch(blk
-    .getRelative(blockfaces[i]),
-    true, plugin.eventListener).runTaskLater(
-    plugin, 3L * i), blk);
-    }
-
-    }*/
         if (powered) {
         	Sign s = (Sign) sign.getState();
         	if (!s.getLine(2).equals("norespawn")||first) {

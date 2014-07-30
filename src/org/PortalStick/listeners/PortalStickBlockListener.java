@@ -133,8 +133,7 @@ public class PortalStickBlockListener implements Listener
 	  
 	  Material type = block.getType();
 	  Region region = plugin.regionManager.getRegion(loc);
-	  
-	  
+	
 	  //TODO: Workaround for https://bukkit.atlassian.net/browse/BUKKIT-5710
       if(block.getBlockPower() > 0) {
           if (region.getBoolean(RegionSetting.ENABLE_REDSTONE_TRANSFER)) {
@@ -362,47 +361,9 @@ public class PortalStickBlockListener implements Listener
                 }
             } 
                 
-        } else if (blk.getType() == Material.WALL_SIGN) {
-                Sign s = (Sign) blk.getState();
-                if (s.getLine(0).equals("cube")) {
-                    Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) blk
-                            .getState().getData()).getAttachedFace());
-                    
-                    try {
-                        final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
-                                BlockFace.DOWN, 2));
-                        final int id;
-                        final int data;
-                        if (!s.getLine(1).isEmpty()) {
-                            try {
-                                String[] split = s.getLine(1).split(":");
-                                id = Integer.parseInt(split[0]);
-                                data = split.length > 1 ? Integer.parseInt(split[1]) : 0;
-                            } catch (Exception nfe) {
-                                return;
-                            }
-                        } else {
-                            id = data = 0;
-                        }
-                        final V10Location loc = new V10Location(blk);
-                        Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
-                                @Override
-                            public void run() {
-                                Block blk = loc.getHandle().getBlock();
-                                if (blk.isBlockPowered()
-                                        || blk.isBlockIndirectlyPowered()) {
-                                    Block next = blk.getRelative(((org.bukkit.material.Sign) blk
-                                            .getState().getData()).getFacing());
-                                    plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), id, data,
-                                            blk, true);
-                                } 
-                            }}, 1l);
-                        
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        } 
+                
+            
         }
 	}
 	
@@ -713,6 +674,51 @@ public class PortalStickBlockListener implements Listener
 					 plugin.portalManager.tryPlacingAutomatedPortal(block2);
 			 }
 		 }
+		  
+		  for (Block blk : plugin.blockUtil.getNearbyBlocks(event.getBlock()
+	              .getLocation(), 1)) {
+	     
+			  if (blk.getType() == Material.WALL_SIGN) {
+	              Sign s = (Sign) blk.getState();
+	              if (s.getLine(0).equals("cube")) {
+	                  Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) blk
+	                          .getState().getData()).getAttachedFace());
+	                  
+	                  try {
+	                      final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
+	                              BlockFace.DOWN, 2));
+	                      final int id;
+	                      final int data;
+	                      if (!s.getLine(1).isEmpty()) {
+	                          try {
+	                              String[] split = s.getLine(1).split(":");
+	                              id = Integer.parseInt(split[0]);
+	                              data = split.length > 1 ? Integer.parseInt(split[1]) : 0;
+	                          } catch (Exception nfe) {
+	                              return;
+	                          }
+	                      } else {
+	                          id = data = 0;
+	                      }
+	                      final V10Location loc2 = new V10Location(blk);
+	                      Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+	                              @Override
+	                          public void run() {
+	                              Block blk = loc2.getHandle().getBlock();
+	                              if (blk.isBlockPowered()
+	                                      || blk.isBlockIndirectlyPowered()) {
+	                                  Block next = blk.getRelative(((org.bukkit.material.Sign) blk
+	                                          .getState().getData()).getFacing());
+	                                  plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), id, data,
+	                                          blk, true);
+	                              } 
+	                          }}, 1l);
+	                      
+	                  } catch (Exception e) {
+	                      e.printStackTrace();
+	                  }}}
+	              
+	          }
 	 }
 	 
 	 @EventHandler(ignoreCancelled = true)

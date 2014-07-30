@@ -1,5 +1,6 @@
 package org.PortalStick.listeners;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -198,6 +199,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			
 		}
 		//Color changing
+		
 		else if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !plugin.util.isPortalGun(player.getItemInHand()))
 		{
 			V10Location loc = new V10Location(event.getClickedBlock());
@@ -233,10 +235,14 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			    portal.delete();
 			} else {
 			    // Take cube
+				
+				ArrayList<Entry<V10Location, FrozenSand>> sandToRemove = new ArrayList<Entry<V10Location, FrozenSand>>();
 				Iterator<Entry<V10Location, FrozenSand>> it = plugin.cubeManager.flyingBlocks.entrySet().iterator();
-				if (it.hasNext()) {
+				while (it.hasNext()) {
 					Entry<V10Location, FrozenSand> e = it.next();
+					
 					if (plugin.util.compareLocation(e.getValue().getLocation().getBlock().getLocation(), loc.getHandle().getBlock().getLocation())) {
+						
 						FrozenSand fb = e.getValue();
 		                plugin.cubeManager.cubesPlayer.put(e.getKey(), player.getUniqueId());
 		                ItemStack item = new ItemStack(Material.getMaterial(Integer.parseInt(fb.id.split(":")[0])), 1, (byte)Integer.parseInt(fb.id.split(":")[1]));
@@ -244,23 +250,26 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 
 		                player.getInventory().addItem(item);
 		                plugin.util.doInventoryUpdate(player, plugin);
-		                fb.remove();
+		               
 		                V10Location middle;
 		                if (plugin.cubeManager.buttons.containsValue(fb)) {
 		                    Iterator<Entry<V10Location, FrozenSand>> iter = plugin.cubeManager.buttons.entrySet().iterator();
 		                    while (iter.hasNext()) {
-		                        Entry<V10Location, FrozenSand> en = iter.next();
-		                        if (en.getValue() == fb) {
-		                            middle = e.getKey();
+		                        Entry<V10Location, FrozenSand> enbt = iter.next();
+		                        if (enbt.getValue() == fb) {
+		                            middle = enbt.getKey();
 		                            plugin.util.changeBtn(middle, false);
 		                                iter.remove();
 		                        }
 		                    }
 		                }
-		                it.remove();
-		                return;	
+		                fb.remove();
+		                sandToRemove.add(e);
+		                
 					}
+					
 				}
+				plugin.cubeManager.flyingBlocks.entrySet().removeAll(sandToRemove);
 			}
 		    
 		}
@@ -504,21 +513,23 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	
 	@Override
 	public void onPacketReceiving(final PacketEvent event) {
-	    PacketContainer packet = event.getPacket();
-	    int entityID = packet.getIntegers().read(0);
+	    final PacketContainer packet = event.getPacket();
+	    final int entityID = packet.getIntegers().read(0);
+	    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+
+			@Override
+			public void run() {
 	    for (final FrozenSand f: plugin.frozenSandManager.fakeBlocks) {  
 	        if (f.entityId+2 == entityID) {
 	        	final EntityUseAction action = packet.getEntityUseActions().read(0);
-	           Bukkit.getScheduler().runTask(plugin, new Runnable(){
-
-				@Override
-				public void run() {
+	           
 					onPlayerInteract(new PlayerInteractEvent(event.getPlayer(), action == EntityUseAction.INTERACT?Action.RIGHT_CLICK_BLOCK:Action.LEFT_CLICK_BLOCK, event.getPlayer().getItemInHand(), f.getLocation().getBlock(), null));
-				}});
+	
 	        	
 	            return;
 	        }
 		}
+	    
 	    Iterator<Entry<V10Location, UUID>> it = plugin.cubeManager.cubes.entrySet().iterator();
 	   while (it.hasNext()) {
 		   Entry<V10Location, UUID> entry = it.next();
@@ -539,5 +550,6 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	            break;
 	    	}
 	    }
+			}});
 	}
 }
