@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.PortalStick.PortalStick;
 import org.PortalStick.Region;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.DyeColor;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -115,7 +117,40 @@ public class Config {
         portalToolDesc = ChatColor.translateAlternateColorCodes('&', getString("main.portal-tool-description", "&aThanks to the ASHPD,\n&2the impossible is easy."));
         RegionTool = getInt("main.region-tool", 268);
         RestoreInvOnWorldChange = getBoolean("main.restore-inventory-on-world-change", true);
-        ColorPresets = getStringList("main.portal-color-presets", Arrays.asList(new String[]{"3-1","2-6","9-10","5-13","8-7","15-4"}));
+        ColorPresets = getStringList("main.portal-color-presets", Arrays.asList(new String[]{"9-1","3-10","4-14"}));
+        Iterator<String> iter = ColorPresets.iterator();
+        debug = getBoolean("Debug", true); //TODO: True cause beta.
+        String st;
+        byte a = 0, b = a;
+        boolean valid, changed = false;;
+        
+        while(iter.hasNext()) {
+            st = iter.next();
+            split = st.split("-");
+            valid = true;
+            if(split.length != 2)
+                valid = false;
+            if(valid)
+                try {
+                    a = Byte.parseByte(split[0]);
+                    b = Byte.parseByte(split[1]);
+                } catch(NumberFormatException e) {
+                    valid = false;
+                }
+            if(valid)
+                valid = a > 0 && b > 0 &&
+                        a < 16 && b < 16 &&
+                        !DyeColor.getByData(a).name().contains("GRAY") &&
+                        !DyeColor.getByData(b).name().contains("GRAY");
+            if(!valid) {
+                if(debug)
+                    plugin.getLogger().warning("Removing invalid color preset: "+st);
+                iter.remove();
+                changed = true;
+            }
+        }
+        if(changed)
+            mainConfig.set("main.portal-color-presets", ColorPresets);
         split = getString("main.fill-portal-back", "-1").split(":");
         if(split.length > 1)
           portalBackData = Byte.parseByte(split[1]);
@@ -154,8 +189,6 @@ public class Config {
         
         Locale locale = Locale.getDefault();
         lang = getString("Language", locale.getLanguage().toLowerCase()+"_"+locale.getCountry());
-        
-        debug = getBoolean("Debug", true); //TODO: True cause beta.
         
 		//Load all current users
 //		for (Player player : plugin.getServer().getOnlinePlayers())
