@@ -269,6 +269,12 @@ public class Portal {
     		  }
     		}
     	  }
+    	} else {
+    	    for(int i1 = 0; i1 < 1; i1++)
+    	        if(coord.teleport[i1] != null) {
+    	            plugin.portalManager.awayBlocks.put(coord.teleport[i1], this);
+    	            awayBlocksY[i1] =coord.teleport[i1];
+    	        }
     	}
     	
     	plugin.regionManager.getRegion(coord.inside[0]).portalCreated(this);

@@ -1,6 +1,5 @@
 package org.PortalStick.managers;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -26,6 +25,7 @@ import org.bukkit.entity.Bat;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -33,28 +33,8 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.material.Directional;
 import org.bukkit.util.Vector;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 
 public class EntityManager implements Runnable {
 	private final PortalStick plugin;
@@ -122,7 +102,7 @@ public class EntityManager implements Runnable {
 			destination = portal.getDestination();
 			lTeleport = destination.coord.teleport[0];
 		  }
-		  else if((Math.abs(vector.getX()) > 0.5 || (Math.abs(vector.getY()) > 1 || (Math.abs(vector.getZ()) > 0.5))) || entity instanceof Boat)
+		  else if((Math.abs(vector.getX()) > 0.5 || (Math.abs(vector.getY()) > 1 || (Math.abs(vector.getZ()) > 0.5))) || entity instanceof Boat || entity instanceof FrozenSand)
 		  {
 			if(!plugin.portalManager.awayBlocks.containsKey(locTo))
 			  return null;

@@ -681,9 +681,9 @@ public class PortalStickBlockListener implements Listener
 
 		     if (blk.getType() == Material.WALL_SIGN) {
 		         Sign s = (Sign) blk.getState();
-		         if (s.getLine(0).equals("[PortalStick]")) {
+		         if (s.getLine(0).equalsIgnoreCase("[PortalStick]")) {
 		             //  Cube sign
-		             if(s.getLine(1).equals("cube")); {
+		             if(s.getLine(1).equalsIgnoreCase("cube")); {
 		                 Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) s
 	                              .getData()).getAttachedFace());
 		                 try {
