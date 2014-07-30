@@ -663,7 +663,7 @@ public class PortalStickBlockListener implements Listener
 			 }
 		 }
 		 
-		 //Portal Generators & music signs
+		 //Portal Generators
 		 if (event.getOldCurrent() == 0 && event.getNewCurrent() > 0)
 		 {
 			 Block block2;
@@ -675,51 +675,43 @@ public class PortalStickBlockListener implements Listener
 			 }
 		 }
 		  
-		  for (Block blk : plugin.blockUtil.getNearbyBlocks(event.getBlock()
-	              .getLocation(), 1)) {
-	     
-			  if (blk.getType() == Material.WALL_SIGN) {
-	              Sign s = (Sign) blk.getState();
-	              if (s.getLine(0).equals("cube")) {
-	                  Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) blk
-	                          .getState().getData()).getAttachedFace());
-	                  
-	                  try {
-	                      final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
-	                              BlockFace.DOWN, 2));
-	                      final int id;
-	                      final int data;
-	                      if (!s.getLine(1).isEmpty()) {
-	                          try {
-	                              String[] split = s.getLine(1).split(":");
-	                              id = Integer.parseInt(split[0]);
-	                              data = split.length > 1 ? Integer.parseInt(split[1]) : 0;
-	                          } catch (Exception nfe) {
-	                              return;
-	                          }
-	                      } else {
-	                          id = data = 0;
-	                      }
-	                      final V10Location loc2 = new V10Location(blk);
-	                      Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
-	                              @Override
-	                          public void run() {
-	                              Block blk = loc2.getHandle().getBlock();
-	                              if (blk.isBlockPowered()
-	                                      || blk.isBlockIndirectlyPowered()) {
-	                                  Block next = blk.getRelative(((org.bukkit.material.Sign) blk
-	                                          .getState().getData()).getFacing());
-	                                  plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), id, data,
-	                                          blk, true);
-	                              } 
-	                          }}, 1l);
-	                      
-	                  } catch (Exception e) {
-	                      e.printStackTrace();
-	                  }}}
-	              
-	          }
-	 }
+		 // PortalStick signs
+		 for (Block blk : plugin.blockUtil.getNearbyBlocks(event.getBlock()
+		         .getLocation(), 1)) {
+
+		     if (blk.getType() == Material.WALL_SIGN) {
+		         Sign s = (Sign) blk.getState();
+		         if (s.getLine(0).equals("[PortalStick]")) {
+		             //  Cube sign
+		             if(s.getLine(1).equals("cube")); {
+		                 Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) s
+	                              .getData()).getAttachedFace());
+		                 try {
+		                     final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
+		                             BlockFace.DOWN, 2));
+		                     final V10Location loc2 = new V10Location(blk);
+		                     Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+		                         @Override
+		                         public void run() {
+		                             Block blk = loc2.getHandle().getBlock();
+		                             if (blk.isBlockPowered()
+		                                     || blk.isBlockIndirectlyPowered()) {
+		                                 Block next = blk.getRelative(((org.bukkit.material.Sign) blk
+		                                         .getState().getData()).getFacing());
+		                                 plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), 159, 9,
+		                                         blk, true);
+		                             } 
+		                         }}, 1l);
+
+		                 } catch (Exception e) {
+		                     e.printStackTrace();
+		                 }
+		             }
+		         }
+		     }
+
+		 }
+	}
 	 
 	 @EventHandler(ignoreCancelled = true)
 	 public void onBlockPistonExtend(BlockPistonExtendEvent event) 

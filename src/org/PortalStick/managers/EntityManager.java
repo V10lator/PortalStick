@@ -549,19 +549,21 @@ public class EntityManager implements Runnable {
 	            .equals(Material.SIGN_POST))) {
 	        Sign s = (Sign) sBlock.getState();
 
+	        if(!s.getLine(0).equalsIgnoreCase("[PortalStick]"))
+	            return false;
 	        double speed = 0.0D;
 	        double x = 0.0D;
 	        double y = 0.0D;
 	        double z = 0.0D;
 	        boolean pos = true;
 	        boolean ok = true;
-	        if (s.getLine(0).contains("direction")) {
+	        if (s.getLine(1).contains("direction")) {
 	            pos = false;
 	            y = entity.getLocation().getDirection().getY();
 	            double tmp = y;
-	            if (s.getLine(0).contains(",")) {
+	            if (s.getLine(1).contains(",")) {
 
-	                String[] text = s.getLine(0).split(",");
+	                String[] text = s.getLine(1).split(",");
 	                if (y < Double.parseDouble(text[1]))
 	                {
 	                    try {
@@ -572,7 +574,7 @@ public class EntityManager implements Runnable {
 	                }
 	            }
 	        } else {
-	            String[] text = s.getLine(0).split(",");
+	            String[] text = s.getLine(1).split(",");
 	            try {
 	                x = Double.parseDouble(text[0]);
 	                y = Double.parseDouble(text[1]);
@@ -583,7 +585,7 @@ public class EntityManager implements Runnable {
 	        }
 	        if(ok) {
 	            try {
-	                speed = Double.parseDouble(s.getLine(1));
+	                speed = Double.parseDouble(s.getLine(2));
 	            } catch (NumberFormatException nfe) {
 	                ok = false;
 	            }
