@@ -1,6 +1,7 @@
 package org.PortalStick.fallingblocks;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -430,9 +431,10 @@ public class FrozenSand implements Entity {
 			this.z = add.getZ();
 			Location to = getLocation();
 			Location newTo = plugin.entityManager.onEntityMove(this, from, to, false);
+			
 			if(newTo != null && !to.equals(newTo)) {
 			    this.x = newTo.getX();
-			    this.y = newTo.getY();
+			    this.y = newTo.getY()+0.5D;
 			    this.z = newTo.getZ();
 			    to = newTo;
 			}
@@ -550,7 +552,7 @@ public class FrozenSand implements Entity {
         }
         @Override
         public boolean isDead() {
-            return plugin.frozenSandManager.fakeBlocks.contains(this);
+            return !plugin.frozenSandManager.fakeBlocks.contains(this);
         }
         @Override
         public boolean isEmpty() {
@@ -566,7 +568,7 @@ public class FrozenSand implements Entity {
         }
         @Override
         public boolean isValid() {
-            return isDead();
+            return !isDead();
         }
         @Override
         public boolean leaveVehicle() {
@@ -598,7 +600,7 @@ public class FrozenSand implements Entity {
         @Override
         public boolean teleport(Location arg0) {
             this.move(arg0);
-            return false;
+            return true;
         }
         @Override
         public boolean teleport(Entity arg0) {

@@ -316,10 +316,6 @@ public class EntityManager implements Runnable {
 		
 		if(really)
 		{
-			Bukkit.getPlayer("sanjay900").sendMessage("ICANTELEPORT");
-			if (entity instanceof FrozenSand) {
-				if (!entity.teleport(teleport)) return null;
-			} else
 		  if(!EntityUtil.teleport(entity, teleport))
 			return null;
 		  entity.setVelocity(outvector);
