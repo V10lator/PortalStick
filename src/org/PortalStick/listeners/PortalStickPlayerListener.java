@@ -41,6 +41,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -457,7 +458,16 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	    }
 
 	}
-
+	@EventHandler
+	public void quit (PlayerQuitEvent event) {
+		for (Entry<FrozenSand, ArrayList<UUID>> e : plugin.frozenSandManager.playerMap.entrySet())
+		  {
+				  if (e.getValue().contains(event.getPlayer().getUniqueId())) {
+					  e.getValue().remove(event.getPlayer().getUniqueId());
+				  }
+			  
+		  }
+	}
 	@EventHandler
 	public void death(PlayerDeathEvent event) {
 	    if(plugin.config.DisabledWorlds.contains(event.getEntity().getLocation().getWorld().getName()))
