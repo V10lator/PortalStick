@@ -24,6 +24,7 @@ public class User {
 	public final boolean isPlayer;
 	public final HashSet<Item> droppedItems = new HashSet<Item>();
 	public boolean hasDefaultTexture = true;
+	public String currentTexture = "";
 	
 	public User(String name) {
 	    this.name = name;

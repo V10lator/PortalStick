@@ -683,31 +683,35 @@ public class PortalStickBlockListener implements Listener
 		         Sign s = (Sign) blk.getState();
 		         if (s.getLine(0).equalsIgnoreCase("[PortalStick]")) {
 		             //  Cube sign
-		             if(s.getLine(1).equalsIgnoreCase("cube")); {
-		                 Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) s
+		        	 if (s.getLine(1).equalsIgnoreCase("cube")||s.getLine(1).equalsIgnoreCase("companioncube"))
+		        	 {
+		        		 Block attachedBlock = blk.getRelative(((org.bukkit.material.Sign) s
 	                              .getData()).getAttachedFace());
-		                 try {
+		                 
 		                     final V10Location hatchMiddleLoc = new V10Location(attachedBlock.getRelative(
 		                             BlockFace.DOWN, 2));
 		                     final V10Location loc2 = new V10Location(blk);
-		                     Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
-		                         @Override
-		                         public void run() {
-		                             Block blk = loc2.getHandle().getBlock();
-		                             if (blk.isBlockPowered()
-		                                     || blk.isBlockIndirectlyPowered()) {
-		                                 Block next = blk.getRelative(((org.bukkit.material.Sign) blk
-		                                         .getState().getData()).getFacing());
-		                                 plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), 159, 9,
-		                                         blk, true);
-		                             } 
-		                         }}, 1l);
+		                     
+		                     String bstr = plugin.regionManager.getRegion(hatchMiddleLoc).getString(s.getLine(1).equalsIgnoreCase("cube")?RegionSetting.CUBE_BLOCK:RegionSetting.COMPANION_CUBE_BLOCK);
 
-		                 } catch (Exception e) {
-		                     e.printStackTrace();
-		                 }
-		             }
+		        		 final int bid = bstr.split(":").length>1?Integer.parseInt(bstr.split(":")[0]):Integer.parseInt(bstr);
+	                     final int bdata = bstr.split(":").length>1?Integer.parseInt(bstr.split(":")[1]):0;
+		        		 
+		        		 Bukkit.getScheduler().runTaskLater(plugin, new Runnable(){
+	                         @Override
+	                         public void run() {
+	                             Block blk = loc2.getHandle().getBlock();
+	                             if (blk.isBlockPowered()
+	                                     || blk.isBlockIndirectlyPowered()) {
+	                                 Block next = blk.getRelative(((org.bukkit.material.Sign) blk
+	                                         .getState().getData()).getFacing());
+	                                 plugin.util.clear(hatchMiddleLoc.getHandle().getBlock(), next.isBlockPowered() || next.isBlockIndirectlyPowered(), bid, bdata,
+	                                         blk, true);
+	                             } 
+	                         }}, 1l);
+		        	 }
 		         }
+		         
 		     }
 
 		 }

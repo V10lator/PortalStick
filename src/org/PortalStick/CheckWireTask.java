@@ -97,29 +97,33 @@ public class CheckWireTask extends BukkitRunnable {
 							.runTaskLater(plugin, 0);
 
 					
-				}
+				} else if (lastblock.getData() == (byte)8 && !on) {
+					lastblock.setType(Material.HARD_CLAY);
+					new CheckWireTask(plugin, lastblock, blk, on)
+							.runTaskLater(plugin, 0);
 
-			} else if (mat == Material.WOOL) {
-			    data = lastblock.getData();
-			    if(data == (byte)4 && on) {
-			        lastblock.setData((byte)13);
-	                new CheckWireTask(plugin, lastblock, blk, on)
-	                .runTaskLater(plugin, 0);
-			    } else if(data == (byte)13 && !on) {
-			        lastblock.setData((byte)4);
-	                new CheckWireTask(plugin, lastblock, blk, on)
-	                .runTaskLater(plugin, 0);
-			    }
-			    if(data == (byte)2 && on) {
-			        lastblock.setData((byte)9);
-	                new CheckWireTask(plugin, lastblock, blk, on)
-	                .runTaskLater(plugin, 0);
-			    } else if(data == (byte)9 && !on) {
-			        lastblock.setData((byte)2);
-	                new CheckWireTask(plugin, lastblock, blk, on)
-	                .runTaskLater(plugin, 0);
-			    }
-			}else if (mat == Material.EMERALD_BLOCK && on) {
+					
+				}
+				//diamond off, gold on
+			} else if (mat == Material.DIAMOND_BLOCK && on) {
+			    lastblock.setType(Material.GOLD_BLOCK);
+			    new CheckWireTask(plugin, lastblock, blk, on)
+                .runTaskLater(plugin, 0);
+			    
+			} else if (mat == Material.GOLD_BLOCK && !on){
+			    lastblock.setType(Material.DIAMOND_BLOCK);
+			    new CheckWireTask(plugin, lastblock, blk, on)
+                .runTaskLater(plugin, 0);
+			    
+			    //hardened off, light_gray clay on
+			} else if (mat == Material.HARD_CLAY && on) {
+				lastblock.setType(Material.STAINED_CLAY);
+				lastblock.setData((byte)8);
+                new CheckWireTask(plugin, lastblock, blk, on)
+                .runTaskLater(plugin, 0);
+				
+			}
+			   else if (mat == Material.EMERALD_BLOCK && on) {
 				lastblock.setType(Material.REDSTONE_BLOCK);
 
 			} else if (mat == Material.REDSTONE_BLOCK && !on) {

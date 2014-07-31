@@ -41,6 +41,8 @@ public enum RegionSetting {
 	ENABLE_RED_GEL_BLOCKS("enable-red-gel-blocks", true, true),
 	BLUE_GEL_BLOCK("blue-gel-block", "35:3", true),
 	RED_GEL_BLOCK("red-gel-block", "35:1", true),
+	CUBE_BLOCK("cube-block", "159:9", true),
+	COMPANION_CUBE_BLOCK("companion-cube-block", "159:0", true),
 	GEL_TUBE("gel-tube", true, true),
 	BLUE_GEL_MIN_VELOCITY("blue-gel-min-velocity", 1.0, true),
 	RED_GEL_VELOCITY_MULTIPLIER("red-gel-velocity-multiplier", 1.15, true),

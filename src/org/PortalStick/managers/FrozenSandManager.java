@@ -1,8 +1,10 @@
 package org.PortalStick.managers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.fallingblocks.FrozenSand;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 public class FrozenSandManager {
     private final PortalStick plugin;
 	public final ArrayList<FrozenSand> fakeBlocks = new ArrayList<FrozenSand>();
+	public final HashMap<FrozenSand, ArrayList<UUID>> playerMap = new HashMap<FrozenSand, ArrayList<UUID>>();
 	public int lastId = 0;
 	
 	public FrozenSandManager(PortalStick plugin) {

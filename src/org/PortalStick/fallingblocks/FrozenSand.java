@@ -1,6 +1,7 @@
 package org.PortalStick.fallingblocks;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -443,9 +444,30 @@ public class FrozenSand implements Entity {
 			}
 		}
 		public void show(Player observer) {
+			if (observer.getLocation().distance(getLocation())<30) {
 	        this.show(observer, this.x, this.y, this.z);
+	        ArrayList<UUID> players;
+	        if (!plugin.frozenSandManager.playerMap.containsKey(this)) {
+	        	players = new ArrayList<UUID>();
+	        } else {
+	        	players = plugin.frozenSandManager.playerMap.get(this);
+	        }
+	        players.add(observer.getUniqueId());
+			plugin.frozenSandManager.playerMap.put(this, players);
+			}
 	    }
- 
+		public void shownc(Player observer) {			
+	        this.show(observer, this.x, this.y, this.z);
+	        ArrayList<UUID> players;
+	        if (!plugin.frozenSandManager.playerMap.containsKey(this)) {
+	        	players = new ArrayList<UUID>();
+	        } else {
+	        	players = plugin.frozenSandManager.playerMap.get(this);
+	        }
+	        players.add(observer.getUniqueId());
+			plugin.frozenSandManager.playerMap.put(this, players);
+			
+	    }
 	    public void show(Player observer, Location location) {
 	        this.show(observer, location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	    }

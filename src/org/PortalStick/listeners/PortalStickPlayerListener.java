@@ -281,7 +281,19 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	{
 	  if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
 		return;
-	  Location to = plugin.entityManager.onEntityMove(event.getPlayer(), event.getFrom(), event.getTo(), false);
+	  for (Entry<FrozenSand, ArrayList<UUID>> e : plugin.frozenSandManager.playerMap.entrySet())
+	  {
+		  if (e.getKey().getLocation().distance(event.getTo()) < 30) {
+			  if (!e.getValue().contains(event.getPlayer().getUniqueId())) {
+				  e.getKey().shownc(event.getPlayer());
+			  }
+		  } else {
+			  if (e.getValue().contains(event.getPlayer().getUniqueId())) {
+				  e.getValue().remove(event.getPlayer().getUniqueId());
+			  }
+		  }
+	  }
+		Location to = plugin.entityManager.onEntityMove(event.getPlayer(), event.getFrom(), event.getTo(), false);
 	  if(to != null) {
 		event.setTo(to);
 	  }
