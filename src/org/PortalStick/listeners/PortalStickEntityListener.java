@@ -404,8 +404,11 @@ public class PortalStickEntityListener implements Listener {
 	    if(entity instanceof InventoryHolder && region.name != "global" && region.getBoolean(RegionSetting.UNIQUE_INVENTORY))
 	        user.revertInventory((InventoryHolder)entity);
 	    plugin.userManager.deleteUser(entity);
-	    if(entity instanceof Player) //TODO
-	        plugin.gelManager.resetPlayer((Player)entity);
+	    if(entity instanceof Player) { //TODO
+	        Player player = (Player)entity;
+	        plugin.gelManager.resetPlayer(player);
+	        plugin.frozenSandManager.clearFrozenSand(player);
+	    }
 	}
 	
 	@EventHandler
@@ -424,7 +427,10 @@ public class PortalStickEntityListener implements Listener {
 	    if(oldWorld.equals(newWorld)) {
 	        return;
 	    }
+	    Player player = event.getEntity() instanceof Player ? (Player)event.getEntity() : null;
 	    boolean oldEnabled = plugin.config.DisabledWorlds.contains(oldWorld);
+	    if(oldEnabled && player != null)
+	        plugin.frozenSandManager.clearFrozenSand(player);
 	    boolean newEnabled = plugin.config.DisabledWorlds.contains(newWorld);
 	    if(oldEnabled == newEnabled) {
 	        return;

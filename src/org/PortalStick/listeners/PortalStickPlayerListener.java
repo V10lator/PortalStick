@@ -1,7 +1,6 @@
 package org.PortalStick.listeners;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.PortalStick.PortalStick;
 import org.PortalStick.Region;
 import org.PortalStick.User;
 import org.PortalStick.fallingblocks.FrozenSand;
-import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.UpdatePlayerView;
 import org.PortalStick.util.V10Location;
@@ -22,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -33,15 +30,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -52,9 +46,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
-
-
-
 
 public class PortalStickPlayerListener extends PacketAdapter implements Listener {
 	private final PortalStick plugin;
@@ -282,21 +273,9 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	{
 	  if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
 		return;
-	  for (Entry<FrozenSand, ArrayList<UUID>> e : plugin.frozenSandManager.playerMap.entrySet())
-	  {
-		  if (e.getKey().getLocation().distance(event.getTo()) < 30) {
-			  if (!e.getValue().contains(event.getPlayer().getUniqueId())) {
-				  e.getKey().shownc(event.getPlayer());
-			  }
-		  } else {
-			  if (e.getValue().contains(event.getPlayer().getUniqueId())) {
-				  e.getValue().remove(event.getPlayer().getUniqueId());
-			  }
-		  }
-	  }
-		Location to = plugin.entityManager.onEntityMove(event.getPlayer(), event.getFrom(), event.getTo(), false);
+		Location to = plugin.entityManager.onEntityMove(event.getPlayer(), event.getFrom(), event.getTo(), true);
 	  if(to != null) {
-		event.setTo(to);
+		event.setCancelled(true);
 	  }
 	}
 	
@@ -458,16 +437,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	    }
 
 	}
-	@EventHandler
-	public void quit (PlayerQuitEvent event) {
-		for (Entry<FrozenSand, ArrayList<UUID>> e : plugin.frozenSandManager.playerMap.entrySet())
-		  {
-				  if (e.getValue().contains(event.getPlayer().getUniqueId())) {
-					  e.getValue().remove(event.getPlayer().getUniqueId());
-				  }
-			  
-		  }
-	}
+
 	@EventHandler
 	public void death(PlayerDeathEvent event) {
 	    if(plugin.config.DisabledWorlds.contains(event.getEntity().getLocation().getWorld().getName()))
