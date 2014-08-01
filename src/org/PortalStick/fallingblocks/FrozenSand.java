@@ -443,29 +443,9 @@ public class FrozenSand implements Entity {
 				this.moveTag(p);
 			}
 		}
-		public void show(Player observer) {
-			if (observer.getLocation().distance(getLocation())<30) {
-	        this.show(observer, this.x, this.y, this.z);
-	        ArrayList<UUID> players;
-	        if (!plugin.frozenSandManager.playerMap.containsKey(this)) {
-	        	players = new ArrayList<UUID>();
-	        } else {
-	        	players = plugin.frozenSandManager.playerMap.get(this);
-	        }
-	        players.add(observer.getUniqueId());
-			plugin.frozenSandManager.playerMap.put(this, players);
-			}
-	    }
 		public void shownc(Player observer) {			
 	        this.show(observer, this.x, this.y, this.z);
-	        ArrayList<UUID> players;
-	        if (!plugin.frozenSandManager.playerMap.containsKey(this)) {
-	        	players = new ArrayList<UUID>();
-	        } else {
-	        	players = plugin.frozenSandManager.playerMap.get(this);
-	        }
-	        players.add(observer.getUniqueId());
-			plugin.frozenSandManager.playerMap.put(this, players);
+	        plugin.frozenSandManager.fakeBlocks.get(this).add(observer.getUniqueId());
 			
 	    }
 	    public void show(Player observer, Location location) {
@@ -574,7 +554,7 @@ public class FrozenSand implements Entity {
         }
         @Override
         public boolean isDead() {
-            return !plugin.frozenSandManager.fakeBlocks.contains(this);
+            return !plugin.frozenSandManager.fakeBlocks.containsKey(this);
         }
         @Override
         public boolean isEmpty() {

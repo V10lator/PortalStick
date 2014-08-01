@@ -511,9 +511,9 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 
 			@Override
 			public void run() {
-	    for (final FrozenSand f: plugin.frozenSandManager.fakeBlocks) {  
+	    for (FrozenSand f: plugin.frozenSandManager.fakeBlocks.keySet()) {  
 	        if (f.entityId+2 == entityID) {
-	        	final EntityUseAction action = packet.getEntityUseActions().read(0);
+	        	EntityUseAction action = packet.getEntityUseActions().read(0);
 	           
 					onPlayerInteract(new PlayerInteractEvent(event.getPlayer(), action == EntityUseAction.INTERACT?Action.RIGHT_CLICK_BLOCK:Action.LEFT_CLICK_BLOCK, event.getPlayer().getItemInHand(), f.getLocation().getBlock(), null));
 	

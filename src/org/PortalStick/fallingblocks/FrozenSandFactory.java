@@ -1,4 +1,7 @@
 package org.PortalStick.fallingblocks;
+import java.util.HashSet;
+import java.util.UUID;
+
 import org.PortalStick.PortalStick;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -62,9 +65,11 @@ public class FrozenSandFactory {
 	        }
 	        int id = plugin.frozenSandManager.getNextId();
 	        FrozenSand hologram = new FrozenSand(plugin, id,this.worldName, this.locX, this.locY, this.locZ, this.attachPlayer,this.ridePlayer, tag);
-	        plugin.frozenSandManager.fakeBlocks.add(hologram);
+	        plugin.frozenSandManager.fakeBlocks.put(hologram, new HashSet<UUID>());
+	        int vd = plugin.getServer().getViewDistance();
 	        for (Player e : world.getPlayers()) {
-	                hologram.show(e);
+	            if (hologram.getLocation().distance(e.getLocation()) < vd)
+	                hologram.shownc(e);
 	        }
 	        return hologram;
 	    }
