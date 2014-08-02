@@ -66,7 +66,7 @@ public class FrozenSandFactory {
 	        int id = plugin.frozenSandManager.getNextId();
 	        FrozenSand hologram = new FrozenSand(plugin, id,this.worldName, this.locX, this.locY, this.locZ, this.attachPlayer,this.ridePlayer, tag);
 	        plugin.frozenSandManager.fakeBlocks.put(hologram, new HashSet<UUID>());
-	        int vd = plugin.getServer().getViewDistance();
+	        int vd = 50;
 	        for (Player e : world.getPlayers()) {
 	            if (hologram.getLocation().distance(e.getLocation()) < vd)
 	                hologram.shownc(e);
