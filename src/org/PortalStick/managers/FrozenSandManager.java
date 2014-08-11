@@ -45,6 +45,7 @@ public class FrozenSandManager {
 	
 	public void checkSight(Player player, Location loc) {
 	    int vd = 50;
+	    if (loc == null) loc = player.getLocation();
 	    for (Entry<FrozenSand, HashSet<UUID>> e : fakeBlocks.entrySet())
 	    {
 	        if (e.getKey().getLocation().distance(loc) < vd) {
