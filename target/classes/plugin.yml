@@ -1,0 +1,54 @@
+name: PortalStick
+main: org.PortalStick.PortalStick
+version: 5.0-dev5
+authors: [matejdro, oliverw92, V10lator, sanjay900]
+softdepend: [WorldGuard]
+depend: [ProtocolLib]
+commands:
+  portalstick:
+    description: Aperture Science Portal Stick
+    aliases: portal
+    usage: /<command> help
+permissions:
+  portalstick.placeportal:
+    description: Place portals
+    default: true
+  portalstick.creategrill:
+    description: Create grills
+    default: op
+  portalstick.deletegrill:
+    description: Delete grills
+    default: op
+  portalstick.createbridge:
+    description: Create bridges
+    default: op
+  portalstick.deletebridge:
+    description: Delete bridges
+    default: op
+  portalstick.teleport:
+    description: Use portals
+    default: true
+  portalstick.gun:
+    description: Get the gun with /portalstick gun
+    default: op
+  portalstick.admin.regions:
+    description: Administrate regions
+    default: op
+  portalstick.admin.deleteall:
+    description: Delete all
+    default: op
+  portalstick.damageboots:
+    description: Damage boots
+    default: true
+  portalstick.admin.language:
+    description: Change language
+    default: op
+  portalstick.admin.debug:
+    description: Toggle debugging
+    default: op
+  portalstick.admin.texture:
+    description: Toggle the texture package
+    default: op
+  portalstick.admin.say:
+    description: Use /portalstick say
+    default: op
