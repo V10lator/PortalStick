@@ -53,8 +53,7 @@
 			<groupId>com.sk89q</groupId>
 			<artifactId>worldguard</artifactId>
 			<version>LATEST</version>
-			<scope>system</scope>
-			<systemPath>D:\Downloadsd\worldguard-6.0.0-SNAPSHOT (1)\worldguard-6.0.0-SNAPSHOT.jar</systemPath>
+			<scope>provided</scope>
 			<type>jar</type>
 		</dependency>
 		<dependency>
