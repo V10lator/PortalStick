@@ -5,6 +5,7 @@
 package org.PortalStick.components;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -125,7 +126,7 @@ public class Wire extends BukkitRunnable {
 
 			} else {
 				for (Entity e : lastblock.getWorld().getEntities()) {
-					if (e instanceof ItemFrame && plugin.util.compareLocation(e.getLocation().getBlock().getLocation(), lastblock.getLocation())) {
+					if (e instanceof ItemFrame && Utils.compareLocation(e.getLocation().getBlock().getLocation(), lastblock.getLocation())) {
 						ItemFrame ifr = ((ItemFrame)e);
 						ItemStack i = ifr.getItem();
 		                if (i.getType() == Material.MAP) {

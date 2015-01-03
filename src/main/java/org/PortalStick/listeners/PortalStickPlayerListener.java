@@ -15,6 +15,7 @@ import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.util.Config.Sound;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.UpdatePlayerView;
+import org.PortalStick.util.Utils;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -64,14 +65,14 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 		Player player = event.getPlayer();
 		EntityCubeImpl cube = plugin.util.nmsUtil.getCube(event.getRightClicked());
 		if (cube != null) {
-			plugin.util.doInventoryUpdate(event.getPlayer(), plugin);
+			Utils.doInventoryUpdate(event.getPlayer(), plugin);
 			plugin.cubeManager.cubesPlayer.put(cube.<V10Location>getStored("respawnLoc"), event.getPlayer().getUniqueId());
 			ItemStack item = new ItemStack(((FallingBlock)cube.getBukkitEntity()).getMaterial(), 1,
 					((FallingBlock)cube.getBukkitEntity()).getBlockData());
 			plugin.cubeManager.cubesPlayerItem.put(cube.<V10Location>getStored("respawnLoc"), item);
 
 			player.getInventory().addItem(item);
-			plugin.util.doInventoryUpdate(player, plugin);
+			Utils.doInventoryUpdate(player, plugin);
 
 			V10Location middle;
 			if (plugin.cubeManager.buttonsToEntity.containsKey(cube.getUniqueID())) {
@@ -88,14 +89,14 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	}
 	public void interactFunnelCube(Player player, FrozenSand fb) {
 		if (fb.getLocation().distance(player.getLocation())>2||fb.getLocation().distance(player.getEyeLocation())>2) return;
-		plugin.util.doInventoryUpdate(player, plugin);
+		Utils.doInventoryUpdate(player, plugin);
 		plugin.cubeManager.cubesPlayer.put(fb.spawnloc, player.getUniqueId());
 		ItemStack item = new ItemStack(fb.getMaterial(), 1,
 				(short) fb.getData());
 		plugin.cubeManager.cubesPlayerItem.put(fb.spawnloc, item);
 
 		player.getInventory().addItem(item);
-		plugin.util.doInventoryUpdate(player, plugin);
+		Utils.doInventoryUpdate(player, plugin);
 
 		V10Location middle;
 		if (plugin.cubeManager.buttonsToEntity.containsKey(fb.getUniqueID())) {
@@ -163,11 +164,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 						for(int i = 0; i < 2; i++)
 							if(p.coord.inside[i] != null && p.coord.inside[i].equals(loc))
 							{
-								plugin
-								.
-								util
-								.
-								sendMessage
+								Utils.sendMessage
 								(
 										player
 										, 
@@ -189,13 +186,13 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 				{
 					if ((b.getType() == Material.IRON_DOOR_BLOCK || b.getType() == Material.WOODEN_DOOR) && ((b.getData() & 4) != 4) )
 					{
-						plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
+						Utils.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
 						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new V10Location(b));
 						return;
 					}
 					else if (b.getType() == Material.TRAP_DOOR && (b.getData() & 4) == 0)
 					{
-						plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
+						Utils.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
 						plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, new V10Location(b));
 						return;
 
@@ -221,12 +218,12 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			switch (event.getAction()) {
 			case RIGHT_CLICK_BLOCK:
 				user.pointTwo = new V10Location(event.getClickedBlock());
-				plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointTwoSet", player.getName()));
+				Utils.sendMessage(player, plugin.i18n.getString("RegionPointTwoSet", player.getName()));
 				event.setCancelled(true);
 				break;
 			case LEFT_CLICK_BLOCK:
 				user.pointOne = new V10Location(event.getClickedBlock());
-				plugin.util.sendMessage(player, plugin.i18n.getString("RegionPointOneSet", player.getName()));
+				Utils.sendMessage(player, plugin.i18n.getString("RegionPointOneSet", player.getName()));
 				event.setCancelled(true);
 			default:
 				break;
@@ -264,7 +261,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 				String color1 = DyeColor.values()[plugin.util.getLeftPortalColor(preset)].toString().replace("_", " ");
 				String color2 = DyeColor.values()[plugin.util.getRightPortalColor(preset)].toString().replace("_", " ");
 
-				plugin.util.sendMessage(player, plugin.i18n.getString("SwitchedPortalColor", player.getName(), color1, color2));
+				Utils.sendMessage(player, plugin.i18n.getString("SwitchedPortalColor", player.getName(), color1, color2));
 			} 
 		}
 		else if (event.getAction() == Action.LEFT_CLICK_BLOCK
@@ -511,7 +508,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 
 			@Override
 			public void run() {
-				for (FrozenSand f: plugin.frozenSandManager.fakeBlocks.keySet()) {  
+				for (FrozenSand f: plugin.util.nmsUtil.frozenSandManager.fakeBlocks.keySet()) {  
 					if (f.entityId+2 == entityID) {
 						if (f.spawnloc == null) {
 						EntityUseAction action = packet.getEntityUseActions().read(0);

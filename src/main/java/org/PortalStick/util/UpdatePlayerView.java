@@ -37,9 +37,9 @@ public class UpdatePlayerView implements Runnable {
             user.hasDefaultTexture = !user.hasDefaultTexture;
         }
         if(!disabled) {
-            for (FrozenSand h : plugin.frozenSandManager.fakeBlocks.keySet())
+            for (FrozenSand h : plugin.util.nmsUtil.frozenSandManager.fakeBlocks.keySet())
                 if(world.equals(h.getLocation().getWorld()))
-                    plugin.frozenSandManager.checkSight(p, p.getLocation());
+                	plugin.util.nmsUtil.frozenSandManager.checkSight(p, p.getLocation());
         }
     }
 }

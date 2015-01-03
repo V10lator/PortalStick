@@ -502,7 +502,7 @@ public class EntityManager implements Runnable {
 		
 		//Update FrozenSand view
 		if(isPlayer)
-		    plugin.frozenSandManager.checkSight((Player)entity, ret);
+			plugin.util.nmsUtil.frozenSandManager.checkSight((Player)entity, ret);
 		
 		//Gel
 		if(!plugin.gelManager.flyingGels.containsKey(entity.getUniqueId()))

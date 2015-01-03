@@ -1,6 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class SayCommand extends BaseCommand {
 		        sb.append(' ').append(args[i]);
 		    p.sendMessage(ChatColor.translateAlternateColorCodes('&', sb.toString()));
 		} else
-		    plugin.util.sendMessage(sender, plugin.i18n.getString("SayFailed", playerName, args[0]));
+		    Utils.sendMessage(sender, plugin.i18n.getString("SayFailed", playerName, args[0]));
 		
 		return true;
 	}

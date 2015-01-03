@@ -26,7 +26,6 @@ import org.PortalStick.listeners.PortalStickPlayerListener;
 import org.PortalStick.listeners.PortalStickVehicleListener;
 import org.PortalStick.managers.CubeManager;
 import org.PortalStick.managers.EntityManager;
-import org.PortalStick.managers.FrozenSandManager;
 import org.PortalStick.managers.FunnelBridgeManager;
 import org.PortalStick.managers.GelManager;
 import org.PortalStick.managers.GrillManager;
@@ -65,7 +64,6 @@ public class PortalStick extends JavaPlugin {
 	public final PortalManager portalManager = new PortalManager(this);
 	public final RegionManager regionManager = new RegionManager(this);
 	public final UserManager userManager = new UserManager(this);
-	public final FrozenSandManager frozenSandManager = new FrozenSandManager();
 	public final CubeManager cubeManager = new CubeManager();
 	public final WireManager wireManager = new WireManager(this);
 	public WorldGuardPlugin worldGuard = null;

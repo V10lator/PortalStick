@@ -3,6 +3,7 @@ package org.PortalStick.commands;
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Region;
 import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.Utils;
 import org.bukkit.entity.Player;
 
 
@@ -17,7 +18,7 @@ public class FlagCommand extends BaseCommand {
 		
 		Region editRegion = plugin.regionManager.getRegion(args[0]);
 		if (editRegion == null) {
-			plugin.util.sendMessage(sender, plugin.i18n.getString("RegionNotFound", playerName, args[0]));
+			Utils.sendMessage(sender, plugin.i18n.getString("RegionNotFound", playerName, args[0]));
 			return true;
 		}
 		
@@ -35,22 +36,22 @@ public class FlagCommand extends BaseCommand {
 					else
 						editRegion.settings.put(setting, args[2]);
 					
-					plugin.util.sendMessage(sender, plugin.i18n.getString("RegionUpdated", playerName, editRegion.name));
+					Utils.sendMessage(sender, plugin.i18n.getString("RegionUpdated", playerName, editRegion.name));
 					plugin.config.saveAll();
 				} catch (Throwable t) {
-					plugin.util.sendMessage(sender, plugin.i18n.getString("InvalidRegionFlagValue", playerName, setting.getYaml()));
+					Utils.sendMessage(sender, plugin.i18n.getString("InvalidRegionFlagValue", playerName, setting.getYaml()));
 					editRegion.settings.put(setting, old);
 				}
 				return true;
 			}
 		}
-		plugin.util.sendMessage(sender, plugin.i18n.getString("RegionUpdated", playerName, args[1]));
+		Utils.sendMessage(sender, plugin.i18n.getString("RegionUpdated", playerName, args[1]));
 		StringBuilder sb = new StringBuilder("&c");
 		for (RegionSetting setting : RegionSetting.values())
 			if (setting.getEditable()) 
 				sb.append("&c").append(setting.getYaml()).append("&7, ");
 		sb.delete(sb.length() - 2, sb.length());
-		plugin.util.sendMessage(sender, sb.toString());
+		Utils.sendMessage(sender, sb.toString());
 		return true;
 	}
 	

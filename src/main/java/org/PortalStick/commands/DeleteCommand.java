@@ -1,6 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.entity.Player;
 
 public class DeleteCommand extends BaseCommand {
@@ -11,7 +12,7 @@ public class DeleteCommand extends BaseCommand {
 	
 	public boolean execute() {
 		plugin.portalManager.deletePortals(plugin.userManager.getUser(player));
-		plugin.util.sendMessage(sender, plugin.i18n.getString("OwnPortalsDeleted", playerName));
+		Utils.sendMessage(sender, plugin.i18n.getString("OwnPortalsDeleted", playerName));
 		return true;
 	}
 	

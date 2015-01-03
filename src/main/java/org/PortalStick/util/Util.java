@@ -1,36 +1,25 @@
 package org.PortalStick.util;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.UUID;
-
 import org.PortalStick.PortalStick;
 import org.PortalStick.util.Config.Sound;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Lever;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
-
 import com.sanjay900.nmsUtil.EntityCubeImpl;
 import com.sanjay900.nmsUtil.NMSUtil;
 
 public class Util {
 	private final PortalStick plugin;
-	private int maxLength = 105;
 	public final NMSUtil nmsUtil;
 	BlockFace[] blockfaces = new BlockFace[] { BlockFace.WEST,
 			BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST,
@@ -42,59 +31,7 @@ public class Util {
 	public Util(PortalStick plugin)
 	{
 		this.plugin = plugin;
-		this.nmsUtil = new NMSUtil();
-	}
-	public Vector faceToVector(BlockFace face) {
-		return new Vector(face.getModX(), face.getModY(), face.getModZ());
-	}
-	public void sendMessage(CommandSender player, String msg) {
-		int i;
-		String part;
-		ChatColor lastColor = ChatColor.RESET;
-		for (String line : msg.split("`n")) {
-			i = 0;
-			while (i < line.length()) {
-				part = getMaxString(line.substring(i));
-				if (i+part.length() < line.length() && part.contains(" "))
-					part = part.substring(0, part.lastIndexOf(" "));
-				part = lastColor + part;
-				player.sendMessage(ChatColor.translateAlternateColorCodes('&', part));
-				lastColor = getLastColor(part);
-				i = i + part.length() -1;
-			}
-		}
-	}
-
-	public Location getSimpleLocation(Location location) {
-		location.setX((double)Math.round(location.getX() * 10) / 10);
-		location.setY((double)Math.round(location.getY() * 10) / 10);
-		location.setZ((double)Math.round(location.getZ() * 10) / 10);
-		return location;
-	}
-
-	public ChatColor getLastColor(String str) {
-		int i = 0;
-		ChatColor lastColor = ChatColor.RESET;
-		while (i < str.length()-2) {
-			for (ChatColor color: ChatColor.values()) {
-				if (str.substring(i, i+2).equalsIgnoreCase(color.toString()))
-					lastColor = color;
-			}
-			i = i+2;
-		}
-		return lastColor;
-	}
-
-	private String getMaxString(String str) {
-		for (int i = 0; i < str.length(); i++) {
-			if (str.substring(0, i).length() == maxLength) {
-				if (str.substring(i, i+1) == "")
-					return str.substring(0, i-1);
-				else
-					return str.substring(0, i);
-			}
-		}
-		return str;
+		this.nmsUtil = new NMSUtil(plugin);
 	}
 
 	private void playNativeSound(Sound sound, V10Location loc)
@@ -176,42 +113,6 @@ public class Util {
 		return Integer.parseInt(plugin.config.ColorPresets.get(preset).split("-")[1]);
 	}
 
-	public ItemStack getItemData(String itemString)
-	{
-		int num;
-		int id;
-		short data;
-
-		String[] split = itemString.split(",");
-		if (split.length < 2)
-			num = 1;
-		else
-			num = Integer.parseInt(split[1]);
-		split = split[0].split(":");
-		if (split.length < 2)
-			data = 0;
-		else
-			data = Short.parseShort(split[1]);
-
-		id = Integer.parseInt(split[0]);
-		return new ItemStack(id, num, data);
-	}
-	public static Entity getEntity(World world, UUID uid) {
-		for (org.bukkit.entity.Entity entity : world.getEntities()) {
-			if (entity.getUniqueId().equals(uid)) {
-				return entity;
-			}
-		}
-		return null;
-	}
-	public void setItemNameAndDesc(ItemStack item, String name, String desc) {
-		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(name);
-		if(desc != null)
-			meta.setLore(Arrays.asList(desc.split("\n")));
-		item.setItemMeta(meta);
-	}
-
 	public boolean isPortalGun(ItemStack item) {
 		return item != null && item.getTypeId() == plugin.config.PortalTool &&
 				item.getDurability() == plugin.config.portalToolData &&
@@ -221,84 +122,8 @@ public class Util {
 
 	public ItemStack createPortalGun() {
 		ItemStack gun = new ItemStack(plugin.config.PortalTool, 1, plugin.config.portalToolData);
-		plugin.util.setItemNameAndDesc(gun, plugin.config.portalToolName, plugin.config.portalToolDesc);
+		Utils.setItemNameAndDesc(gun, plugin.config.portalToolName, plugin.config.portalToolDesc);
 		return gun;
-	}
-
-	public boolean compareLocation(Location l, Location l2) {
-		return (l.getWorld().equals(l2.getWorld())
-				&& l.getX() == l2.getX())
-				&& (l.getY() == l2.getY())
-				&& (l.getZ() == l2.getZ());
-
-	}
-
-	/**
-	 * Removes a item from a inventory
-	 * 
-	 * @param inventory
-	 *            The inventory to remove from.
-	 * @param mat
-	 *            The material to remove .
-	 * @param amount
-	 *            The amount to remove.
-	 * @param damage
-	 *            The data value or -1 if this does not matter.
-	 */
-
-	public void remove(Inventory inv, Material type, int amount,
-			short damage) {
-		ItemStack[] items = inv.getContents();
-		for (int i = 0; i < items.length; i++) {
-			ItemStack is = items[i];
-			if (is != null && is.getType() == type
-					&& is.getData().getData() == damage) {
-				int newamount = is.getAmount() - amount;
-				if (newamount > 0) {
-					is.setAmount(newamount);
-					break;
-				} else {
-					items[i] = null;
-					amount = -newamount;
-					if (amount == 0)
-						break;
-				}
-			}
-		}
-		inv.setContents(items);
-
-	}
-
-	/**
-	 * Checks weather the inventory contains a item or not.
-	 * 
-	 * @param inventory
-	 *            The inventory to check..
-	 * @param mat
-	 *            The material to check .
-	 * @param amount
-	 *            The amount to check.
-	 * @param damage
-	 *            The data value or -1 if this does not matter.
-	 * @return The amount of items the player has got. If this return 0 then the
-	 *         check was successfull.
-	 */
-	public int contains(Inventory inventory, Material mat, int amount,
-			short damage) {
-		int searchAmount = 0;
-		for (ItemStack item : inventory.getContents()) {
-
-			if (item == null || !item.getType().equals(mat)) {
-				continue;
-			}
-
-			if (damage != -1 && item.getDurability() == damage) {
-				continue;
-			}
-
-			searchAmount += item.getAmount();
-		}
-		return searchAmount - amount;
 	}
 
 	public void changeBtn(V10Location middle, boolean on) {
@@ -397,15 +222,7 @@ public class Util {
 		middle.getRelative(BlockFace.DOWN).getRelative(BlockFace.SOUTH, 2)
 		.setType(mat);
 	}
-	public void doInventoryUpdate(final Player player, Plugin plugin) {
-		Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-
-			@Override
-			public void run() {
-				player.updateInventory();
-			}
-		}, 1L);
-	}
+	
 	public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign, EntityCubeImpl en) {
 		clear(hatchMiddle, powered, id, data, sign, false, en);
 	}
@@ -433,12 +250,12 @@ public class Util {
 
 		if (plugin.cubeManager.cubesPlayer.containsKey(loc)) {
 			Player p = Bukkit.getPlayer(plugin.cubeManager.cubesPlayer.get(loc));
-			remove(p.getInventory(),
+			Utils.remove(p.getInventory(),
 					plugin.cubeManager.cubesPlayerItem.get(loc)
 					.getType(), 1, plugin.cubeManager.cubesPlayerItem
 					.get(loc).getData()
 					.getData());
-			doInventoryUpdate(p, plugin);
+			Utils.doInventoryUpdate(p, plugin);
 
 			plugin.cubeManager.cubesPlayer.remove(loc);
 
@@ -540,8 +357,5 @@ public class Util {
 		return error ? null : middle;
 	}
 
-	public boolean isSolid(Material type) {
-		return (type.isSolid() && !type.name().contains("SIGN"));
-	}
 
 }

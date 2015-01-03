@@ -12,8 +12,8 @@ import org.PortalStick.components.Region;
 import org.PortalStick.fallingblocks.FrozenSand;
 import org.PortalStick.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.Utils;
 import org.PortalStick.util.V10Location;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -235,7 +235,7 @@ public class FunnelBridgeManager {
 				String id = String.valueOf(fb
 						.getMaterial().getId())+":"+String.valueOf(fb
 								.getBlockData());
-				FrozenSand fblock = new FrozenSandFactory(plugin).withLocation(fb.getLocation()).withText(id).build();
+				FrozenSand fblock = new FrozenSandFactory(plugin, plugin.util.nmsUtil).withLocation(fb.getLocation()).withText(id).build();
 				cubeinFunnel.put(fblock, funnel);
 				fblock.spawnloc=c.<V10Location>getStored("respawnLoc");
 				entity.remove();
@@ -266,17 +266,17 @@ public class FunnelBridgeManager {
 			Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
 			if (bridge != null && bridge instanceof Funnel) {
 				if (((Funnel)bridge).getDirection(entity.getLocation().getBlock()) != null)
-			entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock())).multiply(0.1));
+			entity.setVelocity(Utils.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock())).multiply(0.1));
 				else {
-					entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
+					entity.setVelocity(Utils.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
 				}
 			} else {
 				if (bridge == null )bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(BlockFace.UP)));
 				if (bridge != null && bridge instanceof Funnel) {
 					if (((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP)) != null)
-				entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP))).multiply(0.1).setY(0.1));
+				entity.setVelocity(Utils.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP))).multiply(0.1).setY(0.1));
 					else {
-						entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
+						entity.setVelocity(Utils.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
 					}
 				} else {
 					entity.setVelocity(new Vector(0,0,0));
@@ -288,17 +288,17 @@ public class FunnelBridgeManager {
 			Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
 			if (bridge != null && bridge instanceof Funnel) {
 				if (((Funnel)bridge).getDirection(entity.getLocation().getBlock()) != null)
-			entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock())).multiply(0.1));
+			entity.setVelocity(Utils.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock())).multiply(0.1));
 				else {
-					entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
+					entity.setVelocity(Utils.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
 				}
 			} else {
 				if (bridge == null )bridge = bridgeBlocks.get(new V10Location(entity.getLocation().getBlock().getRelative(BlockFace.UP)));
 				if (bridge != null && bridge instanceof Funnel) {
 					if (((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP)) != null)
-				entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP))).multiply(0.1).setY(0.1));
+				entity.setVelocity(Utils.faceToVector(((Funnel)bridge).getDirection(entity.getLocation().getBlock().getRelative(BlockFace.UP))).multiply(0.1).setY(0.1));
 					else {
-						entity.setVelocity(plugin.util.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
+						entity.setVelocity(Utils.faceToVector(((Funnel)bridge).facingSide).multiply(0.1));	
 					}
 				}
 				

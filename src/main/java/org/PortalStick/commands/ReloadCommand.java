@@ -1,6 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.entity.Player;
 
 public class ReloadCommand extends BaseCommand {
@@ -11,7 +12,7 @@ public class ReloadCommand extends BaseCommand {
 	
 	public boolean execute() {
 		plugin.config.reLoad();
-		plugin.util.sendMessage(sender, plugin.i18n.getString("ConfigurationReloaded", playerName));
+		Utils.sendMessage(sender, plugin.i18n.getString("ConfigurationReloaded", playerName));
 		return true;
 	}
 	

@@ -1,6 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.entity.Player;
 
 public class DeleteRegionCommand extends BaseCommand {
@@ -11,13 +12,13 @@ public class DeleteRegionCommand extends BaseCommand {
 	
 	public boolean execute() {
 		if (args[0].equalsIgnoreCase("global"))
-			plugin.util.sendMessage(sender, plugin.i18n.getString("CanNotDeleteGlobalRegion", playerName));
+			Utils.sendMessage(sender, plugin.i18n.getString("CanNotDeleteGlobalRegion", playerName));
 		else if (plugin.regionManager.getRegion(args[0]) != null) {
 			plugin.regionManager.deleteRegion(args[0]);
 			plugin.config.reLoad();
-			plugin.util.sendMessage(sender, plugin.i18n.getString("RegionDeleted", playerName, args[0]));
+			Utils.sendMessage(sender, plugin.i18n.getString("RegionDeleted", playerName, args[0]));
 		}
-		else plugin.util.sendMessage(sender, plugin.i18n.getString("RegionNotFound", playerName, args[0]));
+		else Utils.sendMessage(sender, plugin.i18n.getString("RegionNotFound", playerName, args[0]));
 		return true;
 	}
 	

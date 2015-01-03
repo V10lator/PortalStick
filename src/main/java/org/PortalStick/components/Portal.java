@@ -94,7 +94,7 @@ public class Portal {
 		        loc.getBlock().setType(Material.REDSTONE_TORCH_ON);
 		    else
 		        loc.getBlock().setType(Material.AIR);
-		    coord.insideFrozen[i] = new FrozenSandFactory(plugin).withLocation(loc).withText("95:"+(orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset))).build();
+		    coord.insideFrozen[i] = new FrozenSandFactory(plugin, plugin.util.nmsUtil).withLocation(loc).withText("95:"+(orange ? plugin.util.getRightPortalColor(owner.colorPreset) : plugin.util.getLeftPortalColor(owner.colorPreset))).build();
     	}
 		if(receiver)
 		    placetorch = false;

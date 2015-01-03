@@ -1,6 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -70,7 +71,7 @@ public abstract class BaseCommand {
 	public abstract boolean permission(Player player);
 	
 	public void sendUsage() {
-		plugin.util.sendMessage(sender, "&c/"+usedCommand+" " + name + " " + usage);
+		Utils.sendMessage(sender, "&c/"+usedCommand+" " + name + " " + usage);
 	}
 	
 	private void cleanup()

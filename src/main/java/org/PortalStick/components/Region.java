@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.Utils;
 import org.PortalStick.util.V10Location;
 import org.bukkit.entity.Player;
 
@@ -81,7 +82,7 @@ public class Region extends User
 				if(region.contains(vLoc))
 				{
 				  if(player != null)
-					  plugin.util.sendMessage(player, plugin.i18n.getString("RegionsOverlap", player.getName(), name, region.name));
+					  Utils.sendMessage(player, plugin.i18n.getString("RegionsOverlap", player.getName(), name, region.name));
 				  if(plugin.config.debug)
 					  plugin.getLogger().info("Region \""+name+"\" overlaps with region \""+region.name+"\". Removing.");
 				  return false;

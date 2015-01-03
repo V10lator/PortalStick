@@ -12,6 +12,7 @@ import org.PortalStick.components.User;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.PortalCoord;
 import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.Utils;
 import org.PortalStick.util.V10Location;
 import org.PortalStick.util.Config.Sound;
 import org.bukkit.Location;
@@ -233,7 +234,7 @@ public class PortalManager {
 			portalc = generatePortal(block, face);
 			if (!checkPortal(portalc))
 			{
-				if (end) plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
+				if (end) Utils.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
 				plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, block);
 				return false;
 			}
@@ -243,7 +244,7 @@ public class PortalManager {
 			portalc = generateHorizontalPortal(block, face);
 			if (portalc.finished)
 			{
-				if (end) plugin.util.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
+				if (end) Utils.sendMessage(player, plugin.i18n.getString("CannotPlacePortal", player.getName()));
 				plugin.util.playSound(Sound.PORTAL_CANNOT_CREATE, block);
 				return false;
 			}
@@ -321,7 +322,7 @@ public class PortalManager {
 		  Inventory inv = ih.getInventory();
 		  for (Object is : region.getList(RegionSetting.UNIQUE_INVENTORY_ITEMS))
 		  {
-			item = plugin.util.getItemData((String)is);
+			item = Utils.getItemData((String)is);
 			inv.addItem(item);
 		  }
 		}

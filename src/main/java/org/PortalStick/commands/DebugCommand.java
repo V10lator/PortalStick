@@ -1,6 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
+import org.PortalStick.util.Utils;
 import org.bukkit.entity.Player;
 
 public class DebugCommand extends BaseCommand
@@ -13,7 +14,7 @@ public class DebugCommand extends BaseCommand
 	public boolean execute()
 	{
 		plugin.config.debug = !plugin.config.debug;
-		plugin.util.sendMessage(sender, plugin.i18n.getString(plugin.config.debug ? "DebuggingEnabled" : "DebuggingDisabled", playerName));
+		Utils.sendMessage(sender, plugin.i18n.getString(plugin.config.debug ? "DebuggingEnabled" : "DebuggingDisabled", playerName));
 		plugin.config.saveAll();
 		return true;
 	}

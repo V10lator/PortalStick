@@ -293,7 +293,7 @@ public class PortalStickEntityListener implements Listener {
 		if(entity instanceof Player) { //TODO
 			Player player = (Player)entity;
 			plugin.gelManager.resetPlayer(player);
-			plugin.frozenSandManager.clearFrozenSand(player);
+			plugin.util.nmsUtil.frozenSandManager.clearFrozenSand(player);
 		}
 	}
 
@@ -315,7 +315,7 @@ public class PortalStickEntityListener implements Listener {
 		Player player = event.getEntity() instanceof Player ? (Player)event.getEntity() : null;
 		boolean oldEnabled = plugin.config.DisabledWorlds.contains(oldWorld);
 		if(oldEnabled && player != null)
-			plugin.frozenSandManager.clearFrozenSand(player);
+			plugin.util.nmsUtil.frozenSandManager.clearFrozenSand(player);
 		boolean newEnabled = plugin.config.DisabledWorlds.contains(newWorld);
 		if(oldEnabled == newEnabled) {
 			return;

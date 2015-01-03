@@ -12,6 +12,7 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.Wire;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.Utils;
 import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -484,7 +485,7 @@ public class PortalStickBlockListener implements Listener
 	  Region region = plugin.regionManager.getRegion(new V10Location(bs.getLocation()));
 	  if(region.getBoolean(RegionSetting.GEL_TUBE))
 	  {
-		ItemStack gel = plugin.util.getItemData(region.getString(RegionSetting.RED_GEL_BLOCK));
+		ItemStack gel = Utils.getItemData(region.getString(RegionSetting.RED_GEL_BLOCK));
 		if(mat == gel.getType() && is.getDurability() == gel.getDurability())
 		{
 		  event.setCancelled(true);
@@ -498,7 +499,7 @@ public class PortalStickBlockListener implements Listener
 		}
 		else
 		{
-		  gel = plugin.util.getItemData(region.getString(RegionSetting.BLUE_GEL_BLOCK));
+		  gel = Utils.getItemData(region.getString(RegionSetting.BLUE_GEL_BLOCK));
 		  if(mat == gel.getType() && is.getDurability() == gel.getDurability())
 		  {
 			event.setCancelled(true);

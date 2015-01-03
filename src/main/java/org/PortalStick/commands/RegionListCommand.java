@@ -2,6 +2,7 @@ package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Region;
+import org.PortalStick.util.Utils;
 import org.bukkit.entity.Player;
 
 public class RegionListCommand extends BaseCommand {
@@ -11,9 +12,9 @@ public class RegionListCommand extends BaseCommand {
 	}
 	
 	public boolean execute() {
-		plugin.util.sendMessage(sender, "&c---------- &7Portal Regions &c----------");
+		Utils.sendMessage(sender, "&c---------- &7Portal Regions &c----------");
 		for (Region region : plugin.regionManager.regions.values())
-			plugin.util.sendMessage(sender, "&7- &c" + region.name + " &7- &c" + region.min.toString() + " &7-&c " + region.max.toString());
+			Utils.sendMessage(sender, "&7- &c" + region.name + " &7- &c" + region.min.toString() + " &7-&c " + region.max.toString());
 		return true;
 	}
 	
