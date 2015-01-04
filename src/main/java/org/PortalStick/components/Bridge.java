@@ -3,7 +3,7 @@ package org.PortalStick.components;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import org.PortalStick.PortalStick;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

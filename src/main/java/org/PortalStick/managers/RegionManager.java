@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Region;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.entity.Player;
 
 public class RegionManager {

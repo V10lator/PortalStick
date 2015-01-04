@@ -12,7 +12,7 @@ import org.PortalStick.components.Grill;
 import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.PortalStick.util.Config.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;

@@ -2,7 +2,7 @@ package org.PortalStick.components;
 
 import java.util.HashSet;
 
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;

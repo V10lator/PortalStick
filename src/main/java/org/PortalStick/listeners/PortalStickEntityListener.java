@@ -14,7 +14,7 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

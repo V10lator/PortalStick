@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.Utils;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.entity.Player;
 
 public class Region extends User 

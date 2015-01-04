@@ -1,6 +1,8 @@
 package org.PortalStick.util;
 
-import org.PortalStick.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.block.BlockFace;
 
 public class PortalCoord {

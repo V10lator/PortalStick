@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Wire;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Block;
 

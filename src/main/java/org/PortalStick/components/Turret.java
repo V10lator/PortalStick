@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.util.BlockStorage;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

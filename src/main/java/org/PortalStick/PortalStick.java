@@ -33,11 +33,9 @@ import org.PortalStick.managers.PortalManager;
 import org.PortalStick.managers.RegionManager;
 import org.PortalStick.managers.UserManager;
 import org.PortalStick.managers.WireManager;
-import org.PortalStick.util.BlockUtil;
 import org.PortalStick.util.Config;
 import org.PortalStick.util.I18n;
 import org.PortalStick.util.Util;
-import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -50,6 +48,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.sanjay900.nmsUtil.NMSUtil;
+import com.sanjay900.nmsUtil.util.BlockUtil;
+import com.sanjay900.nmsUtil.util.V10Location;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class PortalStick extends JavaPlugin {

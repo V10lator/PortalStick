@@ -9,13 +9,17 @@ import org.PortalStick.components.Grill;
 import org.PortalStick.components.Portal;
 import org.PortalStick.components.Region;
 import org.PortalStick.components.Wire;
-import org.PortalStick.fallingblocks.FrozenSand;
-import org.PortalStick.util.LocationIterator;
+
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.V10Location;
+
+import com.sanjay900.nmsUtil.util.LocationIterator;
+import com.sanjay900.nmsUtil.util.V10Location;
+import com.sanjay900.nmsUtil.util.VelocityUtil;
+
 import org.PortalStick.util.V10Teleport;
 import org.PortalStick.util.Config.Sound;
-import org.PortalStick.util.VelocityUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

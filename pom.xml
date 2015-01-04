@@ -105,6 +105,12 @@
 						<configuration>
 							<keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
 							<minimizeJar>true</minimizeJar>
+							<relocations>
+								<relocation>
+									<pattern>com.sanjay900.nmsUtil</pattern>
+									<shadedPattern>com.sanjay900.portalstick.nmsUtil</shadedPattern>
+								</relocation>
+							</relocations>
 						</configuration>
 					</execution>
 				</executions>

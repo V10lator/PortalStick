@@ -24,6 +24,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.sanjay900.nmsUtil.util.V10Location;
+
 
 public class Config {
 

@@ -3,6 +3,8 @@ package org.PortalStick.util;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import com.sanjay900.nmsUtil.util.V10Location;
+
 public class BlockStorage {
 
     private final int id;

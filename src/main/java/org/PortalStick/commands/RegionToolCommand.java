@@ -2,7 +2,7 @@ package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.User;
-import org.PortalStick.util.Utils;
+import com.sanjay900.nmsUtil.util.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
