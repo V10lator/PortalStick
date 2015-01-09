@@ -35,7 +35,7 @@ public class Util {
 	public Util(PortalStick plugin)
 	{
 		this.plugin = plugin;
-		this.nmsUtil = new NMSUtil(plugin);
+		this.nmsUtil = (NMSUtil) Bukkit.getPluginManager().getPlugin("nmsUtil");
 	}
 
 	private void playNativeSound(Sound sound, V10Location loc)
@@ -268,7 +268,7 @@ public class Util {
 		}
 		if (powered) {
 			Sign s = (Sign) sign.getState();
-			if (!s.getLine(2).equals("norespawn")||first&&NMSUtil.checkVersion()) {
+			if (!s.getLine(2).equals("norespawn")||first&&plugin.util.nmsUtil.checkVersion()) {
 				HashMap<String,Object> storedData = new HashMap<>();
 				storedData.put("respawnLoc", loc);
 

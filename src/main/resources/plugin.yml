@@ -1,9 +1,9 @@
 name: PortalStick
 main: org.PortalStick.PortalStick
-version: 5.0-dev5
+version: ${project.version}
 authors: [matejdro, oliverw92, V10lator, sanjay900]
 softdepend: [WorldGuard]
-depend: [ProtocolLib]
+depend: [ProtocolLib, nmsUtil]
 commands:
   portalstick:
     description: Aperture Science Portal Stick

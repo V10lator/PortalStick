@@ -14,7 +14,9 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
+
 import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -31,13 +33,14 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.sanjay900.nmsUtil.events.CubeGroundTickEvent;
+import com.sanjay900.nmsUtil.events.EntityDespawnEvent;
+import com.sanjay900.nmsUtil.events.EntityMoveEvent;
+import com.sanjay900.nmsUtil.events.EntitySpawnEvent;
 
 
 public class PortalStickEntityListener implements Listener {
@@ -159,8 +162,10 @@ public class PortalStickEntityListener implements Listener {
 		}
 	}
 
-	public void spawn(Entity entity)
+	@EventHandler
+	public void spawn(EntitySpawnEvent evt)
 	{
+		Entity entity =evt.getEntity();
 		if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 			return;
 		//	  System.out.print("Spawned: "+entity.getType());
@@ -204,15 +209,9 @@ public class PortalStickEntityListener implements Listener {
 		}
 	}
 	@EventHandler
-	public void worldLoad(WorldLoadEvent evt) {
-		plugin.util.nmsUtil.registerWorld(evt.getWorld());
-	}
-	@EventHandler
-	public void worldUnLoad(WorldUnloadEvent evt) {
-		plugin.util.nmsUtil.deregisterWorld(evt.getWorld().getUID());
-	}
-	public void despawn(Entity entity)
+	public void despawn(EntityDespawnEvent evt)
 	{
+		Entity entity =evt.getEntity();
 		if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 			return;
 		if(entity instanceof FallingBlock) {
@@ -297,12 +296,13 @@ public class PortalStickEntityListener implements Listener {
 		}
 	}
 
-
-	public void entityMove(Entity entity, Location from, Location to)
+	@EventHandler
+	public void entityMove(EntityMoveEvent evt)
 	{
+		Entity entity =evt.getEntity();
 		if(entity instanceof Player || (entity instanceof Vehicle && !(entity instanceof Pig)))
 			return;
-		plugin.entityManager.onEntityMove(entity, from, to, true);
+		plugin.entityManager.onEntityMove(entity, evt.getFrom(), evt.getTo(), true);
 	}
 
 	@EventHandler

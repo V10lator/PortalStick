@@ -3,26 +3,26 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.PortalStick</groupId>
 	<artifactId>portalStick</artifactId>
-	<version>5.0-SNAPSHOT</version>
+	<version>5.0-dev5</version>
 	<name>PortalStick</name>
 	<description>A plugin that aims to emulate the portal game in bukkit</description>
 	<repositories>
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/groups/public</url>
-		</repository>
-		<repository>
 			<id>shadowvault-releases</id>
 			<name>Comphenix Maven Releases</name>
-			<url>http://ci.shadowvolt.com/plugin/repository/everything/</url>
+			<url>http://ci.shadowvolt.com/plugin/repository/project/ProtocolLib/LastSuccessful/repository/</url>
 		</repository>
 		<repository>
-			<id>sk89q-repo</id>
-			<url>http://maven.sk89q.com/repo/</url>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
 			<id>sanjay900-repo</id>
 			<url>http://ci.eyrenetwork.net/plugin/repository/everything/</url>
+		</repository>
+		<repository>
+			<id>sk89q-repo</id>
+			<url>http://maven.sk89q.com/repo/</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -117,5 +117,15 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>src/main</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.java</include>
+					<include>**/*.yml</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 </project>
