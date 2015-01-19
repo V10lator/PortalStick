@@ -237,8 +237,20 @@ public class FunnelBridgeManager {
 								.getBlockData());
 				FrozenSand fblock = new FrozenSandFactory(plugin, plugin.util.nmsUtil).withLocation(fb.getLocation()).withText(id).build();
 				cubeinFunnel.put(fblock, funnel);
-				fblock.spawnloc=c.<V10Location>getStored("respawnLoc");
+				fblock.setData("respawnLoc",c.<V10Location>getStored("respawnLoc"));
 				entity.remove();
+			} else {
+				if (plugin.gelManager.flyingGels.containsKey(fb.getUniqueId())) {
+					Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
+					if (bridge == null) return;
+					String id = String.valueOf(fb
+							.getMaterial().getId())+":"+String.valueOf(fb
+									.getBlockData());
+					FrozenSand fblock = new FrozenSandFactory(plugin, plugin.util.nmsUtil).withLocation(fb.getLocation()).withText(id).build();
+					fblock.setData("dispenser", plugin.gelManager.flyingGels.get(fb.getUniqueId()));
+					cubeinFunnel.put(fblock, funnel);
+					entity.remove();
+				}
 			}
 			
 		}

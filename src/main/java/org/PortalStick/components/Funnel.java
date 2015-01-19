@@ -6,13 +6,16 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.PortalStick.PortalStick;
+
 import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
 import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 
 public class Funnel extends Bridge {
 	private boolean reversed = false;
@@ -168,8 +171,16 @@ public class Funnel extends Bridge {
 			Entry<FrozenSand, Funnel> e = it.next();
 			if (e.getValue() == this) {
 				HashMap<String,Object> storedData = new HashMap<>();
-				storedData.put("respawnLoc", e.getKey().spawnloc);
+				//Cubes don't have a null spawnLoc
+				if (e.getKey().<V10Location>getData("respawnLoc") != null) {
+				storedData.put("respawnLoc", e.getKey().<V10Location>getData("respawnLoc"));
 				plugin.util.nmsUtil.createCube(e.getKey().getLocation(), e.getKey().getMaterial(), e.getKey().getData(), storedData);
+				} else {
+					//We are dealing with gel
+					FallingBlock fb = e.getKey().getLocation().getWorld().spawnFallingBlock(e.getKey().getLocation(), e.getKey().blockId, (byte) e.getKey().blockData);
+					fb.setDropItem(false);
+					plugin.gelManager.flyingGels.put(fb.getUniqueId(), e.getKey().<V10Location>getData("dispenser"));
+				}
 				e.getKey().remove();
 				it.remove();
 			}

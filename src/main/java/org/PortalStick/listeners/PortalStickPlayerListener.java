@@ -90,10 +90,10 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 	public void interactFunnelCube(Player player, FrozenSand fb) {
 		if (fb.getLocation().distance(player.getLocation())>2||fb.getLocation().distance(player.getEyeLocation())>2) return;
 		Utils.doInventoryUpdate(player, plugin);
-		plugin.cubeManager.cubesPlayer.put(fb.spawnloc, player.getUniqueId());
+		plugin.cubeManager.cubesPlayer.put(fb.<V10Location>getData("respawnLoc"), player.getUniqueId());
 		ItemStack item = new ItemStack(fb.getMaterial(), 1,
 				(short) fb.getData());
-		plugin.cubeManager.cubesPlayerItem.put(fb.spawnloc, item);
+		plugin.cubeManager.cubesPlayerItem.put(fb.<V10Location>getData("respawnLoc"), item);
 
 		player.getInventory().addItem(item);
 		Utils.doInventoryUpdate(player, plugin);
@@ -510,7 +510,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			public void run() {
 				for (FrozenSand f: plugin.util.nmsUtil.frozenSandManager.fakeBlocks.keySet()) {  
 					if (f.entityId+2 == entityID) {
-						if (f.spawnloc == null) {
+						if (f.<V10Location>getData("respawnLoc") == null) {
 						EntityUseAction action = packet.getEntityUseActions().read(0);
 						onPlayerInteract(new PlayerInteractEvent(event.getPlayer(), action == EntityUseAction.INTERACT?Action.RIGHT_CLICK_BLOCK:Action.LEFT_CLICK_BLOCK, event.getPlayer().getItemInHand(), f.getLocation().getBlock(), null));
 						} else {
