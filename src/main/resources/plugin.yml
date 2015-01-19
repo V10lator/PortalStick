@@ -3,7 +3,7 @@ main: org.PortalStick.PortalStick
 version: ${project.version}
 authors: [matejdro, oliverw92, V10lator, sanjay900]
 softdepend: [WorldGuard]
-depend: [ProtocolLib, nmsUtil]
+depend: [ProtocolLib, nmsUtils]
 commands:
   portalstick:
     description: Aperture Science Portal Stick
