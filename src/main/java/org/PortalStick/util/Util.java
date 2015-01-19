@@ -35,7 +35,7 @@ public class Util {
 	public Util(PortalStick plugin)
 	{
 		this.plugin = plugin;
-		this.nmsUtil = (NMSUtil) Bukkit.getPluginManager().getPlugin("nmsUtil");
+		this.nmsUtil = (NMSUtil) Bukkit.getPluginManager().getPlugin("nmsUtils");
 	}
 
 	private void playNativeSound(Sound sound, V10Location loc)
