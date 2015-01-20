@@ -2,6 +2,7 @@
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Bridge;
@@ -12,8 +13,10 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.Wire;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
+
 import com.sanjay900.nmsUtil.util.Utils;
 import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -24,6 +27,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Dropper;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -38,6 +42,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -519,7 +524,6 @@ public class PortalStickBlockListener implements Listener
 		  is.setAmount(is.getAmount() + 1);
 	  }
 	}
-	
 	private class GelTube implements Runnable
 	{
 	  private final V10Location loc;

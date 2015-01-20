@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.PortalStick.PortalStick;
@@ -22,6 +23,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -31,6 +33,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -41,6 +44,7 @@ import com.sanjay900.nmsUtil.events.CubeGroundTickEvent;
 import com.sanjay900.nmsUtil.events.EntityDespawnEvent;
 import com.sanjay900.nmsUtil.events.EntityMoveEvent;
 import com.sanjay900.nmsUtil.events.EntitySpawnEvent;
+import com.sanjay900.nmsUtil.events.FrozenSandCollideWithBlockEvent;
 
 
 public class PortalStickEntityListener implements Listener {
@@ -91,7 +95,70 @@ public class PortalStickEntityListener implements Listener {
 	{
 		this.plugin = plugin;
 	}
-
+	@EventHandler
+	public void gelCollide(FrozenSandCollideWithBlockEvent evt) {
+		V10Location from = evt.getFallingSand().<V10Location>getData("dispenser");
+		if (from != null) {
+			Location loc = evt.getFallingSand().getLocation();
+			V10Location vloc = new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
+			ArrayList<BlockStorage> blocks;
+			if(plugin.gelManager.gels.containsKey(from))
+				blocks = plugin.gelManager.gels.get(from);
+			else
+			{
+				blocks = new ArrayList<BlockStorage>();
+				plugin.gelManager.gels.put(from, blocks);
+			}
+			Block b = loc.getBlock();
+			int mat = evt.getFallingSand().blockId;
+			byte data = (byte) evt.getFallingSand().blockData;
+			BlockStorage bh;
+			Block b2;
+			boolean bl;
+			for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
+			{
+				b2 = b.getRelative(face);
+				if(b2.getType() != Material.AIR && !b2.isLiquid() && b2.getType().isSolid())
+				{
+					bl = false;
+					for(Material mat3: gelBlacklist)
+						if(b2.getType() == mat3)
+						{
+							bl = true;
+							break;
+						}
+					if(bl)
+						continue;
+					vloc = new V10Location(b2);
+					if(plugin.portalManager.insideBlocks.containsKey(vloc) ||
+							plugin.portalManager.behindBlocks.containsKey(vloc) ||
+							plugin.grillManager.borderBlocks.containsKey(vloc) ||
+							plugin.grillManager.insideBlocks.containsKey(vloc) ||
+							plugin.funnelBridgeManager.bridgeBlocks.containsKey(vloc) ||
+							plugin.funnelBridgeManager.bridgeMachineBlocks.containsKey(vloc))
+						continue;
+					bh = new BlockStorage(b2);
+					boolean contains = false;
+					for(BlockStorage bs: blocks) {
+						if(bh.getLocation().equals(bs.getLocation())) {
+							contains = true;
+							break;
+						}
+					}
+					if(!contains)
+					{
+						if(plugin.gelManager.gelMap.containsKey(vloc))
+							bh = plugin.gelManager.gelMap.get(vloc);
+						else
+							plugin.gelManager.gelMap.put(vloc, bh);
+						blocks.add(bh);
+						b2.setTypeIdAndData(mat, data, true);
+					}
+				}
+			}
+			evt.getFallingSand().remove();
+		}
+	}
 	@EventHandler(ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(plugin.config.DisabledWorlds.contains(event.getEntity().getLocation().getWorld().getName()))
@@ -161,7 +228,6 @@ public class PortalStickEntityListener implements Listener {
 			}
 		}
 	}
-
 	@EventHandler
 	public void spawn(EntitySpawnEvent evt)
 	{
@@ -294,6 +360,17 @@ public class PortalStickEntityListener implements Listener {
 			plugin.gelManager.resetPlayer(player);
 			plugin.util.nmsUtil.frozenSandManager.clearFrozenSand(player);
 		}
+	}
+	//Temporary because fallingblock.setItemDrop(false) is bugged.
+	//TODO: Remove when fixed by spigot, or we work out what causes it.
+	@EventHandler
+	public void onItemSpawn(ItemSpawnEvent event){
+	    List<Entity> ents = event.getEntity().getNearbyEntities(1, 1, 1);
+	    for(Entity e : ents){
+	       if (plugin.gelManager.flyingGels.containsKey(e.getUniqueId())) {
+	    	   event.setCancelled(true);
+	       }
+	    }
 	}
 
 	@EventHandler

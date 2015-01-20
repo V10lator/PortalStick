@@ -223,6 +223,7 @@ public class GelManager {
 		  gelMap.remove(bh.getLocation());
 		  tc.add(bh);
 		}
+		
 		gels.remove(loc);
 		Iterator<BlockStorage> iter;
 		BlockStorage bs;
@@ -238,6 +239,15 @@ public class GelManager {
 		    }
 		}
 	  }
+	  ArrayList<FrozenSand> sandtoremove = new ArrayList<>();
+	  for (FrozenSand fb: plugin.util.nmsUtil.frozenSandManager.fakeBlocks.keySet()) {
+		  if (fb.getData("dispenser") != null && fb.<V10Location>getData("dispenser") == loc) {
+			  sandtoremove.add(fb);
+		  }
+	  }
+	  for (FrozenSand fb: sandtoremove) {
+		  fb.remove();
+	  }
 	  World world = loc.getHandle().getWorld();
 	  UUID uuid;
 	  for(Chunk c: world.getLoadedChunks())
@@ -250,6 +260,7 @@ public class GelManager {
 			flyingGels.remove(uuid);
 		  }
 		}
+	  
 	}
 	
 	public void removeGel(BlockStorage bh)

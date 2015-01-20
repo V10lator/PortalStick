@@ -242,7 +242,7 @@ public class Util {
 				}
 			}
 		}
-		if (en != null) 
+		if (en != null) {
 			if(plugin.cubeManager.buttonsToEntity.containsKey(en.getUniqueID())) {
 				V10Location vloc = plugin.cubeManager.buttonsToEntity.get(en.getUniqueID());
 				plugin.cubeManager.buttonsToEntity.remove(en.getUniqueID());
@@ -251,6 +251,7 @@ public class Util {
 				}
 			}
 		en.getBukkitEntity().remove();
+		}
 
 		if (plugin.cubeManager.cubesPlayer.containsKey(loc)) {
 			Player p = Bukkit.getPlayer(plugin.cubeManager.cubesPlayer.get(loc));
