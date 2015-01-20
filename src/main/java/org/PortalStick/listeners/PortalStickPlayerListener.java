@@ -419,7 +419,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 									return;
 								if (p.getItemInHand() != null &&
 										p.getItemInHand()
-										.getAmount() - 1 > 1) {
+										.getAmount() - 1 > 0) {
 									ItemStack hand = p.getItemInHand();
 									hand.setAmount(p.getItemInHand()
 											.getAmount() - 1);

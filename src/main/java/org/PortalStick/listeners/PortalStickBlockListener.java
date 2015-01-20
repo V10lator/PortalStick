@@ -452,7 +452,7 @@ public class PortalStickBlockListener implements Listener
 						event.setCancelled(true);
 						return;
 					}
-					
+					/*
 					int numfrom = funnel1.getCounter(loc);
 					int numto = funnel1.getCounter(tb);
 					
@@ -461,6 +461,7 @@ public class PortalStickBlockListener implements Listener
 						event.setCancelled(true);
 						return;
 					}
+					*/
 					
 				
 				}
@@ -660,8 +661,13 @@ public class PortalStickBlockListener implements Listener
 				 }
 				 else
 				 {
-					 if (event.getNewCurrent() > 0)
+					 if (event.getNewCurrent() > 0){
+						 if (bridge instanceof Funnel) {
+							 ((Funnel) bridge).portal = false;
+						 }
 						 bridge.deactivate();
+						 
+					 }
 				     else
 				    	 bridge.activate(); 
 				 }

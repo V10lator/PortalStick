@@ -2,8 +2,11 @@ package org.PortalStick.components;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+
 import org.PortalStick.PortalStick;
+
 import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,12 +15,14 @@ import org.bukkit.block.BlockFace;
 public class Bridge {
 	final PortalStick plugin;
 	
-	public final LinkedHashMap<V10Location, Integer> bridgeBlocks = new LinkedHashMap<V10Location, Integer>();
+	public final LinkedHashMap<V10Location, BlockFace> bridgeBlocks = new LinkedHashMap<V10Location, BlockFace>();
 	public final HashSet<Portal> involvedPortals = new HashSet<Portal>();
 	HashSet<V10Location> bridgeMachineBlocks = new HashSet<V10Location>();
 	V10Location startBlock;
 	public V10Location creationBlock;
 	public BlockFace facingSide;
+
+	public boolean portal = false;
 
 	public Bridge(PortalStick plugin, V10Location creationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks)
 	{
@@ -83,7 +88,7 @@ public class Bridge {
 			  return;
 			
 			nextBlock.setType(Material.GLASS);
-			bridgeBlocks.put(nextV10Location, 0);
+			bridgeBlocks.put(nextV10Location, face);
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextV10Location, this);
 			
 			if(!nextBlock.getWorld().isChunkLoaded(((int)nextV10Location.getX() + face.getModX()) / 16,((int)nextV10Location.getZ() + face.getModX()) / 16))
@@ -91,6 +96,7 @@ public class Bridge {
 			
 			nextBlock = nextBlock.getRelative(face);
 			nextV10Location = new V10Location(nextBlock);
+			this.portal = false;
 		}
 	}
 	

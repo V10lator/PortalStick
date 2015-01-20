@@ -1,26 +1,26 @@
 package org.PortalStick.components;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.PortalStick.PortalStick;
-
-import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
-import com.sanjay900.nmsUtil.util.V10Location;
-
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.util.V10Location;
+
 public class Funnel extends Bridge {
 	private boolean reversed = false;
 	public boolean activated = true;
-	
+
+	public ArrayList<V10Location> throughPortal = new ArrayList<>();
 	public Funnel(PortalStick plugin, V10Location CreationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks) {
 		super(plugin, CreationBlock, startingBlock, face, machineBlocks);
 	}
@@ -28,26 +28,13 @@ public class Funnel extends Bridge {
 	public void setReverse(boolean value)
 	{
 		reversed = value;
-		activate();
+		//activate();
 	}
 	
 	public BlockFace getDirection(Block block)
 	{
 		V10Location vb = new V10Location(block);
-		if (!bridgeBlocks.containsKey(vb)) return null;
-		
-		int curnum = bridgeBlocks.get(vb);
-		BlockFace face = null;
-		for (BlockFace check : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN})
-		{
-			vb = new V10Location(block.getRelative(check));
-			if (bridgeBlocks.containsKey(vb) && (curnum - bridgeBlocks.get(vb) == 1 || bridgeBlocks.get(vb) > curnum + 1) )			{
-				face = check;
-				break;
-			}
-		}
-		if (face == null) return null;
-		
+		BlockFace face =  bridgeBlocks.get(vb);		
 		if (reversed) face = face.getOppositeFace();
 		
 		return face;
@@ -67,24 +54,22 @@ public class Funnel extends Bridge {
 		}
 		
 		return face;
-	}
-	
-	public int getCounter(V10Location block)
-	{
-		return bridgeBlocks.get(block);
-	}
-	
+	}	
 	@Override
 	public void activate()
 	{
 		activated = true;
 		//deactivate first for cleanup
-		deactivate();
+		if (portal) {
+		deactivateThroughPortal();
+		} else {
+			deactivate();
+		}
 		
 		BlockFace face = facingSide;
 		V10Location nextLibigotLocation = startBlock;
 		Block nextBlock = nextLibigotLocation.getHandle().getBlock();
-		int counter = reversed ? 1 : 8;
+		boolean inPortal = false;
 		while (true)
 		{
 			Portal portal = null;
@@ -122,6 +107,7 @@ public class Funnel extends Bridge {
 			  
 			  involvedPortals.add(portal);
 			  plugin.funnelBridgeManager.involvedPortals.put(portal, this);
+			  inPortal = true;
 			  continue;
 			}
 			else if (nextBlock.getY() > nextBlock.getWorld().getMaxHeight() - 1 || nextBlock.getY() < 1 || (!nextBlock.isLiquid() && nextBlock.getType() != Material.AIR))
@@ -130,21 +116,10 @@ public class Funnel extends Bridge {
 			if (!nextBlock.getWorld().isChunkLoaded(nextBlock.getChunk())) return;
 			nextBlock.setType(Material.WATER);
 			nextBlock.setData((byte)0);
-			/*
-			if (counter < 0) counter = 8;
-			if (counter > 0)
-			{
-				nextBlock.setType(Material.WATER);
-				byte data;
-				if(reversed)
-				  data = (byte)(counter - 1);
-				else
-				  data = (byte)(8 - counter);
-				if (face != BlockFace.UP && face != BlockFace.DOWN) nextBlock.setData((byte)0);
+			bridgeBlocks.put(nextLibigotLocation, face);
+			if (inPortal) {
+				throughPortal.add(nextLibigotLocation);
 			}
-			counter--;
-			*/	
-			bridgeBlocks.put(nextLibigotLocation, counter);
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextLibigotLocation, this);
 			
 			nextBlock = nextBlock.getRelative(face);
@@ -152,6 +127,36 @@ public class Funnel extends Bridge {
 		}
 	}
 	
+	private void deactivateThroughPortal() {
+		for (V10Location b : throughPortal)
+		{
+			b.getHandle().getBlock().setType(Material.AIR);
+			plugin.funnelBridgeManager.bridgeBlocks.remove(b);
+			Iterator<Entry<FrozenSand, Funnel>> it = plugin.funnelBridgeManager.cubeinFunnel.entrySet().iterator();
+			while (it.hasNext()) {
+				Entry<FrozenSand, Funnel> e = it.next();
+				if (e.getValue() == this) {
+					if (!new V10Location(e.getKey().getLocation().getBlock()).equals(b)) continue;
+					HashMap<String,Object> storedData = new HashMap<>();
+					//Cubes don't have a null spawnLoc
+					if (e.getKey().<V10Location>getData("respawnLoc") != null) {
+					storedData.put("respawnLoc", e.getKey().<V10Location>getData("respawnLoc"));
+					plugin.util.nmsUtil.createCube(e.getKey().getLocation(), e.getKey().getMaterial(), e.getKey().getData(), storedData);
+					} else {
+						//We are dealing with gel
+						FallingBlock fb = e.getKey().getLocation().getWorld().spawnFallingBlock(e.getKey().getLocation(), e.getKey().blockId, (byte) e.getKey().blockData);
+						fb.setDropItem(false);
+						plugin.gelManager.flyingGels.put(fb.getUniqueId(), e.getKey().<V10Location>getData("dispenser"));
+					}
+					plugin.util.nmsUtil.frozenSandManager.remove(e.getKey());
+					it.remove();
+				}
+			}
+		}
+		throughPortal.clear();
+		deactivate();
+	}
+
 	@Override
 	public void deactivate()
 	{
@@ -164,9 +169,8 @@ public class Funnel extends Bridge {
 		bridgeBlocks.clear();
 		for (Portal p: involvedPortals)
 			plugin.funnelBridgeManager.involvedPortals.remove(p);
-		for (Entity e : plugin.funnelBridgeManager.glassBlocks.keySet())
-			plugin.funnelBridgeManager.EntityExitsFunnel(e);
 		Iterator<Entry<FrozenSand, Funnel>> it = plugin.funnelBridgeManager.cubeinFunnel.entrySet().iterator();
+		if (!this.portal) { 
 		while (it.hasNext()) {
 			Entry<FrozenSand, Funnel> e = it.next();
 			if (e.getValue() == this) {
@@ -181,9 +185,10 @@ public class Funnel extends Bridge {
 					fb.setDropItem(false);
 					plugin.gelManager.flyingGels.put(fb.getUniqueId(), e.getKey().<V10Location>getData("dispenser"));
 				}
-				e.getKey().remove();
+				plugin.util.nmsUtil.frozenSandManager.remove(e.getKey());
 				it.remove();
 			}
+		}
 		}
 		involvedPortals.clear();
 	}

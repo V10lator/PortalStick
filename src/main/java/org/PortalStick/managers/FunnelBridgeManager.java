@@ -40,8 +40,6 @@ public class FunnelBridgeManager {
 	public HashMap<V10Location, Bridge> bridgeMachineBlocks = new HashMap<V10Location, Bridge>();
 	private HashMap<Entity,Funnel> inFunnel = new HashMap<Entity,Funnel>();
 	public HashMap<FrozenSand,Funnel> cubeinFunnel = new HashMap<FrozenSand,Funnel>();
-	public HashMap<Entity, List<V10Location>> glassBlocks = new HashMap<Entity, List<V10Location>>();
-//	private HashMap<LibigotLocation, Entity> glassBlockOwners = new HashMap<LibigotLocation, Entity>();
 
 	public boolean placeGlassBridge(Player player, V10Location first)
 	{
@@ -137,7 +135,8 @@ public class FunnelBridgeManager {
 			for (V10Location b: portal.coord.inside)
 			{
 			    if(b != null && (cbridge.isBlockNextToBridge(b) || cbridge.isBlockNextToBridge(new V10Location(b.getWorldName(), b.getX(), b.getY() - 1, b.getZ()))))
-			        cbridge.activate();
+			        cbridge.portal = true;
+			    	cbridge.activate();
 			}
 		}
 	}

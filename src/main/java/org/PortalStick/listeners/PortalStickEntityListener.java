@@ -99,6 +99,7 @@ public class PortalStickEntityListener implements Listener {
 	public void gelCollide(FrozenSandCollideWithBlockEvent evt) {
 		V10Location from = evt.getFallingSand().<V10Location>getData("dispenser");
 		if (from != null) {
+			if (plugin.entityManager.teleportFallingFunnel(evt.getFallingSand(),new V10Location(evt.getBlock()))) return;
 			Location loc = evt.getFallingSand().getLocation();
 			V10Location vloc = new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
 			ArrayList<BlockStorage> blocks;

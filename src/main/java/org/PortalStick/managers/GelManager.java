@@ -246,7 +246,7 @@ public class GelManager {
 		  }
 	  }
 	  for (FrozenSand fb: sandtoremove) {
-		  fb.remove();
+		  plugin.util.nmsUtil.frozenSandManager.remove(fb);
 	  }
 	  World world = loc.getHandle().getWorld();
 	  UUID uuid;
