@@ -158,6 +158,7 @@ public class PortalStickEntityListener implements Listener {
 				}
 			}
 			plugin.util.nmsUtil.frozenSandManager.remove(evt.getFallingSand());
+			plugin.funnelBridgeManager.cubeinFunnel.remove(evt.getFallingSand());
 		}
 	}
 	@EventHandler(ignoreCancelled = true)

@@ -75,11 +75,19 @@ public class FunnelBridgeManager {
 		
 		//Check if two irons have redstone torches on them
 		Boolean havetorch = false;
+		Boolean torchOn = true;
 		for (BlockFace check : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP})
 		{
 			if (firstIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
+				machineBlocks.add(new V10Location(firstIron.getRelative(check)));
+				break;
+			}
+			if (firstIron.getRelative(check).getType() == Material.REDSTONE_TORCH_OFF)
+			{
+				havetorch = true;
+				torchOn = false;
 				machineBlocks.add(new V10Location(firstIron.getRelative(check)));
 				break;
 			}
@@ -91,6 +99,13 @@ public class FunnelBridgeManager {
 			if (secondIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
+				machineBlocks.add(new V10Location(secondIron.getRelative(check)));
+				break;
+			}
+			if (secondIron.getRelative(check).getType() == Material.REDSTONE_TORCH_OFF)
+			{
+				havetorch = true;
+				torchOn = false;
 				machineBlocks.add(new V10Location(secondIron.getRelative(check)));
 				break;
 			}
@@ -115,8 +130,10 @@ public class FunnelBridgeManager {
 			bridge = new Bridge(plugin, first, new V10Location(startingBlock), face, machineBlocks);
 		else
 			bridge = new Funnel(plugin, first, new V10Location(startingBlock), face, machineBlocks);
-		bridge.activate();
 		
+		if (torchOn) {
+		bridge.activate();
+		}
 		for (V10Location b: machineBlocks)
 			bridgeMachineBlocks.put(b, bridge);
 		bridges.add(bridge);
