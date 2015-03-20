@@ -12,8 +12,10 @@ import org.PortalStick.components.User;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.PortalCoord;
 import org.PortalStick.util.RegionSetting;
+
 import com.sanjay900.nmsUtil.util.Utils;
 import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.PortalStick.util.Config.Sound;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -69,6 +71,7 @@ public class PortalManager {
 	  }
 	}
 	
+	@SuppressWarnings("deprecation")
 	private boolean checkPortal(PortalCoord portal)
 	{
 		Region region;
@@ -328,6 +331,7 @@ public class PortalManager {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void tryPlacingAutomatedPortal(Block rb)
 	{
 		//Check if wool is correct

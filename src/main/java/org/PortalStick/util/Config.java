@@ -97,6 +97,7 @@ public class Config {
 		saveAll();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void load() {
 		try {
 			mainConfig = plugin.getConfig();

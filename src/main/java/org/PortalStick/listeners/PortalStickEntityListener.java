@@ -15,15 +15,11 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
-
-import com.sanjay900.nmsUtil.util.V10Location;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -32,19 +28,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.sanjay900.nmsUtil.events.CubeGroundTickEvent;
+import com.sanjay900.nmsUtil.events.EntityCollidedWithEntityImplEvent;
 import com.sanjay900.nmsUtil.events.EntityDespawnEvent;
 import com.sanjay900.nmsUtil.events.EntityMoveEvent;
 import com.sanjay900.nmsUtil.events.EntitySpawnEvent;
 import com.sanjay900.nmsUtil.events.FrozenSandCollideWithBlockEvent;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 
 public class PortalStickEntityListener implements Listener {
@@ -276,6 +274,7 @@ public class PortalStickEntityListener implements Listener {
 			plugin.entityManager.checkPiston(event.getBlock().getLocation(), event.getEntity());
 		}
 	}
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void despawn(EntityDespawnEvent evt)
 	{
@@ -406,10 +405,19 @@ public class PortalStickEntityListener implements Listener {
 		}
 	}
 	@EventHandler
+	public void cubeCollideBlock(EntityCollidedWithEntityImplEvent evt) {
+		Entity en = evt.getImplementedEntity().getBukkitEntity();
+		Vector v = en.getLocation().toVector().subtract(evt.getCollisionEntity().getLocation().toVector());
+		Location l = en.getLocation().add(v).getBlock().getLocation();
+		plugin.entityManager.teleport(en, en.getLocation(), en.getLocation(), new V10Location(l), en.getVelocity(), true);
+		
+	}
+	@SuppressWarnings("deprecation")
+	@EventHandler
 	public void cubeGroundTick(CubeGroundTickEvent evt) {
 		Block blockloc = evt.getLocation().getBlock();
 		org.bukkit.block.Block blockUnder = evt.getCube().getBukkitEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
-		if (blockUnder.getType() == Material.LAVA) {
+		if (blockUnder.getType().name().contains("LAVA")|| blockloc.getType().name().contains("LAVA")) {
 			plugin.util.clear(evt.getCube().<V10Location>getStored("respawnLoc").getHandle().getBlock(), true, ((FallingBlock)evt.getCube().getBukkitEntity()).getBlockId(), ((FallingBlock)evt.getCube().getBukkitEntity()).getBlockData(), plugin.cubeManager.cubesign.get(evt.getCube().<V10Location>getStored("respawnLoc")).getHandle().getBlock(), evt.getCube());
 			evt.getCube().getBukkitEntity().remove();
 			return;

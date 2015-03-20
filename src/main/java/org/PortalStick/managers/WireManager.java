@@ -4,11 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.PortalStick.PortalStick;
-import org.PortalStick.components.Wire;
-
-import com.sanjay900.nmsUtil.util.Utils;
-import com.sanjay900.nmsUtil.util.V10Location;
-
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,6 +11,9 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.inventory.ItemStack;
+
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 public class WireManager {
     private final PortalStick plugin;

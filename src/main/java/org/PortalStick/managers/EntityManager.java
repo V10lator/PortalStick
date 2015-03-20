@@ -9,17 +9,9 @@ import org.PortalStick.components.Grill;
 import org.PortalStick.components.Portal;
 import org.PortalStick.components.Region;
 import org.PortalStick.components.Wire;
-
-import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
-
-import org.PortalStick.util.RegionSetting;
-
-import com.sanjay900.nmsUtil.util.LocationIterator;
-import com.sanjay900.nmsUtil.util.V10Location;
-import com.sanjay900.nmsUtil.util.VelocityUtil;
-
-import org.PortalStick.util.V10Teleport;
 import org.PortalStick.util.Config.Sound;
+import org.PortalStick.util.RegionSetting;
+import org.PortalStick.util.V10Teleport;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,19 +19,22 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.material.Directional;
 import org.bukkit.util.Vector;
+
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.util.LocationIterator;
+import com.sanjay900.nmsUtil.util.V10Location;
+import com.sanjay900.nmsUtil.util.VelocityUtil;
 
 
 public class EntityManager implements Runnable {
@@ -55,7 +50,6 @@ public class EntityManager implements Runnable {
 		
 		if (entity == null || entity.isDead())
 		  return null;
-
 		Region regionTo = plugin.regionManager.getRegion(locTo);
 		Portal portal = plugin.portalManager.insideBlocks.get(locTo);
 		V10Location lTeleport;
@@ -277,7 +271,7 @@ public class EntityManager implements Runnable {
         		break;
         }
 		
-		if (!(entity instanceof Player) && !(entity instanceof Chicken) && !(entity instanceof Bat) && (portal.coord.teleportFace == BlockFace.UP || portal.coord.teleportFace == BlockFace.DOWN) && (destination.coord.teleportFace == BlockFace.UP || destination.coord.teleportFace == BlockFace.DOWN) && plugin.rand.nextInt(100) < 5)
+		if (!(entity instanceof Player)&& plugin.util.nmsUtil.getCube(entity)==null && !(entity instanceof Chicken) && !(entity instanceof Bat) && (portal.coord.teleportFace == BlockFace.UP || portal.coord.teleportFace == BlockFace.DOWN) && (destination.coord.teleportFace == BlockFace.UP || destination.coord.teleportFace == BlockFace.DOWN) && plugin.rand.nextInt(100) < 5)
 		{
 		  double d = plugin.rand.nextDouble();
 		  if(d > 0.5D)
@@ -296,10 +290,13 @@ public class EntityManager implements Runnable {
 		
 		teleport.setPitch(pitch);
 		teleport.setYaw(yaw);
-		
 		if (entity instanceof Arrow)
 			teleport.setY(teleport.getY() + 0.5);
 		destination.disabled = true;
+		if (plugin.util.nmsUtil.getCube(entity)!=null&& destination.coord.teleportFace == BlockFace.UP) {
+			teleport = teleport.getBlock().getLocation();
+			teleport = teleport.add(0.5, 1, 0.5);
+		}
 		if(really)
 		{
 		  if(!plugin.util.nmsUtil.teleport(entity,teleport))
@@ -404,6 +401,7 @@ public class EntityManager implements Runnable {
 		  
 		if (regionTo.getBoolean(RegionSetting.ENABLE_AERIAL_FAITH_PLATES))
 		{
+			/*
 			Block blockStart = null;
 			d = Double.parseDouble(regionTo.getString(RegionSetting.FAITH_PLATE_POWER).split("-")[0]);
 			String faithBlock = regionTo.getString(RegionSetting.FAITH_PLATE_BLOCK);
@@ -439,6 +437,7 @@ public class EntityManager implements Runnable {
 					return null;
 				}
 			}
+			*/
 			checkPiston(locTo, entity);
 		}
 		
@@ -705,20 +704,9 @@ public class EntityManager implements Runnable {
 					lTeleport = destination.coord.teleport[0];
 				  else
 					lTeleport = destination.coord.teleport[1];
+			} else {
+				return false;
 			}
-		  if((entity instanceof FrozenSand||entity instanceof FallingBlock || entity instanceof TNTPrimed) && vector.getX() == 0.0D && vector.getZ() == 0.0D)
-		  {
-			portal = plugin.portalManager.awayBlocksY.get(locTo);
-			if(!plugin.portalManager.awayBlocksY.containsKey(locTo))
-			  return false;
-			portal = plugin.portalManager.awayBlocksY.get(locTo);
-			if(!portal.open)
-			  return false;
-			destination = portal.getDestination();
-			lTeleport = destination.coord.teleport[0];
-		  }
-		  else if((Math.abs(vector.getX()) > 0.5 || (Math.abs(vector.getY()) > 1 || (Math.abs(vector.getZ()) > 0.5))) || entity instanceof Boat || entity instanceof FrozenSand)
-		  {
 			if(!plugin.portalManager.awayBlocks.containsKey(locTo))
 			  return false;
 			portal = plugin.portalManager.awayBlocks.get(locTo);
@@ -771,11 +759,7 @@ public class EntityManager implements Runnable {
 			  else
 				break;
 			}
-		  }
-		  else
-			return false;
 		}
-		
 		Location teleport = lTeleport.getHandle();
 		Block block = teleport.getBlock();
         Material mat = block.getType();
@@ -874,7 +858,7 @@ public class EntityManager implements Runnable {
         		break;
         }
 		
-		if (!(entity instanceof Player) && !(entity instanceof Chicken) && !(entity instanceof Bat) && (portal.coord.teleportFace == BlockFace.UP || portal.coord.teleportFace == BlockFace.DOWN) && (destination.coord.teleportFace == BlockFace.UP || destination.coord.teleportFace == BlockFace.DOWN) && plugin.rand.nextInt(100) < 5)
+		if ((portal.coord.teleportFace == BlockFace.UP || portal.coord.teleportFace == BlockFace.DOWN) && (destination.coord.teleportFace == BlockFace.UP || destination.coord.teleportFace == BlockFace.DOWN) && plugin.rand.nextInt(100) < 5)
 		{
 		  double d = plugin.rand.nextDouble();
 		  if(d > 0.5D)
@@ -891,10 +875,9 @@ public class EntityManager implements Runnable {
 		
 		teleport.setPitch(pitch);
 		teleport.setYaw(yaw);
-		
-		if (entity instanceof Arrow)
-			teleport.setY(teleport.getY() + 0.5);
 		destination.disabled = true;
+		
+		
 		entity.teleport(teleport);
 		  entity.setVelocity(outvector);
 		

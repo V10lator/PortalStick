@@ -2,7 +2,9 @@ package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.User;
+
 import com.sanjay900.nmsUtil.util.Utils;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,6 +14,7 @@ public class RegionToolCommand extends BaseCommand {
 		super(plugin, "regiontool", 0, "<- enable/disable region selection mode", true);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public boolean execute() {
 		User user = plugin.userManager.getUser(player);
 		if (user.usingTool) {

@@ -117,6 +117,7 @@ public class Util {
 		return Integer.parseInt(plugin.config.ColorPresets.get(preset).split("-")[1]);
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean isPortalGun(ItemStack item) {
 		return item != null && item.getTypeId() == plugin.config.PortalTool &&
 				item.getDurability() == plugin.config.portalToolData &&
@@ -125,6 +126,7 @@ public class Util {
 	}
 
 	public ItemStack createPortalGun() {
+		@SuppressWarnings("deprecation")
 		ItemStack gun = new ItemStack(plugin.config.PortalTool, 1, plugin.config.portalToolData);
 		Utils.setItemNameAndDesc(gun, plugin.config.portalToolName, plugin.config.portalToolDesc);
 		return gun;
@@ -134,16 +136,14 @@ public class Util {
 		changeBtn(middle.getHandle().getBlock(), on);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void changeBtn(Block middle, boolean on) {
 		Block under = middle.getRelative(BlockFace.DOWN);
 		byte data;
-		byte ldata;
 		if(on) {
 			data = 5;
-			ldata = 8;
 		} else {
 			data = 14;
-			ldata = 0;
 		}
 		for (BlockFace f : blockfaces)
 			middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), data, true);
@@ -201,6 +201,7 @@ public class Util {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void changeBtnInner(Block middle, boolean on) {
 		Material mat;
 		byte data;
@@ -230,6 +231,7 @@ public class Util {
 	public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign, EntityCubeImpl en) {
 		clear(hatchMiddle, powered, id, data, sign, false, en);
 	}
+	@SuppressWarnings("deprecation")
 	public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign, boolean first, EntityCubeImpl en) {
 		V10Location loc = new V10Location(hatchMiddle);
 		if (en == null) {
@@ -269,7 +271,7 @@ public class Util {
 		}
 		if (powered) {
 			Sign s = (Sign) sign.getState();
-			if (!s.getLine(2).equals("norespawn")||first&&plugin.util.nmsUtil.checkVersion()) {
+			if ((!s.getLine(2).equals("norespawn")||first)&&plugin.util.nmsUtil.checkVersion()) {
 				HashMap<String,Object> storedData = new HashMap<>();
 				storedData.put("respawnLoc", loc);
 
@@ -279,6 +281,7 @@ public class Util {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public Block chkBtn (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;
@@ -332,6 +335,7 @@ public class Util {
 
 
 
+	@SuppressWarnings("deprecation")
 	public Block chkBtnInner (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;

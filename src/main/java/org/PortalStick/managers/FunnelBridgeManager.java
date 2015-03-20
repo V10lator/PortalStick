@@ -2,18 +2,13 @@ package org.PortalStick.managers;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Bridge;
 import org.PortalStick.components.Funnel;
 import org.PortalStick.components.Portal;
 import org.PortalStick.components.Region;
-import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
-import com.sanjay900.nmsUtil.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.RegionSetting;
-import com.sanjay900.nmsUtil.util.Utils;
-import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,6 +19,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.sanjay900.nmsUtil.EntityCubeImpl;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSandFactory;
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 
 public class FunnelBridgeManager {
@@ -145,7 +144,7 @@ public class FunnelBridgeManager {
 	{
 		Bridge bridge = involvedPortals.get(portal);
 		if (bridge != null)
-			bridge.activate();
+			bridge.reorient(portal.coord.inside);
 		
 		for (Bridge cbridge : bridges)
 		{
@@ -153,7 +152,7 @@ public class FunnelBridgeManager {
 			{
 			    if(b != null && (cbridge.isBlockNextToBridge(b) || cbridge.isBlockNextToBridge(new V10Location(b.getWorldName(), b.getX(), b.getY() - 1, b.getZ()))))
 			        cbridge.portal = true;
-			    	cbridge.activate();
+			    	cbridge.reorient(portal.coord.inside);
 			}
 		}
 	}
@@ -167,7 +166,7 @@ public class FunnelBridgeManager {
 		    	for (Bridge cbridge : bridges)
 				{
 					if (cbridge.isBlockNextToBridge(block))
-						cbridge.activate();
+						cbridge.reorient(block);
 				}
 		    }
 		}, 1L);
@@ -225,6 +224,7 @@ public class FunnelBridgeManager {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void EntityEntersFunnel(final Entity entity, final Funnel funnel)
 	{
 		

@@ -84,10 +84,11 @@ public class Bridge {
 				continue;
 			}
 			else if (nextBlock.getY() > nextBlock.getWorld().getMaxHeight() - 1 ||
-					(!nextBlock.isLiquid() && nextBlock.getType() != Material.AIR))
+					(!nextBlock.isLiquid() && (nextBlock.getType() != Material.AIR||(nextBlock.getType() != Material.STAINED_CLAY))))
 			  return;
 			
-			nextBlock.setType(Material.GLASS);
+			nextBlock.setType(Material.STAINED_CLAY);
+			nextBlock.setData((byte)3);
 			bridgeBlocks.put(nextV10Location, face);
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextV10Location, this);
 			
@@ -133,5 +134,8 @@ public class Bridge {
 	{
 		Location loc = creationBlock.getHandle();
 		return loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ();
+	}
+	public void reorient(V10Location... block) {
+		activate();
 	}
 }

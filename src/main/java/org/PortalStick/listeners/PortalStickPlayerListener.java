@@ -11,12 +11,16 @@ import org.PortalStick.PortalStick;
 import org.PortalStick.components.Portal;
 import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
+
 import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+
 import org.PortalStick.util.Config.Sound;
 import org.PortalStick.util.RegionSetting;
 import org.PortalStick.util.UpdatePlayerView;
+
 import com.sanjay900.nmsUtil.util.Utils;
 import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -59,12 +63,13 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 				PacketType.Play.Client.USE_ENTITY);
 		this.plugin = plugin;
 	}
+	@SuppressWarnings("deprecation")
 	@EventHandler(ignoreCancelled = false)
 	public void cubeInteractEvent(PlayerInteractEntityEvent event) {
-		if (event.getRightClicked().getLocation().distance(event.getPlayer().getLocation())>2||event.getRightClicked().getLocation().distance(event.getPlayer().getEyeLocation())>2) return;
+		if (event.getRightClicked().getLocation().distance(event.getPlayer().getLocation())>2||event.getRightClicked().getLocation().distance(event.getPlayer().getEyeLocation())>3) return;
 		Player player = event.getPlayer();
 		EntityCubeImpl cube = plugin.util.nmsUtil.getCube(event.getRightClicked());
-		if (cube != null) {
+		if (cube != null && !plugin.cubeManager.cubesPlayer.containsKey(cube.<V10Location>getStored("respawnLoc"))) {
 			Utils.doInventoryUpdate(event.getPlayer(), plugin);
 			plugin.cubeManager.cubesPlayer.put(cube.<V10Location>getStored("respawnLoc"), event.getPlayer().getUniqueId());
 			ItemStack item = new ItemStack(((FallingBlock)cube.getBukkitEntity()).getMaterial(), 1,
@@ -91,6 +96,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 		if (fb.getLocation().distance(player.getLocation())>2||fb.getLocation().distance(player.getEyeLocation())>2) return;
 		Utils.doInventoryUpdate(player, plugin);
 		plugin.cubeManager.cubesPlayer.put(fb.<V10Location>getData("respawnLoc"), player.getUniqueId());
+		@SuppressWarnings("deprecation")
 		ItemStack item = new ItemStack(fb.getMaterial(), 1,
 				(short) fb.getData());
 		plugin.cubeManager.cubesPlayerItem.put(fb.<V10Location>getData("respawnLoc"), item);
@@ -110,6 +116,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 		}
 		fb.remove();
 	}
+	@SuppressWarnings("deprecation")
 	@EventHandler(ignoreCancelled = false)
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
@@ -286,10 +293,11 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 			return;
 		Location to = plugin.entityManager.onEntityMove(event.getPlayer(), event.getFrom(), event.getTo(), true);
 		if(to != null) {
-			event.setCancelled(true);
+			event.setTo(to);
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler()
 	public void noPickup(PlayerPickupItemEvent event)
 	{
@@ -356,6 +364,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void trackDrops(PlayerDropItemEvent event)
 	{
@@ -385,6 +394,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 		plugin.userManager.getUser(player).droppedItems.add(item);
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void drop(PlayerDropItemEvent event) {
 		if(plugin.config.DisabledWorlds.contains(event.getPlayer().getLocation().getWorld().getName()))
@@ -443,6 +453,7 @@ public class PortalStickPlayerListener extends PacketAdapter implements Listener
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void death(PlayerDeathEvent event) {
 		if(plugin.config.DisabledWorlds.contains(event.getEntity().getLocation().getWorld().getName()))

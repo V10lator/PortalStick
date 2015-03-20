@@ -130,8 +130,8 @@ public class Wire extends BukkitRunnable {
 						ItemFrame ifr = ((ItemFrame)e);
 						ItemStack i = ifr.getItem();
 		                if (i.getType() == Material.MAP) {
-		                	if (i.getData().getData() == (byte)7 || i.getData().getData() == (byte)11) {
-		                		i.setDurability((short) (on?11:7));
+		                	if (i.getData().getData() == (byte)715 || i.getData().getData() == (byte)716) {
+		                		i.setDurability((short) (on?716:715));
 		                		ifr.setItem(i);
 		                		
 		                	}
