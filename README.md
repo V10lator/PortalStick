@@ -1,4 +1,3 @@
-PortalStick  [![Build Status](http://ci.eyrenetwork.net/job/PortalStick/badge/icon)](http://ci.eyrenetwork.net/job/PortalStick/)
-===========
+THIS IS A DEAD PROJECT
 
-Portal Gun plugin for Minecraft.
+IF YOU WANT TO REUSE CODES SEE THEM AS PUBLIC DOMAIN!
