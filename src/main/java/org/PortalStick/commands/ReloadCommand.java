@@ -1,7 +1,7 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
-import org.PortalStick.util.Utils;
+import com.sanjay900.nmsUtil.util.Utils;
 import org.bukkit.entity.Player;
 
 public class ReloadCommand extends BaseCommand {

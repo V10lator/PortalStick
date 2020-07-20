@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.PortalStick.PortalStick;
-import org.PortalStick.fallingblocks.FrozenSand;
-import org.PortalStick.fallingblocks.FrozenSandFactory;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 

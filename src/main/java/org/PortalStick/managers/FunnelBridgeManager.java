@@ -2,18 +2,13 @@ package org.PortalStick.managers;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Bridge;
 import org.PortalStick.components.Funnel;
 import org.PortalStick.components.Portal;
 import org.PortalStick.components.Region;
-import org.PortalStick.fallingblocks.FrozenSand;
-import org.PortalStick.fallingblocks.FrozenSandFactory;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.Utils;
-import org.PortalStick.util.V10Location;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,6 +19,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.sanjay900.nmsUtil.EntityCubeImpl;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSandFactory;
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 
 public class FunnelBridgeManager {
@@ -40,8 +39,6 @@ public class FunnelBridgeManager {
 	public HashMap<V10Location, Bridge> bridgeMachineBlocks = new HashMap<V10Location, Bridge>();
 	private HashMap<Entity,Funnel> inFunnel = new HashMap<Entity,Funnel>();
 	public HashMap<FrozenSand,Funnel> cubeinFunnel = new HashMap<FrozenSand,Funnel>();
-	public HashMap<Entity, List<V10Location>> glassBlocks = new HashMap<Entity, List<V10Location>>();
-//	private HashMap<LibigotLocation, Entity> glassBlockOwners = new HashMap<LibigotLocation, Entity>();
 
 	public boolean placeGlassBridge(Player player, V10Location first)
 	{
@@ -77,11 +74,19 @@ public class FunnelBridgeManager {
 		
 		//Check if two irons have redstone torches on them
 		Boolean havetorch = false;
+		Boolean torchOn = true;
 		for (BlockFace check : new BlockFace[]{BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP})
 		{
 			if (firstIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
+				machineBlocks.add(new V10Location(firstIron.getRelative(check)));
+				break;
+			}
+			if (firstIron.getRelative(check).getType() == Material.REDSTONE_TORCH_OFF)
+			{
+				havetorch = true;
+				torchOn = false;
 				machineBlocks.add(new V10Location(firstIron.getRelative(check)));
 				break;
 			}
@@ -93,6 +98,13 @@ public class FunnelBridgeManager {
 			if (secondIron.getRelative(check).getType() == Material.REDSTONE_TORCH_ON)
 			{
 				havetorch = true;
+				machineBlocks.add(new V10Location(secondIron.getRelative(check)));
+				break;
+			}
+			if (secondIron.getRelative(check).getType() == Material.REDSTONE_TORCH_OFF)
+			{
+				havetorch = true;
+				torchOn = false;
 				machineBlocks.add(new V10Location(secondIron.getRelative(check)));
 				break;
 			}
@@ -117,8 +129,10 @@ public class FunnelBridgeManager {
 			bridge = new Bridge(plugin, first, new V10Location(startingBlock), face, machineBlocks);
 		else
 			bridge = new Funnel(plugin, first, new V10Location(startingBlock), face, machineBlocks);
-		bridge.activate();
 		
+		if (torchOn) {
+		bridge.activate();
+		}
 		for (V10Location b: machineBlocks)
 			bridgeMachineBlocks.put(b, bridge);
 		bridges.add(bridge);
@@ -130,14 +144,15 @@ public class FunnelBridgeManager {
 	{
 		Bridge bridge = involvedPortals.get(portal);
 		if (bridge != null)
-			bridge.activate();
+			bridge.reorient(portal.coord.inside);
 		
 		for (Bridge cbridge : bridges)
 		{
 			for (V10Location b: portal.coord.inside)
 			{
 			    if(b != null && (cbridge.isBlockNextToBridge(b) || cbridge.isBlockNextToBridge(new V10Location(b.getWorldName(), b.getX(), b.getY() - 1, b.getZ()))))
-			        cbridge.activate();
+			        cbridge.portal = true;
+			    	cbridge.reorient(portal.coord.inside);
 			}
 		}
 	}
@@ -151,7 +166,7 @@ public class FunnelBridgeManager {
 		    	for (Bridge cbridge : bridges)
 				{
 					if (cbridge.isBlockNextToBridge(block))
-						cbridge.activate();
+						cbridge.reorient(block);
 				}
 		    }
 		}, 1L);
@@ -209,6 +224,7 @@ public class FunnelBridgeManager {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void EntityEntersFunnel(final Entity entity, final Funnel funnel)
 	{
 		
@@ -237,8 +253,20 @@ public class FunnelBridgeManager {
 								.getBlockData());
 				FrozenSand fblock = new FrozenSandFactory(plugin, plugin.util.nmsUtil).withLocation(fb.getLocation()).withText(id).build();
 				cubeinFunnel.put(fblock, funnel);
-				fblock.spawnloc=c.<V10Location>getStored("respawnLoc");
+				fblock.setData("respawnLoc",c.<V10Location>getStored("respawnLoc"));
 				entity.remove();
+			} else {
+				if (plugin.gelManager.flyingGels.containsKey(fb.getUniqueId())) {
+					Bridge bridge = bridgeBlocks.get(new V10Location(entity.getLocation()));
+					if (bridge == null) return;
+					String id = String.valueOf(fb
+							.getMaterial().getId())+":"+String.valueOf(fb
+									.getBlockData());
+					FrozenSand fblock = new FrozenSandFactory(plugin, plugin.util.nmsUtil).withLocation(fb.getLocation()).withText(id).build();
+					fblock.setData("dispenser", plugin.gelManager.flyingGels.get(fb.getUniqueId()));
+					cubeinFunnel.put(fblock, funnel);
+					entity.remove();
+				}
 			}
 			
 		}

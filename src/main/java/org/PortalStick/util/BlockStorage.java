@@ -3,13 +3,16 @@ package org.PortalStick.util;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
+import com.sanjay900.nmsUtil.util.V10Location;
+
 public class BlockStorage {
 
     private final int id;
     private final V10Location location;
     private final byte data;
     
-    public BlockStorage(Block block) {
+    @SuppressWarnings("deprecation")
+	public BlockStorage(Block block) {
         this.id = block.getTypeId(); // TODO: Deprecated...
         this.location = new V10Location(block);
         this.data = block.getData();

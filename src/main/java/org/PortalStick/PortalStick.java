@@ -1,10 +1,7 @@
 package org.PortalStick;
 
 import java.util.ArrayList;
-import java.util.Map.Entry;
 import java.util.Random;
-import java.util.UUID;
-
 import org.PortalStick.commands.BaseCommand;
 import org.PortalStick.commands.DeleteAllCommand;
 import org.PortalStick.commands.DeleteCommand;
@@ -33,23 +30,19 @@ import org.PortalStick.managers.PortalManager;
 import org.PortalStick.managers.RegionManager;
 import org.PortalStick.managers.UserManager;
 import org.PortalStick.managers.WireManager;
-import org.PortalStick.util.BlockUtil;
 import org.PortalStick.util.Config;
 import org.PortalStick.util.I18n;
 import org.PortalStick.util.Util;
-import org.PortalStick.util.V10Location;
-import org.bukkit.Bukkit;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.sanjay900.nmsUtil.NMSUtil;
+import com.sanjay900.nmsUtil.util.BlockUtil;
+import com.sanjay900.nmsUtil.util.V10Location;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class PortalStick extends JavaPlugin {
@@ -79,7 +72,6 @@ public class PortalStick extends JavaPlugin {
 		//config.unLoad() handles cleanup, so let's call it
 		wireManager.cleanUpWire();
 		config.unLoad();
-		util.nmsUtil.deregisterAll();
 		getServer().getScheduler().cancelTasks(this);
 		for (V10Location vloc : cubeManager.buttonsToEntity.values()) {
 			util.changeBtn(vloc, false);
@@ -125,15 +117,6 @@ public class PortalStick extends JavaPlugin {
 		tmpList.add(new GetGunCommand(this));
 		tmpList.add(new ToggleTextureCommand(this));
 		commands = tmpList.toArray(new BaseCommand[0]);
-		
-		if (!NMSUtil.checkVersion()) {
-			Bukkit.getLogger().warning("Portalstick does not support this version of Spigot, and as a result the cube is broken.");
-			Bukkit.getLogger().warning("Please don't report problems with the cube to the developers since you are using an unsupported version.");
-		}
-		util.nmsUtil.registerEntities();
-		for (World w: Bukkit.getWorlds()) {
-			util.nmsUtil.registerWorld(w);
-		}
 	}
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String args[])

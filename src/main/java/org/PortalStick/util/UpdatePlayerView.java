@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.User;
-import org.PortalStick.fallingblocks.FrozenSand;
+import com.sanjay900.nmsUtil.fallingblocks.FrozenSand;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 

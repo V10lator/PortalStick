@@ -2,8 +2,11 @@ package org.PortalStick.components;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+
 import org.PortalStick.PortalStick;
-import org.PortalStick.util.V10Location;
+
+import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,12 +15,14 @@ import org.bukkit.block.BlockFace;
 public class Bridge {
 	final PortalStick plugin;
 	
-	public final LinkedHashMap<V10Location, Integer> bridgeBlocks = new LinkedHashMap<V10Location, Integer>();
+	public final LinkedHashMap<V10Location, BlockFace> bridgeBlocks = new LinkedHashMap<V10Location, BlockFace>();
 	public final HashSet<Portal> involvedPortals = new HashSet<Portal>();
 	HashSet<V10Location> bridgeMachineBlocks = new HashSet<V10Location>();
 	V10Location startBlock;
 	public V10Location creationBlock;
 	public BlockFace facingSide;
+
+	public boolean portal = false;
 
 	public Bridge(PortalStick plugin, V10Location creationBlock, V10Location startingBlock, BlockFace face, HashSet<V10Location> machineBlocks)
 	{
@@ -79,11 +84,12 @@ public class Bridge {
 				continue;
 			}
 			else if (nextBlock.getY() > nextBlock.getWorld().getMaxHeight() - 1 ||
-					(!nextBlock.isLiquid() && nextBlock.getType() != Material.AIR))
+					(!nextBlock.isLiquid() && (nextBlock.getType() != Material.AIR||(nextBlock.getType() != Material.STAINED_CLAY))))
 			  return;
 			
-			nextBlock.setType(Material.GLASS);
-			bridgeBlocks.put(nextV10Location, 0);
+			nextBlock.setType(Material.STAINED_CLAY);
+			nextBlock.setData((byte)3);
+			bridgeBlocks.put(nextV10Location, face);
 			plugin.funnelBridgeManager.bridgeBlocks.put(nextV10Location, this);
 			
 			if(!nextBlock.getWorld().isChunkLoaded(((int)nextV10Location.getX() + face.getModX()) / 16,((int)nextV10Location.getZ() + face.getModX()) / 16))
@@ -91,6 +97,7 @@ public class Bridge {
 			
 			nextBlock = nextBlock.getRelative(face);
 			nextV10Location = new V10Location(nextBlock);
+			this.portal = false;
 		}
 	}
 	
@@ -127,5 +134,8 @@ public class Bridge {
 	{
 		Location loc = creationBlock.getHandle();
 		return loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ();
+	}
+	public void reorient(V10Location... block) {
+		activate();
 	}
 }

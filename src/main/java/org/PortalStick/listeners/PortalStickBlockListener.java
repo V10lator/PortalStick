@@ -12,8 +12,6 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.Wire;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.Utils;
-import org.PortalStick.util.V10Location;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -41,6 +39,9 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 public class PortalStickBlockListener implements Listener
 {
@@ -447,7 +448,7 @@ public class PortalStickBlockListener implements Listener
 						event.setCancelled(true);
 						return;
 					}
-					
+					/*
 					int numfrom = funnel1.getCounter(loc);
 					int numto = funnel1.getCounter(tb);
 					
@@ -456,6 +457,7 @@ public class PortalStickBlockListener implements Listener
 						event.setCancelled(true);
 						return;
 					}
+					*/
 					
 				
 				}
@@ -519,7 +521,6 @@ public class PortalStickBlockListener implements Listener
 		  is.setAmount(is.getAmount() + 1);
 	  }
 	}
-	
 	private class GelTube implements Runnable
 	{
 	  private final V10Location loc;
@@ -579,7 +580,7 @@ public class PortalStickBlockListener implements Listener
 		}
 		loc2.setX(loc2.getX()+0.5D);
 		loc2.setZ(loc2.getZ()+0.5D);
-		FallingBlock fb = loc2.getWorld().spawnFallingBlock(loc2, mat, data);
+		FallingBlock fb = loc2.getWorld().spawnFallingBlock(loc2.add(0, -1, 0), mat, data);
 		fb.setDropItem(false);
 		fb.setVelocity(vector);
 		//fb.setPlaceBlock(false); //TODO
@@ -656,8 +657,13 @@ public class PortalStickBlockListener implements Listener
 				 }
 				 else
 				 {
-					 if (event.getNewCurrent() > 0)
+					 if (event.getNewCurrent() > 0){
+						 if (bridge instanceof Funnel) {
+							 ((Funnel) bridge).portal = false;
+						 }
 						 bridge.deactivate();
+						 
+					 }
 				     else
 				    	 bridge.activate(); 
 				 }

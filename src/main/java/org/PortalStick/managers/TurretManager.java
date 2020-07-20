@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.PortalStick.components.Turret;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.entity.Entity;
 
 class TurretManager {

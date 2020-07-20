@@ -2,8 +2,8 @@ package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
 import org.PortalStick.components.Region;
-import org.PortalStick.util.Utils;
-import org.PortalStick.util.V10Location;
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 

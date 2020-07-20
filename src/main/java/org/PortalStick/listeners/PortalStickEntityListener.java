@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.PortalStick.PortalStick;
@@ -14,7 +15,6 @@ import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
 import org.PortalStick.util.BlockStorage;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.V10Location;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -28,16 +28,21 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.sanjay900.nmsUtil.events.CubeGroundTickEvent;
+import com.sanjay900.nmsUtil.events.EntityCollidedWithEntityImplEvent;
+import com.sanjay900.nmsUtil.events.EntityDespawnEvent;
+import com.sanjay900.nmsUtil.events.EntityMoveEvent;
+import com.sanjay900.nmsUtil.events.EntitySpawnEvent;
+import com.sanjay900.nmsUtil.events.FrozenSandCollideWithBlockEvent;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 
 public class PortalStickEntityListener implements Listener {
@@ -88,7 +93,72 @@ public class PortalStickEntityListener implements Listener {
 	{
 		this.plugin = plugin;
 	}
-
+	@EventHandler
+	public void gelCollide(FrozenSandCollideWithBlockEvent evt) {
+		V10Location from = evt.getFallingSand().<V10Location>getData("dispenser");
+		if (from != null) {
+			if (plugin.entityManager.teleportFallingFunnel(evt.getFallingSand(),new V10Location(evt.getBlock()))) return;
+			Location loc = evt.getFallingSand().getLocation();
+			V10Location vloc = new V10Location(loc.getWorld(), (int)loc.getX(), (int)loc.getY(), (int)loc.getZ());
+			ArrayList<BlockStorage> blocks;
+			if(plugin.gelManager.gels.containsKey(from))
+				blocks = plugin.gelManager.gels.get(from);
+			else
+			{
+				blocks = new ArrayList<BlockStorage>();
+				plugin.gelManager.gels.put(from, blocks);
+			}
+			Block b = loc.getBlock();
+			int mat = evt.getFallingSand().blockId;
+			byte data = (byte) evt.getFallingSand().blockData;
+			BlockStorage bh;
+			Block b2;
+			boolean bl;
+			for(BlockFace face: new BlockFace[] {BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP})
+			{
+				b2 = b.getRelative(face);
+				if(b2.getType() != Material.AIR && !b2.isLiquid() && b2.getType().isSolid())
+				{
+					bl = false;
+					for(Material mat3: gelBlacklist)
+						if(b2.getType() == mat3)
+						{
+							bl = true;
+							break;
+						}
+					if(bl)
+						continue;
+					vloc = new V10Location(b2);
+					if(plugin.portalManager.insideBlocks.containsKey(vloc) ||
+							plugin.portalManager.behindBlocks.containsKey(vloc) ||
+							plugin.grillManager.borderBlocks.containsKey(vloc) ||
+							plugin.grillManager.insideBlocks.containsKey(vloc) ||
+							plugin.funnelBridgeManager.bridgeBlocks.containsKey(vloc) ||
+							plugin.funnelBridgeManager.bridgeMachineBlocks.containsKey(vloc))
+						continue;
+					bh = new BlockStorage(b2);
+					boolean contains = false;
+					for(BlockStorage bs: blocks) {
+						if(bh.getLocation().equals(bs.getLocation())) {
+							contains = true;
+							break;
+						}
+					}
+					if(!contains)
+					{
+						if(plugin.gelManager.gelMap.containsKey(vloc))
+							bh = plugin.gelManager.gelMap.get(vloc);
+						else
+							plugin.gelManager.gelMap.put(vloc, bh);
+						blocks.add(bh);
+						b2.setTypeIdAndData(mat, data, true);
+					}
+				}
+			}
+			plugin.util.nmsUtil.frozenSandManager.remove(evt.getFallingSand());
+			plugin.funnelBridgeManager.cubeinFunnel.remove(evt.getFallingSand());
+		}
+	}
 	@EventHandler(ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(plugin.config.DisabledWorlds.contains(event.getEntity().getLocation().getWorld().getName()))
@@ -158,9 +228,10 @@ public class PortalStickEntityListener implements Listener {
 			}
 		}
 	}
-
-	public void spawn(Entity entity)
+	@EventHandler
+	public void spawn(EntitySpawnEvent evt)
 	{
+		Entity entity =evt.getEntity();
 		if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 			return;
 		//	  System.out.print("Spawned: "+entity.getType());
@@ -203,16 +274,11 @@ public class PortalStickEntityListener implements Listener {
 			plugin.entityManager.checkPiston(event.getBlock().getLocation(), event.getEntity());
 		}
 	}
+	@SuppressWarnings("deprecation")
 	@EventHandler
-	public void worldLoad(WorldLoadEvent evt) {
-		plugin.util.nmsUtil.registerWorld(evt.getWorld());
-	}
-	@EventHandler
-	public void worldUnLoad(WorldUnloadEvent evt) {
-		plugin.util.nmsUtil.deregisterWorld(evt.getWorld().getUID());
-	}
-	public void despawn(Entity entity)
+	public void despawn(EntityDespawnEvent evt)
 	{
+		Entity entity =evt.getEntity();
 		if(plugin.config.DisabledWorlds.contains(entity.getLocation().getWorld().getName()))
 			return;
 		if(entity instanceof FallingBlock) {
@@ -296,13 +362,25 @@ public class PortalStickEntityListener implements Listener {
 			plugin.util.nmsUtil.frozenSandManager.clearFrozenSand(player);
 		}
 	}
+	//Temporary because fallingblock.setItemDrop(false) is bugged.
+	//TODO: Remove when fixed by spigot, or we work out what causes it.
+	@EventHandler
+	public void onItemSpawn(ItemSpawnEvent event){
+	    List<Entity> ents = event.getEntity().getNearbyEntities(1, 1, 1);
+	    for(Entity e : ents){
+	       if (plugin.gelManager.flyingGels.containsKey(e.getUniqueId())) {
+	    	   event.setCancelled(true);
+	       }
+	    }
+	}
 
-
-	public void entityMove(Entity entity, Location from, Location to)
+	@EventHandler
+	public void entityMove(EntityMoveEvent evt)
 	{
+		Entity entity =evt.getEntity();
 		if(entity instanceof Player || (entity instanceof Vehicle && !(entity instanceof Pig)))
 			return;
-		plugin.entityManager.onEntityMove(entity, from, to, true);
+		plugin.entityManager.onEntityMove(entity, evt.getFrom(), evt.getTo(), true);
 	}
 
 	@EventHandler
@@ -327,10 +405,19 @@ public class PortalStickEntityListener implements Listener {
 		}
 	}
 	@EventHandler
+	public void cubeCollideBlock(EntityCollidedWithEntityImplEvent evt) {
+		Entity en = evt.getImplementedEntity().getBukkitEntity();
+		Vector v = en.getLocation().toVector().subtract(evt.getCollisionEntity().getLocation().toVector());
+		Location l = en.getLocation().add(v).getBlock().getLocation();
+		plugin.entityManager.teleport(en, en.getLocation(), en.getLocation(), new V10Location(l), en.getVelocity(), true);
+		
+	}
+	@SuppressWarnings("deprecation")
+	@EventHandler
 	public void cubeGroundTick(CubeGroundTickEvent evt) {
 		Block blockloc = evt.getLocation().getBlock();
 		org.bukkit.block.Block blockUnder = evt.getCube().getBukkitEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
-		if (blockUnder.getType() == Material.LAVA) {
+		if (blockUnder.getType().name().contains("LAVA")|| blockloc.getType().name().contains("LAVA")) {
 			plugin.util.clear(evt.getCube().<V10Location>getStored("respawnLoc").getHandle().getBlock(), true, ((FallingBlock)evt.getCube().getBukkitEntity()).getBlockId(), ((FallingBlock)evt.getCube().getBukkitEntity()).getBlockData(), plugin.cubeManager.cubesign.get(evt.getCube().<V10Location>getStored("respawnLoc")).getHandle().getBlock(), evt.getCube());
 			evt.getCube().getBukkitEntity().remove();
 			return;

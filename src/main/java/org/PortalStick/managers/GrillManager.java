@@ -12,7 +12,9 @@ import org.PortalStick.components.Grill;
 import org.PortalStick.components.Region;
 import org.PortalStick.components.User;
 import org.PortalStick.util.RegionSetting;
-import org.PortalStick.util.V10Location;
+
+import com.sanjay900.nmsUtil.util.V10Location;
+
 import org.PortalStick.util.Config.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -190,6 +192,7 @@ public class GrillManager {
     	}
     }
 
+	@SuppressWarnings("deprecation")
 	public void emancipate(Region region, Entity entity)
 	{
 		
@@ -220,13 +223,13 @@ public class GrillManager {
 			if(id == (Integer)is)
 			  return;
 		  }
+		  playGrillAnimation(entity.getLocation());
 		  EntityCubeImpl cb = plugin.util.nmsUtil.getCube(entity);
 		  if (cb != null) {
-			  plugin.util.clear(cb.<V10Location>getStored("respawnLoc").getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), plugin.cubeManager.cubesign.get(cb.<V10Location>getStored("respawnLoc")).getHandle().getBlock(), cb);  
+			  plugin.util.clear(cb.<V10Location>getStored("respawnLoc").getHandle().getBlock(), true, fb.getBlockId(), fb.getBlockData(), plugin.cubeManager.cubesign.get(cb.<V10Location>getStored("respawnLoc")).getHandle().getBlock(), cb);
 		  }
 		  
 		  entity.remove();
-		  playGrillAnimation(entity.getLocation());
 		}
 		return;
 	  }
@@ -401,7 +404,8 @@ public class GrillManager {
 	private ItemStack checkItemSlot(ItemStack slot, List<?> ice, boolean roe, HashSet<Integer> rm)
 	{
 	  boolean remove = true;
-	  int slotId = slot.getTypeId();
+	  @SuppressWarnings("deprecation")
+	int slotId = slot.getTypeId();
 	  int id;
 	  for (Object is: ice)
 	  {

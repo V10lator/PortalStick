@@ -5,7 +5,7 @@
 package org.PortalStick.components;
 
 import org.PortalStick.PortalStick;
-import org.PortalStick.util.Utils;
+import com.sanjay900.nmsUtil.util.Utils;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -130,8 +130,8 @@ public class Wire extends BukkitRunnable {
 						ItemFrame ifr = ((ItemFrame)e);
 						ItemStack i = ifr.getItem();
 		                if (i.getType() == Material.MAP) {
-		                	if (i.getData().getData() == (byte)7 || i.getData().getData() == (byte)11) {
-		                		i.setDurability((short) (on?11:7));
+		                	if (i.getData().getData() == (byte)715 || i.getData().getData() == (byte)716) {
+		                		i.setDurability((short) (on?716:715));
 		                		ifr.setItem(i);
 		                		
 		                	}

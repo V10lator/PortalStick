@@ -1,9 +1,10 @@
 package org.PortalStick.commands;
 
 import org.PortalStick.PortalStick;
-import org.PortalStick.util.Utils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.sanjay900.nmsUtil.util.Utils;
 
 public abstract class BaseCommand {
 	protected final PortalStick plugin;

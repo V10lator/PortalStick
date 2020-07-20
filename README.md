@@ -1,1 +1,3 @@
-Development moved to https://github.com/V10coding/PortalStick
+THIS IS A DEAD PROJECT
+
+IF YOU WANT TO REUSE CODES SEE THEM AS PUBLIC DOMAIN!

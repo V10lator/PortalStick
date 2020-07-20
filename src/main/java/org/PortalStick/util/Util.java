@@ -1,6 +1,7 @@
 package org.PortalStick.util;
 
 import java.util.HashMap;
+
 import org.PortalStick.PortalStick;
 import org.PortalStick.util.Config.Sound;
 import org.bukkit.Bukkit;
@@ -15,8 +16,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Lever;
 import org.bukkit.plugin.Plugin;
+
 import com.sanjay900.nmsUtil.EntityCubeImpl;
 import com.sanjay900.nmsUtil.NMSUtil;
+import com.sanjay900.nmsUtil.util.Utils;
+import com.sanjay900.nmsUtil.util.V10Location;
 
 public class Util {
 	private final PortalStick plugin;
@@ -31,7 +35,7 @@ public class Util {
 	public Util(PortalStick plugin)
 	{
 		this.plugin = plugin;
-		this.nmsUtil = new NMSUtil(plugin);
+		this.nmsUtil = (NMSUtil) Bukkit.getPluginManager().getPlugin("nmsUtils");
 	}
 
 	private void playNativeSound(Sound sound, V10Location loc)
@@ -113,6 +117,7 @@ public class Util {
 		return Integer.parseInt(plugin.config.ColorPresets.get(preset).split("-")[1]);
 	}
 
+	@SuppressWarnings("deprecation")
 	public boolean isPortalGun(ItemStack item) {
 		return item != null && item.getTypeId() == plugin.config.PortalTool &&
 				item.getDurability() == plugin.config.portalToolData &&
@@ -121,6 +126,7 @@ public class Util {
 	}
 
 	public ItemStack createPortalGun() {
+		@SuppressWarnings("deprecation")
 		ItemStack gun = new ItemStack(plugin.config.PortalTool, 1, plugin.config.portalToolData);
 		Utils.setItemNameAndDesc(gun, plugin.config.portalToolName, plugin.config.portalToolDesc);
 		return gun;
@@ -130,16 +136,14 @@ public class Util {
 		changeBtn(middle.getHandle().getBlock(), on);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void changeBtn(Block middle, boolean on) {
 		Block under = middle.getRelative(BlockFace.DOWN);
 		byte data;
-		byte ldata;
 		if(on) {
 			data = 5;
-			ldata = 8;
 		} else {
 			data = 14;
-			ldata = 0;
 		}
 		for (BlockFace f : blockfaces)
 			middle.getRelative(f).setTypeIdAndData(Material.WOOL.getId(), data, true);
@@ -197,6 +201,7 @@ public class Util {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void changeBtnInner(Block middle, boolean on) {
 		Material mat;
 		byte data;
@@ -226,6 +231,7 @@ public class Util {
 	public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign, EntityCubeImpl en) {
 		clear(hatchMiddle, powered, id, data, sign, false, en);
 	}
+	@SuppressWarnings("deprecation")
 	public void clear(Block hatchMiddle, boolean powered, int id, int data, Block sign, boolean first, EntityCubeImpl en) {
 		V10Location loc = new V10Location(hatchMiddle);
 		if (en == null) {
@@ -238,7 +244,7 @@ public class Util {
 				}
 			}
 		}
-		if (en != null) 
+		if (en != null) {
 			if(plugin.cubeManager.buttonsToEntity.containsKey(en.getUniqueID())) {
 				V10Location vloc = plugin.cubeManager.buttonsToEntity.get(en.getUniqueID());
 				plugin.cubeManager.buttonsToEntity.remove(en.getUniqueID());
@@ -247,6 +253,7 @@ public class Util {
 				}
 			}
 		en.getBukkitEntity().remove();
+		}
 
 		if (plugin.cubeManager.cubesPlayer.containsKey(loc)) {
 			Player p = Bukkit.getPlayer(plugin.cubeManager.cubesPlayer.get(loc));
@@ -264,7 +271,7 @@ public class Util {
 		}
 		if (powered) {
 			Sign s = (Sign) sign.getState();
-			if (!s.getLine(2).equals("norespawn")||first&&NMSUtil.checkVersion()) {
+			if ((!s.getLine(2).equals("norespawn")||first)&&plugin.util.nmsUtil.checkVersion()) {
 				HashMap<String,Object> storedData = new HashMap<>();
 				storedData.put("respawnLoc", loc);
 
@@ -274,6 +281,7 @@ public class Util {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public Block chkBtn (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;
@@ -327,6 +335,7 @@ public class Util {
 
 
 
+	@SuppressWarnings("deprecation")
 	public Block chkBtnInner (Location l) {
 		Block blockUnder = l.getBlock().getRelative(BlockFace.DOWN);
 		if (!(blockUnder.getType()==Material.WOOL)) return null;

@@ -24,6 +24,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.sanjay900.nmsUtil.events.EntityDespawnEvent;
+import com.sanjay900.nmsUtil.events.EntitySpawnEvent;
+import com.sanjay900.nmsUtil.util.V10Location;
+
 
 public class Config {
 
@@ -93,6 +97,7 @@ public class Config {
 		saveAll();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void load() {
 		try {
 			mainConfig = plugin.getConfig();
@@ -221,7 +226,7 @@ public class Config {
 		    if(!DisabledWorlds.contains(w.getName())) {
 		        for(Chunk c: w.getLoadedChunks()) {
 		            for(Entity e: c.getEntities()) {
-		                plugin.eL.spawn(e);
+		                plugin.eL.spawn(new EntitySpawnEvent(e));
 		            }
 		        }
 		    }
@@ -297,7 +302,7 @@ public class Config {
 		    if(!DisabledWorlds.contains(w.getName())) {
 		        for(Chunk c: w.getLoadedChunks()) {
 		            for(Entity e: c.getEntities()) {
-		                plugin.eL.despawn(e);
+		                plugin.eL.despawn(new EntityDespawnEvent(e));
 		            }
 		        }
 		    }
